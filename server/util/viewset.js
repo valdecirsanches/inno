@@ -240,7 +240,8 @@ async function valida(ser, dados, { instancia = null, parcial = false } = {}) {
     }
     if (ser.declarados.has(n) || so.has(n)) continue;
     const c = ser.porNome[n];
-    if (!c || c.pk || !c.editavel || c.auto_now || c.auto_now_add) continue;
+    // pk AutoField é só leitura; pk IntegerField comum (ex.: TbWhatsApp) o DRF exige e confere se é única
+    if (!c || (c.pk && ['AutoField', 'BigAutoField'].includes(c.tipo)) || !c.editavel || c.auto_now || c.auto_now_add) continue;
     if (c.tipo === 'FileField' || c.tipo === 'ImageField') continue;   // uploads: tratados pelas rotas que usam
     const d = campoDrf(c);
     let v = obtemValor(dados, c, d, parcial);
@@ -259,7 +260,7 @@ async function valida(ser, dados, { instancia = null, parcial = false } = {}) {
     try { valores[c.atributo] = await converteValor(c, d, v); } catch (e) {
       if (typeof e === 'string') erros[n] = [e]; else throw e;
     }
-    if (!(n in erros) && c.unico && valores[c.atributo] !== null) {
+    if (!(n in erros) && (c.unico || c.pk) && valores[c.atributo] !== null) {
       const q = db.tabela(ser.modelo).where(db.coluna(ser.modelo, c.atributo), valores[c.atributo]);
       if (instancia) q.whereNot(db.coluna(ser.modelo, m.pk), instancia[m.pk]);
       if (await q.first()) erros[n] = [`${capitaliza(m.verbose || ser.modelo)} com este ${c.verbose || n} já existe.`];

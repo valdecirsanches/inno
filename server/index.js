@@ -22,6 +22,8 @@ app.use('/static', express.static(path.join(config.raiz, 'static'), { maxAge: '1
 
 // corpo da requisição como no Django: request.GET / request.POST (QueryDict)
 // e request.data (JSON das chamadas axios / API)
+// o robô do WhatsApp (/webhook/) lê o corpo cru (json.loads(request.body))
+app.use('/webhook', express.raw({ type: () => true, limit: '20mb' }));
 app.use(express.text({ type: 'application/x-www-form-urlencoded', limit: '20mb' }));
 app.use(express.json({ limit: '20mb' }));
 app.use(multipart);

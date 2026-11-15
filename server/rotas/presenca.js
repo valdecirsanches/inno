@@ -52,7 +52,32 @@ function quando(ag) {
   return `${d} de ${MESES[+m - 1]} às ${String(ag.hora).slice(0, 5)}`;
 }
 
-/** ConfirmaPresenca (confirmacao=1) / CancelaPresenca (confirmacao=2) */
+/**
+ * Corpo de ConfirmaPresenca (confirmacao=1) / CancelaPresenca (confirmacao=2)
+ * depois de achar a consulta. Devolve o dicionário do JsonResponse.
+ * req: a requisição (o robô passa um dicionário no lugar: aí ag.save(request)
+ * não marca quem alterou, porque request.user dá erro e o except engole).
+ */
+async function processa(req, ag, novo, campoClinica) {
+  const d = quando(ag);
+  const nomePaciente = async () => pyStr(null, (await rel('TbPacientes', ag.fk_paciente_id) || erroNone('paciente')).paciente);
+  if (ag.confirmacao === 1) return { success: `Olá ${await nomePaciente()},\nA sua consulta em ${d} \njá foi *c o n f i r m a d a !*` };
+  if (ag.confirmacao === 2) return { success: `Olá ${await nomePaciente()},\nA sua consulta em ${d} \njá foi *c a n c e l a d a!*` };
+  ag.confirmacao = novo;
+  ag.confirmacao_dh = db.agora();
+  // TbAgendaCons.save(request): marca quem alterou (só com usuário logado)
+  if (req && req.user && req.user.pk) {
+    ag.id_usuario_alteracao = req.user.pk;
+    ag.dh_alteracao = db.agora();
+  }
+  await modelo.salva(req, A, ag);
+  const pac = await nomePaciente();
+  const cl = await rel('TbClinica', ag.fk_clinica_id);
+  if (!cl) throw erroNone(campoClinica);
+  return { success: `Olá ${pac},\nSua consulta em ${d} \n${pyStr(null, cl[campoClinica])}` };
+}
+
+/** ConfirmaPresenca / CancelaPresenca chamadas pela URL */
 function responde(novo, campoClinica) {
   return a(async (req, res) => {
     let ag;
@@ -63,29 +88,15 @@ function responde(novo, campoClinica) {
       ag = null;
     }
     if (!ag) return json(res, { error: 'Consulta não encontrada' }, 404);
-    const d = quando(ag);
-    const nomePaciente = async () => pyStr(null, (await rel('TbPacientes', ag.fk_paciente_id) || erroNone('paciente')).paciente);
-    let msg;
-    if (ag.confirmacao === 1) {
-      msg = `Olá ${await nomePaciente()},\nA sua consulta em ${d} \njá foi *c o n f i r m a d a !*`;
-    } else if (ag.confirmacao === 2) {
-      msg = `Olá ${await nomePaciente()},\nA sua consulta em ${d} \njá foi *c a n c e l a d a!*`;
-    } else {
-      ag.confirmacao = novo;
-      ag.confirmacao_dh = db.agora();
-      // TbAgendaCons.save(request): marca quem alterou (só com usuário logado)
-      if (req.user && req.user.pk) {
-        ag.id_usuario_alteracao = req.user.pk;
-        ag.dh_alteracao = db.agora();
-      }
-      await modelo.salva(req, A, ag);
-      const pac = await nomePaciente();
-      const cl = await rel('TbClinica', ag.fk_clinica_id);
-      if (!cl) throw erroNone(campoClinica);
-      msg = `Olá ${pac},\nSua consulta em ${d} \n${pyStr(null, cl[campoClinica])}`;
-    }
-    json(res, { success: msg });
+    json(res, await processa(req, ag, novo, campoClinica));
   });
+}
+
+/** ConfirmaPresenca({'id_consulta': ...}) / CancelaPresenca(...) chamadas pelo robô */
+async function peloRobo(req, idConsulta, opcao) {
+  const ag = await db.busca(A, { id: idConsulta });
+  if (!ag) return { error: 'Consulta não encontrada' };
+  return opcao === '1' ? processa(req, ag, 1, 'whatsapp_confirma') : processa(req, ag, 2, 'whatsapp_cancela');
 }
 
 const erroNone = (attr) => erroPython(`'NoneType' object has no attribute '${attr}'`);
@@ -114,4 +125,14 @@ module.exports = function (app) {
   // @csrf_exempt (em rotas/index.js), aceita GET e POST como a view do Django
   app.all('/confirmar-presenca-efetivo/', responde(1, 'whatsapp_confirma'));
   app.all('/cancelar-presenca-efetivo/', responde(2, 'whatsapp_cancela'));
+  // as mesmas views em /whatsapp/ (com login; @csrf_exempt)
+  app.all('/whatsapp/ConfirmaPresenca/', responde(1, 'whatsapp_confirma'));
+  app.all('/whatsapp/CancelaPresenca/', responde(2, 'whatsapp_cancela'));
+  // VerificaPresenca(id, body='') ligada direto a uma URL: recebe o request
+  // no lugar do id e o .get(id=request) dá erro sempre
+  app.all('/whatsapp/VerificaPresenca/', a(async () => {
+    throw erroPython("Field 'id' expected a number but got <WSGIRequest: GET '/whatsapp/VerificaPresenca/'>.");
+  }));
 };
+module.exports.peloRobo = peloRobo;
+module.exports.MESES = MESES;

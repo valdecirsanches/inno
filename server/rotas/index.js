@@ -19,10 +19,13 @@ const MODULOS = [
   require('./painel'),
   require('./presenca'),
   require('./api-memed'),
+  require('./api-whatsapp'),
+  require('./robo'),
 ];
 
 // rotas que no Django tinham @csrf_exempt
-const ISENTOS = [/^\/webhook\//, /^\/confirmar-presenca-efetivo\//, /^\/cancelar-presenca-efetivo\//];
+const ISENTOS = [/^\/webhook\//, /^\/confirmar-presenca-efetivo\//, /^\/cancelar-presenca-efetivo\//,
+  /^\/whatsapp\/(ConfirmaPresenca|CancelaPresenca|VerificaPresenca)\//];
 
 function registra(app) { for (const m of MODULOS) m(app); }
 

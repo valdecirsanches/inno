@@ -30,6 +30,8 @@ O dono do projeto fala português: responda em português.
   `salva` / `exclui` / `excluiLista` (com o log de auditoria em `tb_usuarios_log`).
 - `server/util/viewset.js` + `server/util/serializers.js`: ModelViewSet/serializers do DRF
   para as rotas `/api/` (veja `server/rotas/api-medico.js` como exemplo).
+- `server/util/requests.js`: a biblioteca requests do Python (status_code, ok, json(), Timeout,
+  ConnectionError...); `server/util/whatsapp.js`: o WhatsAppService (servidor WAHA).
 - `server/util/pdf.js`: equivalente do ReportLab (canvas e platypus) para os impressos.
 - `server/db.js`: acesso ao banco, com os tipos de `server/modelos.json`.
   O `modelos.json` tem também três tabelas acrescentadas à mão (o exportador não as gera):
@@ -42,7 +44,8 @@ O dono do projeto fala português: responda em português.
 - Banco de teste: SQLite montado a partir de `server/modelos.json` (`DB_CLIENT=better-sqlite3`).
   Exemplo completo em `tools/impressos/gera_inno.js` (cria as tabelas, faz login e chama as rotas).
 - Rotas: `node tools/testes/etapa5.js` (usuários, painel, logs, presença) e
-  `node tools/testes/etapa6-memed.js` (Memed, com uma Memed falsa local).
+  `node tools/testes/etapa6-memed.js` (Memed) e `node tools/testes/etapa6-whatsapp.js`
+  (WhatsApp e robô), cada um com o serviço externo falso, local.
   Para testes novos, use `tools/testes/base.js` (banco, login e cliente prontos).
   Neste ambiente, rode com `NO_PROXY=127.0.0.1` se houver proxy.
 - Impressos (PDF): `tools/impressos/` roda os `reports.py` originais e compara página a página
@@ -50,5 +53,5 @@ O dono do projeto fala português: responda em português.
 
 ## O que falta (atualize esta lista junto com o README)
 
-- API do WhatsApp (`/api/whatsapp/`, `/whatsapp/...` e o robô em `/webhook/`), que depende do servidor de WhatsApp
-- Admin do Django (`/admin/...`)
+- Admin do Django (`/admin/...`): o AppClinic registra no admin só usuários (TbUsuario) e
+  logs (UserLog); veja `Seguranca/admin.py` e `logs/admin.py`. É a última etapa.

@@ -55,7 +55,8 @@ O `.env` nunca vai para o GitHub.
 | 4c | API de médicos e horários (`/api/medico/`, `/api/medico/horario/`: lista, detalhe, gravação, CID-10, dados para a Memed, criar e limpar horários) | pronta |
 | 5 | Segurança (tela de usuários e `usuario.json`: lista, gravação e exclusão), painel (`/painel/`), logs de auditoria (`/logs/painel/`, `/logs/gerenciar/`), opções de presença do paciente (`/opcoesPresenca/`, `/confirmar-presenca-efetivo/`, `/cancelar-presenca-efetivo/`) | pronta |
 | 6a | API da Memed (`/api/memed/`: médico como prescritor, situação do cadastro, acesso da aba Memed do atendimento, sincronização de especialidades) | pronta |
-| 6b | API do WhatsApp (`/api/whatsapp/`, `/whatsapp/...`, `/webhook/`), admin do Django | a fazer |
+| 6b | WhatsApp: API (`/api/whatsapp/`: envio da confirmação, texto da agenda, QR code, início e reinício da sessão, foto do contato), `/whatsapp/...` e o robô que lê as respostas dos pacientes (`/webhook/resposta/`) | pronta |
+| 7 | Admin do Django (`/admin/...`) | a fazer |
 
 Enquanto a conversão não termina, use o Inno só para conferir os módulos prontos. O AppClinic continua sendo o sistema principal.
 
@@ -93,3 +94,4 @@ O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As 
 - Impressos: o nome do arquivo com acento (resumo de atendimentos) vai no formato MIME (`=?utf-8?b?...?=`), porque o Node não envia latin-1 cru no cabeçalho.
 - Criar horários com intervalo negativo travava o AppClinic num laço sem fim; o Inno ignora esse intervalo.
 - Ao abrir a agenda, se a lista de médicos chegava antes do calendário ter data, a tela pedia a agenda de "NaN-NaN-NaN" e recebia erro. O Inno espera a data.
+- WhatsApp e Memed: quando o servidor de fora não responde, algumas respostas trazem o texto do erro de rede (`"error": "..."`). O texto é parecido com o do Python (`HTTPConnectionPool(...): Max retries exceeded...`), mas não idêntico, porque vem do Node.
