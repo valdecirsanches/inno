@@ -32,16 +32,21 @@ O dono do projeto fala português: responda em português.
   para as rotas `/api/` (veja `server/rotas/api-medico.js` como exemplo).
 - `server/util/pdf.js`: equivalente do ReportLab (canvas e platypus) para os impressos.
 - `server/db.js`: acesso ao banco, com os tipos de `server/modelos.json`.
+  O `modelos.json` tem também três tabelas acrescentadas à mão (o exportador não as gera):
+  `TbUsuario_groups` e `TbUsuario_user_permissions` (as ManyToMany do usuário) e
+  `LogEntry` (`django_admin_log`), que a exclusão de usuário apaga como o Django.
+  Se exportar de novo, mantenha-as.
 
 ## Testes
 
 - Banco de teste: SQLite montado a partir de `server/modelos.json` (`DB_CLIENT=better-sqlite3`).
   Exemplo completo em `tools/impressos/gera_inno.js` (cria as tabelas, faz login e chama as rotas).
+- Rotas da etapa 5 (usuários, painel, logs, presença): `node tools/testes/etapa5.js`.
+  Use como modelo para os testes das próximas etapas.
 - Impressos (PDF): `tools/impressos/` roda os `reports.py` originais e compara página a página
   (veja `tools/impressos/LEIAME.md`). Rode de novo ao mexer em `server/util/pdf.js`.
 
 ## O que falta (atualize esta lista junto com o README)
 
-- API da Memed (`/api/memed/`) e do WhatsApp (`/api/whatsapp/`), que dependem dos serviços externos
-- Painel (`/painel/`), logs (`/logs/...`), opções de presença (`/opcoesPresenca/`), `/seguranca/usuario.json/`
+- API da Memed (`/api/memed/`) e do WhatsApp (`/api/whatsapp/` e `/whatsapp/...`), que dependem dos serviços externos
 - Admin do Django (`/admin/...`)

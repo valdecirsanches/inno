@@ -21,7 +21,7 @@ function criaConexao() {
     client: 'mysql2',
     connection: {
       host: b.host, port: b.porta, user: b.usuario, password: b.senha, database: b.nome,
-      dateStrings: true, charset: 'utf8mb4', supportBigNumbers: true, bigNumberStrings: false,
+      dateStrings: true, jsonStrings: true, charset: 'utf8mb4', supportBigNumbers: true, bigNumberStrings: false,
     },
     pool: { min: 1, max: 10 },
   });
@@ -74,7 +74,7 @@ function converte(campo, v) {
       if (typeof v === 'string') return ['1', 't', 'true', 's', 'sim', 'y', 'yes'].includes(v.trim().toLowerCase());
       return v === true || v === 1;
     case 'IntegerField': case 'AutoField': case 'BigAutoField': case 'PositiveIntegerField':
-    case 'SmallIntegerField': case 'BigIntegerField': case 'ForeignKey': case 'OneToOneField':
+    case 'SmallIntegerField': case 'PositiveSmallIntegerField': case 'BigIntegerField': case 'ForeignKey': case 'OneToOneField':
       return typeof v === 'number' ? v : (String(v).trim() === '' ? null : Number(v));
     case 'FloatField':
       return Number(v);

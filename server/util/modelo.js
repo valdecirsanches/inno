@@ -221,7 +221,7 @@ function jsonSeguro(nomeModelo, dict, inteiros = new Set()) {
   return o;
 }
 
-async function registraLog(req, acao, nomeModelo, pk, antes, depois) {
+async function registraLog(req, acao, nomeModelo, pk, antes, depois, conexao = db.knex) {
   const u = req && req.user;
   if (!u || !u.is_authenticated || IGNORAR_NO_LOG.has(nomeModelo)) return;
   if (temArquivo(nomeModelo)) {
@@ -232,7 +232,7 @@ async function registraLog(req, acao, nomeModelo, pk, antes, depois) {
   if (antes !== undefined || depois !== undefined) {
     data = pyJson({ antes: antes || {}, depois: depois || {} });
   }
-  await db.tabela('UserLog').insert(db.paraColunas('UserLog', {
+  await conexao(db.modelo('UserLog').tabela).insert(db.paraColunas('UserLog', {
     user_id: u.id, action: acao, model_name: nomeModelo, object_id: pk === null ? null : String(pk),
     data, ip_address: ipDe(req), created_at: db.agora(),
   }));
@@ -252,8 +252,12 @@ async function insereComId(nomeModelo, colunas) {
  * auto_now_add e registra o log como os signals do AppClinic.
  *   obj: {atributo: valor} completo (para atualizar, com a pk)
  *   somenteCampos: save(update_fields=[...])
+ *   pkNaoVolta: pk IntegerField sem AutoField (ex.: TbUsuario): o Django não
+ *               lê o id gerado, então o objeto em memória (e o log) ficam com id None
+ *   extrasLog:  chaves a mais no model_to_dict do log (ex.: as ManyToMany
+ *               groups/user_permissions, que num objeto sem pk são [])
  */
-async function salva(req, nomeModelo, obj, { somenteCampos = null } = {}) {
+async function salva(req, nomeModelo, obj, { somenteCampos = null, pkNaoVolta = false, extrasLog = null } = {}) {
   const m = db.modelo(nomeModelo);
   const pk = obj[m.pk];
   const agora = db.agora();
@@ -309,17 +313,19 @@ async function salva(req, nomeModelo, obj, { somenteCampos = null } = {}) {
       dados[m.pk] = (Number(max && max.m) || 0) + 1;
       id = await insereComId(nomeModelo, db.paraColunas(nomeModelo, dados));
     }
-    obj[m.pk] = Number(id);
+    obj[m.pk] = pkNaoVolta ? null : Number(id);
   }
   // o log do Django usa os valores do objeto em memória (model_to_dict(instance))
   const memoria = Object.assign({}, obj);
-  const depois = await db.busca(nomeModelo, { [m.pk]: obj[m.pk] });
-  Object.assign(obj, depois);
+  if (obj[m.pk] !== null && obj[m.pk] !== undefined) {
+    const depois = await db.busca(nomeModelo, { [m.pk]: obj[m.pk] });
+    Object.assign(obj, depois);
+  }
 
   // log de auditoria (post_save)
   try {
     if (!existe) {
-      await registraLog(req, 'Criação de registro', nomeModelo, obj[m.pk], {}, jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, memoria), inteiros));
+      await registraLog(req, 'Criação de registro', nomeModelo, obj[m.pk], {}, Object.assign(jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, memoria), inteiros), extrasLog || {}));
     } else {
       const a = jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, antes));
       const d = jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, memoria));
@@ -381,4 +387,8 @@ async function excluiLista(req, nomeModelo, objs) {
   }
 }
 
-module.exports = { camposDoForm, modelToDict, inicialEmTexto, validaForm, salva, exclui, excluiLista, lerData, lerHora, lerDataHora, MSG };
+/** o 'antes' do log de exclusão: model_to_dict(instance) pronto para o JSON */
+const antesDaExclusao = (nomeModelo, obj, extras = null) => Object.assign(jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, obj)), extras || {});
+
+module.exports = { camposDoForm, modelToDict, inicialEmTexto, validaForm, salva, exclui, excluiLista, lerData, lerHora, lerDataHora, MSG,
+  registraLog, antesDaExclusao, capitaliza };

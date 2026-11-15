@@ -5619,5 +5619,190 @@
   "pk": "id",
   "tabela": "tb_usuarios_log",
   "verbose": "user log"
+ },
+ "TbUsuario_groups": {
+  "app": "Seguranca",
+  "campos": [
+   {
+    "atributo": "id",
+    "branco": true,
+    "coluna": "id",
+    "editavel": true,
+    "nome": "id",
+    "nulo": false,
+    "pk": true,
+    "tipo": "AutoField",
+    "verbose": "ID"
+   },
+   {
+    "atributo": "tbusuario_id",
+    "branco": false,
+    "coluna": "tbusuario_id",
+    "editavel": true,
+    "nome": "tbusuario",
+    "nulo": false,
+    "pk": false,
+    "ref": "TbUsuario",
+    "tipo": "ForeignKey",
+    "verbose": "tbusuario"
+   },
+   {
+    "atributo": "group_id",
+    "branco": false,
+    "coluna": "group_id",
+    "editavel": true,
+    "nome": "group",
+    "nulo": false,
+    "pk": false,
+    "ref": "Group",
+    "tipo": "ForeignKey",
+    "verbose": "group"
+   }
+  ],
+  "pk": "id",
+  "tabela": "tb_usuarios_groups",
+  "verbose": "TbUsuario-group relationship"
+ },
+ "TbUsuario_user_permissions": {
+  "app": "Seguranca",
+  "campos": [
+   {
+    "atributo": "id",
+    "branco": true,
+    "coluna": "id",
+    "editavel": true,
+    "nome": "id",
+    "nulo": false,
+    "pk": true,
+    "tipo": "AutoField",
+    "verbose": "ID"
+   },
+   {
+    "atributo": "tbusuario_id",
+    "branco": false,
+    "coluna": "tbusuario_id",
+    "editavel": true,
+    "nome": "tbusuario",
+    "nulo": false,
+    "pk": false,
+    "ref": "TbUsuario",
+    "tipo": "ForeignKey",
+    "verbose": "tbusuario"
+   },
+   {
+    "atributo": "permission_id",
+    "branco": false,
+    "coluna": "permission_id",
+    "editavel": true,
+    "nome": "permission",
+    "nulo": false,
+    "pk": false,
+    "ref": "Permission",
+    "tipo": "ForeignKey",
+    "verbose": "permission"
+   }
+  ],
+  "pk": "id",
+  "tabela": "tb_usuarios_user_permissions",
+  "verbose": "TbUsuario-permission relationship"
+ },
+ "LogEntry": {
+  "app": "admin",
+  "campos": [
+   {
+    "atributo": "id",
+    "branco": true,
+    "coluna": "id",
+    "editavel": true,
+    "nome": "id",
+    "nulo": false,
+    "pk": true,
+    "tipo": "AutoField",
+    "verbose": "ID"
+   },
+   {
+    "atributo": "action_time",
+    "branco": false,
+    "coluna": "action_time",
+    "editavel": false,
+    "nome": "action_time",
+    "nulo": false,
+    "pk": false,
+    "tipo": "DateTimeField",
+    "verbose": "data/hora da ação"
+   },
+   {
+    "atributo": "user_id",
+    "branco": false,
+    "coluna": "user_id",
+    "editavel": true,
+    "nome": "user",
+    "nulo": false,
+    "pk": false,
+    "ref": "TbUsuario",
+    "tipo": "ForeignKey",
+    "verbose": "usuário"
+   },
+   {
+    "atributo": "content_type_id",
+    "branco": true,
+    "coluna": "content_type_id",
+    "editavel": true,
+    "nome": "content_type",
+    "nulo": true,
+    "pk": false,
+    "ref": "ContentType",
+    "tipo": "ForeignKey",
+    "verbose": "tipo de conteúdo"
+   },
+   {
+    "atributo": "object_id",
+    "branco": true,
+    "coluna": "object_id",
+    "editavel": true,
+    "nome": "object_id",
+    "nulo": true,
+    "pk": false,
+    "tipo": "TextField",
+    "verbose": "id do objeto"
+   },
+   {
+    "atributo": "object_repr",
+    "branco": false,
+    "coluna": "object_repr",
+    "editavel": true,
+    "max": 200,
+    "nome": "object_repr",
+    "nulo": false,
+    "pk": false,
+    "tipo": "CharField",
+    "verbose": "repr do objeto"
+   },
+   {
+    "atributo": "action_flag",
+    "branco": false,
+    "coluna": "action_flag",
+    "editavel": true,
+    "nome": "action_flag",
+    "nulo": false,
+    "pk": false,
+    "tipo": "PositiveSmallIntegerField",
+    "verbose": "flag de ação"
+   },
+   {
+    "atributo": "change_message",
+    "branco": true,
+    "coluna": "change_message",
+    "editavel": true,
+    "nome": "change_message",
+    "nulo": false,
+    "pk": false,
+    "tipo": "TextField",
+    "verbose": "mensagem de alteração"
+   }
+  ],
+  "pk": "id",
+  "tabela": "django_admin_log",
+  "verbose": "entrada de log"
  }
 }
