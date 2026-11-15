@@ -46,9 +46,11 @@ O `.env` nunca vai para o GitHub.
 |---|---|---|
 | 1 | Login, saída, troca de senha, tela inicial, menu, cadastro de pacientes (busca, cadastro, consultas, recibos), listas de convênios, planos e médicos | pronta |
 | 2 | Agenda de consultas (lista do dia, calendário, agendar, status, chegada, confirmação, abrir/gerar/desativar agenda, horários, cores, gráficos), listas de procedimentos e especialidades, `/api/especialidade/` | pronta |
-| 2b | Atendimento | a fazer |
-| 3 | Prontuário, recibos impressos e demais PDFs | a fazer |
-| 4 | WhatsApp, Memed, painéis, configurações e o restante | a fazer |
+| 2b | Atendimento, histórico do paciente e API da agenda | pronta |
+| 3 | Prontuário (anamnese, exames, prescrições, relatórios, documentos) | pronta |
+| 3b | Recibos impressos, ficha, atestados e demais PDFs | a fazer |
+| 4 | Configurações (modelos de exames, prescrições e relatórios do médico), busca de CID (`/cadastros/LocalizaCID/`) | pronta |
+| 5 | WhatsApp, Memed, painéis e o restante | a fazer |
 
 Enquanto a conversão não termina, use o Inno só para conferir os módulos prontos. O AppClinic continua sendo o sistema principal.
 

@@ -104,9 +104,11 @@ module.exports = function (app) {
     const inst = String(rem) > '0' ? await obtem(CR, { id: numero(rem) }) : null;
     const { f, obj } = await formulario(CR, form, inst);
     if (!f.valido) dictErro();
-    obj.fk_prescricao_id = presc;
+    // pr.fk_prescricao_id = prescricao (texto): '' grava NULL, não-número dá erro,
+    // e a resposta devolve o texto recebido (o Django não relê o objeto)
+    obj.fk_prescricao_id = presc === '' ? null : numero(presc);
     await modelo.salva(req, CR, obj);
-    json(res, { success: { id_prescricao: obj.fk_prescricao_id } });
+    json(res, { success: { id_prescricao: presc } });
   }));
   app.get(`${C}/prescricoes/CarregarConfPrescricaoRemedios`, a(async (req, res) => {
     const id = req.GET.get('id_prescricao');

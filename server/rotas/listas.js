@@ -6,10 +6,20 @@
 const db = require('../db');
 const { json } = require('../util/http');
 const drf = require('../util/drf');
+const { exige, escapaLike } = require('../util/python');
 
 const a = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
 module.exports = function (app) {
+  // Cadastros/ajax.LocalizaCID: código ou descrição contém o texto, por código
+  app.get('/cadastros/LocalizaCID/', a(async (req, res) => {
+    const cid = exige(req.GET, 'cid');
+    const C = 'CID10', p = `%${escapaLike(cid)}%`;
+    const q = db.tabela(C).where((w) => { db.like(w, db.coluna(C, 'codigo'), p); db.like(w, db.coluna(C, 'descricao'), p, { ou: true }); })
+      .orderBy(db.coluna(C, 'codigo'));
+    json(res, { success: db.linhas(C, await q).map((c) => ({ id: c.id, codigo: c.codigo, descricao: c.descricao })) });
+  }));
+
   app.get('/cadastros/convenio/SelecionaConvenio/', a(async (req, res) => {
     const C = 'TbConvenio';
     const l = db.linhas(C, await db.tabela(C).orderBy(db.coluna(C, 'razao')));
