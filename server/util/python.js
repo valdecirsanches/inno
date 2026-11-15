@@ -164,3 +164,39 @@ function pyRepr(campo, v) {
 
 module.exports.pyReprTexto = pyReprTexto;
 module.exports.pyRepr = pyRepr;
+
+/** str.splitlines() do Python */
+function splitlines(s) {
+  if (s === null || s === undefined) return [];
+  const partes = String(s).split(/\r\n|[\n\r\v\f\x1c\x1d\x1e\x85\u2028\u2029]/);
+  if (partes.length && partes[partes.length - 1] === '') partes.pop();
+  return partes;
+}
+
+/** len() de texto (conta caracteres, não unidades UTF-16) */
+function pyLen(s) { return [...String(s)].length; }
+
+/** funcoes.idade do AppClinic: '...' sem data */
+function idadeF(nasc, hoje = new Date()) {
+  if (!nasc) return '...';
+  const [a, m, d] = String(nasc).slice(0, 10).split('-').map(Number);
+  let y = hoje.getFullYear() - a;
+  const hm = hoje.getMonth() + 1, hd = hoje.getDate();
+  if (hm < m || (hm === m && hd < d)) y -= 1;
+  return y;
+}
+
+/** repr() de um valor JS simples (dict/list/str/int/None/bool) */
+function pyReprValor(v) {
+  if (v === null || v === undefined) return 'None';
+  if (typeof v === 'boolean') return v ? 'True' : 'False';
+  if (typeof v === 'number') return Number.isInteger(v) ? String(v) : pyFloat(v);
+  if (typeof v === 'string') return pyReprTexto(v);
+  if (Array.isArray(v)) return '[' + v.map(pyReprValor).join(', ') + ']';
+  return '{' + Object.entries(v).map(([k, x]) => `${pyReprTexto(k)}: ${pyReprValor(x)}`).join(', ') + '}';
+}
+
+module.exports.splitlines = splitlines;
+module.exports.pyLen = pyLen;
+module.exports.idadeF = idadeF;
+module.exports.pyReprValor = pyReprValor;

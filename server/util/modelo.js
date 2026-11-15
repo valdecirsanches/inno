@@ -183,7 +183,10 @@ function mudou(c, velho, novo) {
   const nulo = (v) => v === null || v === undefined;
   if (nulo(velho) && nulo(novo)) return false;
   if (nulo(velho) !== nulo(novo)) return true;
-  if (['BooleanField', 'NullBooleanField'].includes(c.tipo)) return Boolean(velho) !== Boolean(novo === 'False' ? false : novo);
+  if (['BooleanField', 'NullBooleanField'].includes(c.tipo)) {
+    const b = (v) => (typeof v === 'string' ? ['t', 'True', '1', 'true', 's', 'sim', 'y', 'yes'].includes(v) : Boolean(v));
+    return b(velho) !== b(novo);
+  }
   if (['IntegerField', 'AutoField', 'BigAutoField', 'PositiveIntegerField', 'SmallIntegerField', 'BigIntegerField',
     'ForeignKey', 'OneToOneField', 'FloatField', 'DecimalField'].includes(c.tipo)) {
     const a = Number(velho), b = Number(novo);

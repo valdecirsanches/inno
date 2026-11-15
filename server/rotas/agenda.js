@@ -551,7 +551,7 @@ module.exports = function (app) {
   }));
 
   // ---------------------------------------------------------- gráficos
-  app.get(`${BASE}/Graficos.Agendamentos`, a(async (req, res) => {
+  const graficoAgendamentos = async (req, res) => {
     const medico = req.user.fk_medico_id;
     if (!medico) return json(res, { erro: 'Usuário não é médico!' });
     const hoje = new Date();
@@ -592,7 +592,10 @@ module.exports = function (app) {
     }
     const total = await conta(doMes().where(C('status'), 'ATENDIDO'));
     json(res, { success: { atraso, dados: ret, total } });
-  }));
+  };
+  app.get(`${BASE}/Graficos.Agendamentos`, a(graficoAgendamentos));
+  module.exports.graficoAgendamentos = graficoAgendamentos;
+
 
   app.get(`${BASE}/Graficos.Pacientes`, a(async (req, res) => {
     const medico = req.user.fk_medico_id;

@@ -127,6 +127,8 @@ function paraColunas(nomeModelo, obj) {
     let valor = v;
     // booleano como 1/0, igual ao driver do Django (mysqlclient)
     if (['BooleanField', 'NullBooleanField'].includes(c.tipo) && typeof v === 'boolean') valor = v ? 1 : 0;
+    // texto num BooleanField (o Django converte 't'/'True'/'1' e 'f'/'False'/'0')
+    if (['BooleanField', 'NullBooleanField'].includes(c.tipo) && typeof v === 'string' && ['t', 'True', '1', 'f', 'False', '0'].includes(v)) valor = ['t', 'True', '1'].includes(v) ? 1 : 0;
     // TimeField recebendo data e hora (como o Django aceita): grava só a hora
     if (c.tipo === 'TimeField' && typeof v === 'string' && /^\d{4}-\d{2}-\d{2}[ T]/.test(v)) valor = v.slice(11);
     // DateField recebendo datetime: grava só a data
