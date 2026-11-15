@@ -50,7 +50,8 @@ O `.env` nunca vai para o GitHub.
 | 3 | Prontuário (anamnese, exames, prescrições, relatórios, documentos) | pronta |
 | 3b | Impressos em PDF: ficha e recibo do paciente, agenda do dia, resumo de atendimentos, atestado, pedido de exame, receita (comum e de controle especial), relatório e resumo do prontuário | pronta |
 | 4 | Configurações (modelos de exames, prescrições e relatórios do médico), busca de CID (`/cadastros/LocalizaCID/`) | pronta |
-| 5 | WhatsApp, Memed, painéis e o restante | a fazer |
+| 4b | Cadastros: especialidades, planos de saúde, médicos (tela, busca, horários, gravação), convênios e clínicas (telas e `convenio.json` / `clinica.json`), filtro e resumo de atendimentos | pronta |
+| 5 | API (`/api/...`), WhatsApp, Memed, painel, logs, admin e o restante | a fazer |
 
 Enquanto a conversão não termina, use o Inno só para conferir os módulos prontos. O AppClinic continua sendo o sistema principal.
 
