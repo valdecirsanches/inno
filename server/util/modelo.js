@@ -177,6 +177,24 @@ async function validaForm(nomeModelo, dados, { instancia = null, exclui = [], so
   return { valido: Object.keys(erros).length === 0, erros, valores };
 }
 
+/** o valor novo é diferente do que está no banco? */
+function mudou(c, velho, novo) {
+  const nulo = (v) => v === null || v === undefined;
+  if (nulo(velho) && nulo(novo)) return false;
+  if (nulo(velho) !== nulo(novo)) return true;
+  if (['BooleanField', 'NullBooleanField'].includes(c.tipo)) return Boolean(velho) !== Boolean(novo === 'False' ? false : novo);
+  if (['IntegerField', 'AutoField', 'BigAutoField', 'PositiveIntegerField', 'SmallIntegerField', 'BigIntegerField',
+    'ForeignKey', 'OneToOneField', 'FloatField', 'DecimalField'].includes(c.tipo)) {
+    const a = Number(velho), b = Number(novo);
+    if (!Number.isNaN(a) && !Number.isNaN(b)) return a !== b;
+  }
+  if (['DateTimeField', 'TimeField'].includes(c.tipo)) {
+    const n = (v) => String(v).replace('T', ' ').replace(/\.0+$/, '');
+    return n(velho) !== n(novo);
+  }
+  return String(velho) !== String(novo);
+}
+
 const capitaliza = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
 // ------------------------------------------------------------ gravação
@@ -241,8 +259,15 @@ async function salva(req, nomeModelo, obj, { somenteCampos = null } = {}) {
   if (existe) {
     let campos = m.campos.filter((c) => !c.pk);
     if (somenteCampos) campos = campos.filter((c) => somenteCampos.includes(c.nome) || somenteCampos.includes(c.atributo) || c.auto_now);
+    // grava só o que mudou: o Django regravava todas as colunas com o valor
+    // que leu, então o resultado no banco é o mesmo; e colunas de tipos
+    // antigos (ex.: login_atualizacao) não são reconvertidas à toa
     const dados = {};
-    for (const c of campos) if (obj[c.atributo] !== undefined) dados[c.atributo] = obj[c.atributo];
+    for (const c of campos) {
+      if (obj[c.atributo] === undefined) continue;
+      if (!c.auto_now && !mudou(c, antes[c.atributo], obj[c.atributo])) continue;
+      dados[c.atributo] = obj[c.atributo];
+    }
     if (Object.keys(dados).length) {
       await db.tabela(nomeModelo).where(db.coluna(nomeModelo, m.pk), pk).update(db.paraColunas(nomeModelo, dados));
     }

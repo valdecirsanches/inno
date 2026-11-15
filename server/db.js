@@ -70,7 +70,9 @@ function converte(campo, v) {
   switch (campo.tipo) {
     case 'BooleanField':
     case 'NullBooleanField':
-      return v === true || v === 1 || v === '1' || v === 't' || v === 'true' || (Buffer.isBuffer(v) && v[0] === 1);
+      if (Buffer.isBuffer(v)) return v[0] === 1;                  // BIT(1)
+      if (typeof v === 'string') return ['1', 't', 'true', 's', 'sim', 'y', 'yes'].includes(v.trim().toLowerCase());
+      return v === true || v === 1;
     case 'IntegerField': case 'AutoField': case 'BigAutoField': case 'PositiveIntegerField':
     case 'SmallIntegerField': case 'BigIntegerField': case 'ForeignKey': case 'OneToOneField':
       return typeof v === 'number' ? v : (String(v).trim() === '' ? null : Number(v));
@@ -123,7 +125,10 @@ function paraColunas(nomeModelo, obj) {
     const c = m._porAtributo[k];
     if (!c) continue;
     let valor = v;
-    if (c.tipo === 'BooleanField' && config.banco.cliente === 'better-sqlite3' && typeof v === 'boolean') valor = v ? 1 : 0;
+    // booleano como 1/0, igual ao driver do Django (mysqlclient)
+    if (['BooleanField', 'NullBooleanField'].includes(c.tipo) && typeof v === 'boolean') valor = v ? 1 : 0;
+    // TimeField recebendo data e hora (como o Django aceita): grava só a hora
+    if (c.tipo === 'TimeField' && typeof v === 'string' && /^\d{4}-\d{2}-\d{2}[ T]/.test(v)) valor = v.slice(11);
     saida[c.coluna] = valor;
   }
   return saida;
