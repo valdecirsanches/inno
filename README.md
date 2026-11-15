@@ -48,7 +48,7 @@ O `.env` nunca vai para o GitHub.
 | 2 | Agenda de consultas (lista do dia, calendário, agendar, status, chegada, confirmação, abrir/gerar/desativar agenda, horários, cores, gráficos), listas de procedimentos e especialidades, `/api/especialidade/` | pronta |
 | 2b | Atendimento, histórico do paciente e API da agenda | pronta |
 | 3 | Prontuário (anamnese, exames, prescrições, relatórios, documentos) | pronta |
-| 3b | Recibos impressos, ficha, atestados e demais PDFs | a fazer |
+| 3b | Impressos em PDF: ficha e recibo do paciente, agenda do dia, resumo de atendimentos, atestado, pedido de exame, receita (comum e de controle especial), relatório e resumo do prontuário | pronta |
 | 4 | Configurações (modelos de exames, prescrições e relatórios do médico), busca de CID (`/cadastros/LocalizaCID/`) | pronta |
 | 5 | WhatsApp, Memed, painéis e o restante | a fazer |
 
@@ -68,10 +68,13 @@ server/
   util/orm.js        get(), int(), strptime() etc. com os mesmos erros do Django
   util/modelo.js     validação e gravação como o formulário e o save() do Django,
                      com o log de auditoria em tb_usuarios_log
+  util/pdf.js        PDFs no lugar do ReportLab (mesmas medidas e mesmo layout)
+  fontes/            fontes Bitstream Vera (as mesmas do ReportLab; licença livre)
   rotas/             uma pasta por módulo, com os mesmos endereços
 templates/           as telas do AppClinic, convertidas para Nunjucks
 static/              CSS, JS e imagens do AppClinic
 tools/               scripts da conversão (rodam uma vez, no AppClinic, não no servidor)
+                     e tools/impressos/, que confere os PDFs contra os do AppClinic
 ```
 
 ## Diferenças em relação ao AppClinic
@@ -81,4 +84,5 @@ O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As 
 - Entrar pela página `/login/` direto não leva mais a uma página "não encontrada" (`/login/None`).
 - Endereços chamados sem a barra final respondem direto, sem o redirecionamento extra.
 - A primeira vez que um usuário sem preferências salvas abre um paciente, o Django dava erro. O Inno cria as preferências com os valores padrão.
+- Impressos: o nome do arquivo com acento (resumo de atendimentos) vai no formato MIME (`=?utf-8?b?...?=`), porque o Node não envia latin-1 cru no cabeçalho.
 - Ao abrir a agenda, se a lista de médicos chegava antes do calendário ter data, a tela pedia a agenda de "NaN-NaN-NaN" e recebia erro. O Inno espera a data.
