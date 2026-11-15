@@ -15,8 +15,10 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'compara-'));
 const dbInno = path.join(tmp, 'inno.sqlite3');
 const dbDj = path.join(tmp, 'django.sqlite3');
 Object.assign(process.env, { DB_CLIENT: 'better-sqlite3', DB_FILE: dbInno, SECRET_KEY: 'x'.repeat(40), DEBUG: '', DB_NAME: 'inno', DB_HOST_EXIBIDO: 'localhost', MEDIA_ROOT: path.join(tmp, 'media-inno') });
+const MYSQL = !!process.env.MYSQL;   // MYSQL=1: os dois sobre MySQL/MariaDB (ver mysql.js)
 const { montaBanco } = require(R + '/tools/testes/base.js');
-const sq = montaBanco(dbInno);
+const sq = MYSQL ? null : montaBanco(dbInno);
+if (!MYSQL) {
 // tabelas do próprio Django (auth/contenttypes) que o AppClinic consulta
 sq.exec(`CREATE TABLE IF NOT EXISTS auth_group (id INTEGER PRIMARY KEY, name TEXT);
   CREATE TABLE IF NOT EXISTS auth_permission (id INTEGER PRIMARY KEY, name TEXT, content_type_id INTEGER, codename TEXT);
@@ -25,6 +27,10 @@ sq.exec(`CREATE TABLE IF NOT EXISTS auth_group (id INTEGER PRIMARY KEY, name TEX
 if (ROTEIRO.prepara) ROTEIRO.prepara(sq);
 sq.close();
 fs.copyFileSync(dbInno, dbDj);
+} else {
+  const c = require('./mysql').CFG;
+  Object.assign(process.env, { DB_CLIENT: 'mysql2', DB_HOST: c.host, DB_USER: c.user, DB_PASSWORD: c.password, DB_NAME: 'cmp_inno', DB_FILE: '' });
+}
 
 const porta = () => new Promise((ok) => { const s = require('net').createServer().listen(0, () => { const p = s.address().port; s.close(() => ok(p)); }); });
 
@@ -45,6 +51,7 @@ function cliente(base) {
 function normaliza(t, portas) {
   let s = t;
   for (const p of portas) s = s.split(`127.0.0.1:${p}`).join('HOST').split(`localhost:${p}`).join('HOST');
+  s = s.split('localhost/cmp_inno').join('localhost/inno');   // nome do banco no modo MySQL
   s = s.replace(/name="csrfmiddlewaretoken" value="[^"]*"/g, 'name="csrfmiddlewaretoken" value="X"');
   s = s.replace(/csrf_?[Tt]oken["']?\s*[:=]\s*["'][^"']*["']/g, 'csrftoken="X"');
   const hoje = new Date();
@@ -66,10 +73,12 @@ function difere(a, b) {
 }
 
 (async () => {
+  let tabelasMy = null;
+  if (MYSQL) tabelasMy = await require('./mysql').cria(['cmp_django', 'cmp_inno'], ROTEIRO.prepara);
   const [pDj, pIn] = [await porta(), await porta()];
   const dj = spawn(PY, ['manage.py', 'runserver', `127.0.0.1:${pDj}`, '--noreload', '--nothreading'], {
     cwd: APPCLINIC,
-    env: Object.assign({}, process.env, { DJ_DB: dbDj, DJ_MEDIA: path.join(tmp, 'media-dj'), DJANGO_SETTINGS_MODULE: 'teste_settings', PYTHONPATH: `${__dirname}:${APPCLINIC}`, PYTHONIOENCODING: 'utf-8', LANG: 'pt_BR.UTF-8' }),
+    env: Object.assign({}, process.env, { DJ_DB: dbDj, DJ_MYSQL: MYSQL ? 'cmp_django' : '', DJ_MEDIA: path.join(tmp, 'media-dj'), DJANGO_SETTINGS_MODULE: 'teste_settings', PYTHONPATH: `${__dirname}:${APPCLINIC}`, PYTHONIOENCODING: 'utf-8', LANG: 'pt_BR.UTF-8' }),
     stdio: ['ignore', 'ignore', fs.openSync(path.join(tmp, 'django.log'), 'w')],
   });
   const app = require(R + '/server/index.js');
@@ -82,14 +91,21 @@ function difere(a, b) {
   let iguais = 0;
   const difs = [];
   // banco conferido a cada passo: mostra o primeiro passo em que cada tabela diverge
-  const Database = require(R + '/node_modules/better-sqlite3');
-  const [x, y] = [new Database(dbDj, { readonly: true }), new Database(dbInno, { readonly: true })];
-  const tabelas = x.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map((t) => t.name);
+  let x, y, tabelas;
+  if (MYSQL) {
+    const my = require('./mysql');
+    [x, y] = [await my.leitor('cmp_django'), await my.leitor('cmp_inno')];
+    tabelas = tabelasMy;
+  } else {
+    const Database = require(R + '/node_modules/better-sqlite3');
+    const [a, b] = [new Database(dbDj, { readonly: true }), new Database(dbInno, { readonly: true })];
+    const leitor = (db) => ({ linhas: async (t) => db.prepare(`SELECT * FROM "${t}" ORDER BY 1`).all() });
+    [x, y] = [leitor(a), leitor(b)];
+    tabelas = a.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map((t) => t.name);
+  }
   const IGNORA = new Set(['tb_usuarios_log', 'tbWhatsappLog', 'tb_usuarios_opcoes']);
-  const linhasDe = (db, t) => {
-    const cols = x.prepare(`PRAGMA table_info("${t}")`).all().map((c) => c.name);
-    return db.prepare(`SELECT * FROM "${t}" ORDER BY 1`).all().map((l) => normaliza(JSON.stringify(cols.map((c) => (typeof l[c] === 'number' ? l[c] : l[c] === null ? null : String(l[c]).replace(/\.0+$/, '')))), []));
-  };
+  const linhasDe = async (db, t) => (await db.linhas(t)).map((l) => normaliza(JSON.stringify(Object.keys(l).map((c) => (typeof l[c] === 'number' ? l[c] : l[c] === null ? null : String(l[c]).replace(/\.0+$/, '')))), []));
+
   const jaDivergiu = new Set();
   const divergencias = [];
   for (const passo of ROTEIRO.passos()) {
@@ -110,7 +126,7 @@ function difere(a, b) {
     if (problemas.length) difs.push(`${metodo} ${url}\n    ${problemas.join('\n    ')}`); else iguais++;
     for (const t of tabelas) {
       if (jaDivergiu.has(t) || IGNORA.has(t)) continue;
-      const [la, lb] = [linhasDe(x, t), linhasDe(y, t)];
+      const [la, lb] = [await linhasDe(x, t), await linhasDe(y, t)];
       if (JSON.stringify(la) !== JSON.stringify(lb)) {
         jaDivergiu.add(t);
         const so = (p, q) => p.filter((l) => !q.includes(l));

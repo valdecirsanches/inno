@@ -15,6 +15,12 @@ python3.11 -m venv ~/venv-dj
 sudo localedef -i pt_BR -f UTF-8 pt_BR.UTF-8
 ```
 
+## Modo MySQL
+
+Com `MYSQL=1`, os dois sistemas rodam sobre MySQL/MariaDB (como no servidor) em vez de
+SQLite: o comparador cria os bancos `cmp_django` e `cmp_inno` (usuário/senha em
+`MYSQL_USER`/`MYSQL_PASSWORD`, padrão `teste`/`teste`; o Django precisa do `pymysql`).
+
 ## Rodar (na raiz do inno)
 
 ```bash
@@ -26,6 +32,7 @@ node tools/comparacao/compara.js ../appclinic ~/venv-dj/bin/python tools/compara
 
 - `roteiro.js`: um GET em cada endereço, com parâmetros que as telas usam.
 - `roteiro-telas.js`: o que as telas gravam (paciente, agenda, prontuário, recibo...).
+- `roteiro-atestado.js`: a aba de atestado (lista, seleção com o CID, gravação, impressão).
 - `roteiro-metodos.js`: cada endereço com GET, POST, PUT, PATCH e DELETE.
 - `metodos_django.py`: gera `server/metodos-django.json` (que o Inno usa para responder
   aos métodos como o Django: 405 nas views em classe, qualquer método nas em função).
