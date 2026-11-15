@@ -14,6 +14,7 @@ const MODULOS = [
   require('./configuracoes'),
   require('./impressos'),
   require('./cadastros'),
+  require('./api-medico'),
 ];
 
 // rotas que no Django tinham @csrf_exempt

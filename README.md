@@ -51,7 +51,8 @@ O `.env` nunca vai para o GitHub.
 | 3b | Impressos em PDF: ficha e recibo do paciente, agenda do dia, resumo de atendimentos, atestado, pedido de exame, receita (comum e de controle especial), relatório e resumo do prontuário | pronta |
 | 4 | Configurações (modelos de exames, prescrições e relatórios do médico), busca de CID (`/cadastros/LocalizaCID/`) | pronta |
 | 4b | Cadastros: especialidades, planos de saúde, médicos (tela, busca, horários, gravação), convênios e clínicas (telas e `convenio.json` / `clinica.json`), filtro e resumo de atendimentos | pronta |
-| 5 | API (`/api/...`), WhatsApp, Memed, painel, logs, admin e o restante | a fazer |
+| 4c | API de médicos e horários (`/api/medico/`, `/api/medico/horario/`: lista, detalhe, gravação, CID-10, dados para a Memed, criar e limpar horários) | pronta |
+| 5 | API da Memed e do WhatsApp, painel, logs, opções de presença, admin e o restante | a fazer |
 
 Enquanto a conversão não termina, use o Inno só para conferir os módulos prontos. O AppClinic continua sendo o sistema principal.
 
@@ -86,4 +87,5 @@ O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As 
 - Endereços chamados sem a barra final respondem direto, sem o redirecionamento extra.
 - A primeira vez que um usuário sem preferências salvas abre um paciente, o Django dava erro. O Inno cria as preferências com os valores padrão.
 - Impressos: o nome do arquivo com acento (resumo de atendimentos) vai no formato MIME (`=?utf-8?b?...?=`), porque o Node não envia latin-1 cru no cabeçalho.
+- Criar horários com intervalo negativo travava o AppClinic num laço sem fim; o Inno ignora esse intervalo.
 - Ao abrir a agenda, se a lista de médicos chegava antes do calendário ter data, a tela pedia a agenda de "NaN-NaN-NaN" e recebia erro. O Inno espera a data.
