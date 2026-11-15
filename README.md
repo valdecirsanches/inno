@@ -85,6 +85,14 @@ tools/               scripts da conversão (rodam uma vez, no AppClinic, não no
                      e a conferência de cobertura (cobertura.js: todos os endereços do AppClinic)
 ```
 
+## Conferência com o AppClinic
+
+`tools/comparacao/` sobe o AppClinic original (Django) e o Inno com cópias do mesmo banco
+de teste e faz as mesmas requisições nos dois, comparando as respostas e as tabelas a cada
+passo: 274 leituras (todos os endereços), 126 gravações (paciente, recibo, agenda,
+prontuário, cadastros, configurações, usuários) e 837 combinações de endereço e método HTTP.
+Fora as diferenças abaixo, as respostas e o banco ficam iguais.
+
 ## Diferenças em relação ao AppClinic
 
 O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As exceções, todas a favor do usuário:

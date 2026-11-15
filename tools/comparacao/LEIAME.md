@@ -21,11 +21,18 @@ sudo localedef -i pt_BR -f UTF-8 pt_BR.UTF-8
 python3 tools/testes/rotas_django.py ../appclinic > /tmp/django.txt
 ROTAS=/tmp/django.txt node tools/comparacao/compara.js ../appclinic ~/venv-dj/bin/python
 node tools/comparacao/compara.js ../appclinic ~/venv-dj/bin/python tools/comparacao/roteiro-telas.js
+node tools/comparacao/compara.js ../appclinic ~/venv-dj/bin/python tools/comparacao/roteiro-metodos.js
 ```
 
 - `roteiro.js`: um GET em cada endereço, com parâmetros que as telas usam.
 - `roteiro-telas.js`: o que as telas gravam (paciente, agenda, prontuário, recibo...).
+- `roteiro-metodos.js`: cada endereço com GET, POST, PUT, PATCH e DELETE.
+- `metodos_django.py`: gera `server/metodos-django.json` (que o Inno usa para responder
+  aos métodos como o Django: 405 nas views em classe, qualquer método nas em função).
 - `teste_settings.py`: o settings.py do AppClinic com SQLite (não altera o AppClinic).
+
+O comparador confere as tabelas depois de cada passo e mostra o primeiro passo em que
+cada uma diverge (fora os logs e as preferências do usuário).
 
 Diferenças esperadas (estão no README, "Diferenças em relação ao AppClinic"): o login
 sem "next" e as preferências criadas com `ultimo_pac = 0`.

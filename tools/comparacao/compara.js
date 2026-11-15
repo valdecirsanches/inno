@@ -81,6 +81,17 @@ function difere(a, b) {
   const portas = [pDj, pIn];
   let iguais = 0;
   const difs = [];
+  // banco conferido a cada passo: mostra o primeiro passo em que cada tabela diverge
+  const Database = require(R + '/node_modules/better-sqlite3');
+  const [x, y] = [new Database(dbDj, { readonly: true }), new Database(dbInno, { readonly: true })];
+  const tabelas = x.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map((t) => t.name);
+  const IGNORA = new Set(['tb_usuarios_log', 'tbWhatsappLog', 'tb_usuarios_opcoes']);
+  const linhasDe = (db, t) => {
+    const cols = x.prepare(`PRAGMA table_info("${t}")`).all().map((c) => c.name);
+    return db.prepare(`SELECT * FROM "${t}" ORDER BY 1`).all().map((l) => normaliza(JSON.stringify(cols.map((c) => (typeof l[c] === 'number' ? l[c] : l[c] === null ? null : String(l[c]).replace(/\.0+$/, '')))), []));
+  };
+  const jaDivergiu = new Set();
+  const divergencias = [];
   for (const passo of ROTEIRO.passos()) {
     const [metodo, url, opc] = passo;
     let a, b;
@@ -97,25 +108,19 @@ function difere(a, b) {
       else if (a.tipo !== b.tipo) problemas.push(`tipo ${a.tipo} x ${b.tipo}`);
     }
     if (problemas.length) difs.push(`${metodo} ${url}\n    ${problemas.join('\n    ')}`); else iguais++;
-  }
-  // estado final do banco
-  const Database = require(R + '/node_modules/better-sqlite3');
-  const [x, y] = [new Database(dbDj, { readonly: true }), new Database(dbInno, { readonly: true })];
-  const tabelas = x.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map((t) => t.name);
-  const IGNORA = new Set(['tb_usuarios_log', 'tbWhatsappLog']);
-  const tabDifs = [];
-  for (const t of tabelas) {
-    const cols = x.prepare(`PRAGMA table_info("${t}")`).all().map((c) => c.name);
-    const linhas = (db) => db.prepare(`SELECT * FROM "${t}" ORDER BY 1`).all().map((l) => normaliza(JSON.stringify(cols.map((c) => (typeof l[c] === 'number' ? l[c] : l[c] === null ? null : String(l[c]).replace(/\.0+$/, '')))), []));
-    const [la, lb] = [linhas(x), linhas(y)];
-    if (JSON.stringify(la) !== JSON.stringify(lb)) {
-      const so = (p, q) => p.filter((l) => !q.includes(l));
-      tabDifs.push(`${t}${IGNORA.has(t) ? ' (log)' : ''}: ${la.length} x ${lb.length} linhas\n      só no django: ${so(la, lb).slice(0, 3).join('\n                    ')}\n      só no inno:   ${so(lb, la).slice(0, 3).join('\n                    ')}`);
+    for (const t of tabelas) {
+      if (jaDivergiu.has(t) || IGNORA.has(t)) continue;
+      const [la, lb] = [linhasDe(x, t), linhasDe(y, t)];
+      if (JSON.stringify(la) !== JSON.stringify(lb)) {
+        jaDivergiu.add(t);
+        const so = (p, q) => p.filter((l) => !q.includes(l));
+        divergencias.push(`${t} diverge depois de ${metodo} ${url.slice(0, 160)}\n      só no django: ${so(la, lb).slice(0, 2).join('\n                    ').slice(0, 600)}\n      só no inno:   ${so(lb, la).slice(0, 2).join('\n                    ').slice(0, 600)}`);
+      }
     }
   }
   console.log(`\n${iguais} respostas iguais, ${difs.length} diferentes\n`);
   for (const d of difs) console.log('✗ ' + d + '\n');
-  console.log(tabDifs.length ? `Tabelas diferentes no fim:\n  ${tabDifs.join('\n  ')}` : 'Banco igual no fim.');
+  console.log(divergencias.length ? `Tabelas que divergiram:\n  ${divergencias.join('\n  ')}` : 'Banco igual em todos os passos (fora logs e preferências).');
   console.log(`\n(log do Django: ${path.join(tmp, 'django.log')})`);
   dj.kill(); srv.close();
   setTimeout(() => process.exit(0), 100);

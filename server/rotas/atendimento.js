@@ -255,6 +255,11 @@ module.exports = function (app) {
     paginar: false,
     filtros: { id: ['exact'], data: ['exact'] },
     busca: ['fk_medico', 'data'],
+    // criar pela API nunca funcionou no AppClinic: TbAgendaCons.save(request=None) não aceita o
+    // force_insert que o objects.create() do DRF passa. Depois de validar, erro 500 e nada gravado.
+    antesDeCriar: () => {
+      throw erroPython("Got a `TypeError` when calling `TbAgendaCons.objects.create()`. This may be because you have a writable field on the serializer class that is not a valid argument to `TbAgendaCons.objects.create()`. You may need to make the field read-only, or override the AgendaSerializer.create() method to handle this correctly.\nOriginal exception was:\n TbAgendaCons.save() got an unexpected keyword argument 'force_insert'");
+    },
     consulta: (req, detalhe) => {
       const q = db.tabela(A);
       if (detalhe) return q;
@@ -270,7 +275,6 @@ module.exports = function (app) {
       })();
     },
     nome404: A,
-    antesDeCriar: async () => {},
     acoes: [
       { nome: 'grava_cor', detalhe: true, metodos: ['post'], fn: async (req, res, o) => {
         o.cor = req.data && typeof req.data.get === 'function' ? req.data.get('cor', '') : (req.data && req.data.cor !== undefined ? req.data.cor : '');

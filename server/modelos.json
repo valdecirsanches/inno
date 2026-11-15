@@ -249,7 +249,8 @@
     "pk": false,
     "ref": "TbConvenio",
     "tipo": "ForeignKey",
-    "verbose": "fk convenio"
+    "verbose": "fk convenio",
+    "on_delete": "SET_NULL"
    },
    {
     "atributo": "fk_usuario_id",
@@ -3722,7 +3723,8 @@
     "pk": false,
     "ref": "TbConvenio",
     "tipo": "ForeignKey",
-    "verbose": "fk convenio"
+    "verbose": "fk convenio",
+    "on_delete": "SET_NULL"
    },
    {
     "atributo": "fk_plano_id",
@@ -4165,7 +4167,13 @@
   ],
   "pk": "id",
   "tabela": "paciente",
-  "verbose": "tb pacientes"
+  "verbose": "tb pacientes",
+  "unicos_juntos": [
+   [
+    "fk_clinica",
+    "codigo"
+   ]
+  ]
  },
  "TbPlanos": {
   "app": "Planos",
@@ -4191,7 +4199,8 @@
     "pk": false,
     "ref": "TbConvenio",
     "tipo": "ForeignKey",
-    "verbose": "fk convenio"
+    "verbose": "fk convenio",
+    "on_delete": "SET_NULL"
    },
    {
     "atributo": "descricao",

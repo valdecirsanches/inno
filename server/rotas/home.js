@@ -64,14 +64,21 @@ module.exports = function (app) {
     await render(res, 'Seguranca/Usuario/trocasenha.html', { form: formSenha({}) });
   }));
 
+  // PasswordChangeView: PUT faz o mesmo que POST (ProcessFormView.put)
+  app.all('/mudar_senha/', (req, res, next) => (req.method === 'PUT' ? (req.method = 'POST', next()) : next()));
   app.post('/mudar_senha/', a(async (req, res) => {
     const antiga = req.POST.get('old_password', '');
     const nova1 = req.POST.get('new_password1', '');
     const nova2 = req.POST.get('new_password2', '');
+    // PasswordChangeForm: primeiro o "obrigatório" de cada campo; a senha antiga só é
+    // conferida se veio; "não correspondem" só com as duas novas preenchidas
     const e = {};
-    if (!senhas.confere(antiga, req.user.password)) e.old_password = 'A senha antiga foi digitada incorretamente. Por favor, informe-a novamente.';
-    if (nova1 !== nova2) e.new_password2 = 'Os dois campos de senha não correspondem.';
-    if (!nova1) e.new_password1 = 'Este campo é obrigatório.';
+    const OBRIG = 'Este campo é obrigatório.';
+    if (!antiga) e.old_password = OBRIG;
+    else if (!senhas.confere(antiga, req.user.password)) e.old_password = 'A senha antiga foi digitada incorretamente. Por favor, informe-a novamente.';
+    if (!nova1) e.new_password1 = OBRIG;
+    if (!nova2) e.new_password2 = OBRIG;
+    else if (nova1 && nova1 !== nova2) e.new_password2 = 'Os dois campos de senha não correspondem.';
     if (Object.keys(e).length) return render(res, 'Seguranca/Usuario/trocasenha.html', { form: formSenha(e) });
     const codificada = senhas.codifica(nova1);
     await db.tabela('TbUsuario').where(db.coluna('TbUsuario', 'id'), req.user.id)

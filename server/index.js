@@ -28,6 +28,7 @@ app.use(express.text({ type: 'application/x-www-form-urlencoded', limit: '20mb' 
 app.use(express.json({ limit: '20mb' }));
 app.use(multipart);
 app.use((req, res, next) => {
+  if (req.redespachado) return next();   // já preparado na primeira passada
   const i = req.originalUrl.indexOf('?');
   req.GET = new QueryDict(i >= 0 ? req.originalUrl.slice(i + 1) : '');
   // req.corpo: QueryDict(request.body) (usado pelos PUT/DELETE das telas)
@@ -51,6 +52,8 @@ app.use(loginObrigatorio);
 app.use('/media', express.static(config.mediaRoot));
 
 require('./rotas').registra(app);
+// método HTTP que o Inno não registrou para o endereço: como o Django faria
+app.use(require('./seguranca/metodos')(app));
 
 // 404 e 500 como o Django com DEBUG desligado
 app.use((req, res) => {

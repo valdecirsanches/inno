@@ -180,6 +180,20 @@ async function validaForm(nomeModelo, dados, { instancia = null, exclui = [], so
     if (instancia) q.whereNot(db.coluna(nomeModelo, m.pk), instancia[m.pk]);
     if (await q.first()) erros[c.nome] = `${capitaliza(m.verbose)} com este ${capitaliza(c.verbose)} já existe.`;
   }
+  // UniqueConstraint(fields=[...]) / unique_together: erro geral (__all__), como o validate_unique
+  for (const grupo of m.unicos_juntos || []) {
+    const cs = grupo.map((n) => m.campos.find((c) => c.nome === n));
+    const noForm = cs.every((c) => camposDoForm(nomeModelo, { exclui, so }).some((x) => x.nome === c.nome));
+    if (!noForm || cs.some((c) => erros[c.nome] || valores[c.atributo] === null || valores[c.atributo] === undefined)) continue;
+    const q = db.tabela(nomeModelo);
+    for (const c of cs) q.where(c.coluna, valores[c.atributo]);
+    if (instancia) q.whereNot(db.coluna(nomeModelo, m.pk), instancia[m.pk]);
+    if (await q.first()) {
+      const rotulos = cs.map((c) => capitaliza(c.verbose));
+      const lista = rotulos.length > 1 ? `${rotulos.slice(0, -1).join(', ')} e ${rotulos[rotulos.length - 1]}` : rotulos[0];
+      erros.__all__ = `${capitaliza(m.verbose)} com este ${lista} já existe.`;
+    }
+  }
   return { valido: Object.keys(erros).length === 0, erros, valores };
 }
 
@@ -257,8 +271,10 @@ async function insereComId(nomeModelo, colunas) {
  *   extrasLog:  chaves a mais no model_to_dict do log (ex.: as ManyToMany
  *               groups/user_permissions, que num objeto sem pk são [])
  */
-async function salva(req, nomeModelo, obj, { somenteCampos = null, pkNaoVolta = false, extrasLog = null } = {}) {
+async function salva(req, nomeModelo, obj, { somenteCampos = null, pkNaoVolta = null, extrasLog = null } = {}) {
   const m = db.modelo(nomeModelo);
+  // pk IntegerField comum (sem AutoField): o Django não lê o id que o banco gerou
+  if (pkNaoVolta === null) pkNaoVolta = !['AutoField', 'BigAutoField'].includes(m._porAtributo[m.pk].tipo) && (obj[m.pk] === null || obj[m.pk] === undefined);
   const pk = obj[m.pk];
   const agora = db.agora();
   const hoje = db.hoje();
@@ -291,6 +307,16 @@ async function salva(req, nomeModelo, obj, { somenteCampos = null, pkNaoVolta = 
       await db.tabela(nomeModelo).where(db.coluna(nomeModelo, m.pk), pk).update(db.paraColunas(nomeModelo, dados));
     }
   } else {
+    // TbPacientes.save() do AppClinic: paciente novo recebe o próximo código da clínica
+    // (o código que veio do formulário é descartado)
+    const novoPaciente = nomeModelo === 'TbPacientes' && (pk === null || pk === undefined);
+    if (novoPaciente) {
+      const q = db.tabela(nomeModelo).max({ maior: db.coluna(nomeModelo, 'codigo') });
+      if (obj.fk_clinica_id === null || obj.fk_clinica_id === undefined) q.whereNull(db.coluna(nomeModelo, 'fk_clinica_id'));
+      else q.where(db.coluna(nomeModelo, 'fk_clinica_id'), obj.fk_clinica_id);
+      const r = await q.first();
+      obj.codigo = (Number(r && r.maior) || 0) + 1;
+    }
     const dados = {};
     for (const c of m.campos) {
       if (obj[c.atributo] !== undefined) dados[c.atributo] = obj[c.atributo];
@@ -314,6 +340,11 @@ async function salva(req, nomeModelo, obj, { somenteCampos = null, pkNaoVolta = 
       id = await insereComId(nomeModelo, db.paraColunas(nomeModelo, dados));
     }
     obj[m.pk] = pkNaoVolta ? null : Number(id);
+    if (novoPaciente && req && req.user && req.user.is_authenticated) {
+      // TbOpcoes.objects.filter(fk_usuario=usuario).update(ultimo_pac=self.codigo): sem log
+      await db.tabela('TbOpcoes').where(db.coluna('TbOpcoes', 'fk_usuario_id'), req.user.id)
+        .update(db.paraColunas('TbOpcoes', { ultimo_pac: obj.codigo }));
+    }
   }
   // o log do Django usa os valores do objeto em memória (model_to_dict(instance))
   const memoria = Object.assign({}, obj);
@@ -359,12 +390,28 @@ function modelToDictAtrib(nomeModelo, obj) {
  */
 const temArquivo = (nomeModelo) => db.modelo(nomeModelo).campos.some((c) => c.tipo === 'FileField' || c.tipo === 'ImageField');
 
+/**
+ * on_delete=SET_NULL (Collector do Django): antes de apagar, quem aponta para os
+ * registros fica com a chave vazia (sem log; ex.: excluir um convênio zera o
+ * convênio de pacientes, consultas e planos)
+ */
+async function anulaReferencias(nomeModelo, ids) {
+  for (const [nome, m] of Object.entries(db.MODELOS)) {
+    for (const c of m.campos) {
+      if (c.ref === nomeModelo && c.on_delete === 'SET_NULL') {
+        await db.tabela(nome).whereIn(c.coluna, ids).update({ [c.coluna]: null });
+      }
+    }
+  }
+}
+
 async function exclui(req, nomeModelo, obj) {
   const m = db.modelo(nomeModelo);
   if (temArquivo(nomeModelo) && req && req.user && req.user.is_authenticated) {
     console.error(`[LOG ERRO] Falha ao registrar exclusão para ${nomeModelo}: Object of type FieldFile is not JSON serializable`);
     return;
   }
+  await anulaReferencias(nomeModelo, [obj[m.pk]]);
   await db.tabela(nomeModelo).where(db.coluna(nomeModelo, m.pk), obj[m.pk]).del();
   try {
     await registraLog(req, 'Exclusão de registro', nomeModelo, obj[m.pk], jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, obj)), {});
@@ -379,6 +426,7 @@ async function excluiLista(req, nomeModelo, objs) {
   const ordenados = objs.slice().sort((x, y) => Number(x[m.pk]) - Number(y[m.pk])).reverse();
   if (!ordenados.length) return;
   if (temArquivo(nomeModelo) && req && req.user && req.user.is_authenticated) return;
+  await anulaReferencias(nomeModelo, ordenados.map((o) => o[m.pk]));
   await db.tabela(nomeModelo).whereIn(db.coluna(nomeModelo, m.pk), ordenados.map((o) => o[m.pk])).del();
   for (const o of ordenados) {
     try {

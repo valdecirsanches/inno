@@ -51,6 +51,10 @@ O dono do projeto fala português: responda em português.
   `node tools/testes/cobertura.js /tmp/django.txt` listam endereços do AppClinic que o Inno
   não responde (os falsos positivos conhecidos estão no topo do cobertura.js).
   Neste ambiente, rode com `NO_PROXY=127.0.0.1` se houver proxy.
+- **Comparação com o AppClinic de verdade** (o teste mais importante): `tools/comparacao/`
+  sobe o Django original e o Inno no mesmo banco de teste e compara respostas e tabelas
+  passo a passo (veja `tools/comparacao/LEIAME.md`). Rode os três roteiros depois de
+  qualquer mudança; hoje todos dão iguais, fora as diferenças documentadas no README.
 - Impressos (PDF): `tools/impressos/` roda os `reports.py` originais e compara página a página
   (veja `tools/impressos/LEIAME.md`). Rode de novo ao mexer em `server/util/pdf.js`.
 
