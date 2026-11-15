@@ -108,7 +108,8 @@ async function limpaCampo(c, bruto, presente) {
   if (vazio) {
     if (obrigatorio) return { erro: MSG.obrigatorio };
     const textual = ['CharField', 'TextField', 'EmailField', 'SlugField', 'URLField'].includes(tipo);
-    return { valor: textual && !c.nulo ? '' : null };
+    // CharField(null=True) do form vira None; TextField fica '' (o Django só troca o vazio por None no CharField)
+    return { valor: textual && (!c.nulo || tipo === 'TextField') ? '' : null };
   }
   switch (tipo) {
     case 'CharField': case 'TextField': case 'EmailField': case 'SlugField': case 'URLField': case 'GenericIPAddressField':
@@ -204,10 +205,11 @@ function ipDe(req) {
   return ip && ip.startsWith('::ffff:') ? ip.slice(7) : ip;
 }
 
-function jsonSeguro(nomeModelo, dict) {
+function jsonSeguro(nomeModelo, dict, inteiros = new Set()) {
   const m = db.modelo(nomeModelo);
   const o = {};
-  for (const [k, v] of Object.entries(dict)) o[k] = pyIso(m._porAtributo[k], v);
+  // FloatField com padrão inteiro (ex.: codigo = 99999): em memória é int no Python
+  for (const [k, v] of Object.entries(dict)) o[k] = inteiros.has(k) && v !== null ? v : pyIso(m._porAtributo[k], v);
   return o;
 }
 
@@ -244,6 +246,7 @@ async function salva(req, nomeModelo, obj, { somenteCampos = null } = {}) {
   const pk = obj[m.pk];
   const agora = db.agora();
   const hoje = db.hoje();
+  const inteiros = new Set();
   let antes = null;
   let existe = false;
   if (pk !== null && pk !== undefined) {
@@ -278,7 +281,7 @@ async function salva(req, nomeModelo, obj, { somenteCampos = null } = {}) {
       else if (c.pk) continue;
       // Field.get_default() do Django: o padrão do modelo; sem padrão, '' para
       // texto que não aceita nulo e None para o resto
-      else if (c.padrao !== undefined) dados[c.atributo] = c.padrao;
+      else if (c.padrao !== undefined) { dados[c.atributo] = c.padrao; if (c.tipo === 'FloatField' && Number.isInteger(c.padrao)) inteiros.add(c.atributo); }
       else dados[c.atributo] = !c.nulo && TEXTO.includes(c.tipo) ? '' : null;
       if (obj[c.atributo] === undefined) obj[c.atributo] = dados[c.atributo];
     }
@@ -304,7 +307,7 @@ async function salva(req, nomeModelo, obj, { somenteCampos = null } = {}) {
   // log de auditoria (post_save)
   try {
     if (!existe) {
-      await registraLog(req, 'Criação de registro', nomeModelo, obj[m.pk], {}, jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, memoria)));
+      await registraLog(req, 'Criação de registro', nomeModelo, obj[m.pk], {}, jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, memoria), inteiros));
     } else {
       const a = jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, antes));
       const d = jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, memoria));

@@ -327,6 +327,9 @@ var $Medico = $("#medico").selectize({
     onChange: function(value){
         var dateData = $dataAgenda.datepicker('getDate');
         $('#titMedico').html(Medico.getItem(value).html());
+        // lista de médicos chegou antes do calendário ter data: a carga
+        // inicial fica com o $(window).load, que já tem a data certa
+        if (!dateData || isNaN(dateData.getTime())) { return; }
         $('#titData').html(strzero(dateData.getDate(),2)+'/'+(dateData.getMonth()+1)+'/'+dateData.getFullYear());
         AutoAgenda(dateData, value);
         DDHLivres(dateData);
@@ -386,6 +389,7 @@ function DDHLivres(dt){
 }
 
 function _DDHLivres(dt){
+    if (!dt || isNaN(dt.getTime())) { return; }   // calendário ainda sem data
     if ($dataAgenda.datepicker){
         var myDate = dt.getFullYear()+'-'+(dt.getMonth()+1)+'-'+dt.getDate(),
             med = Medico.getValue() || 0;

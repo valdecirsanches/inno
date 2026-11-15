@@ -45,7 +45,8 @@ O `.env` nunca vai para o GitHub.
 | Etapa | Módulos | Situação |
 |---|---|---|
 | 1 | Login, saída, troca de senha, tela inicial, menu, cadastro de pacientes (busca, cadastro, consultas, recibos), listas de convênios, planos e médicos | pronta |
-| 2 | Agenda e atendimento | a fazer |
+| 2 | Agenda de consultas (lista do dia, calendário, agendar, status, chegada, confirmação, abrir/gerar/desativar agenda, horários, cores, gráficos), listas de procedimentos e especialidades, `/api/especialidade/` | pronta |
+| 2b | Atendimento | a fazer |
 | 3 | Prontuário, recibos impressos e demais PDFs | a fazer |
 | 4 | WhatsApp, Memed, painéis, configurações e o restante | a fazer |
 
@@ -61,6 +62,8 @@ server/
   modelos.json       definição das tabelas (exportada dos modelos do AppClinic)
   templates.js       telas (Nunjucks), imprimindo valores como o Django
   seguranca/         senhas no formato do Django, sessão, CSRF, login obrigatório
+  util/drf.js        o papel do Django REST Framework nas rotas /api/
+  util/orm.js        get(), int(), strptime() etc. com os mesmos erros do Django
   util/modelo.js     validação e gravação como o formulário e o save() do Django,
                      com o log de auditoria em tb_usuarios_log
   rotas/             uma pasta por módulo, com os mesmos endereços
@@ -76,3 +79,4 @@ O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As 
 - Entrar pela página `/login/` direto não leva mais a uma página "não encontrada" (`/login/None`).
 - Endereços chamados sem a barra final respondem direto, sem o redirecionamento extra.
 - A primeira vez que um usuário sem preferências salvas abre um paciente, o Django dava erro. O Inno cria as preferências com os valores padrão.
+- Ao abrir a agenda, se a lista de médicos chegava antes do calendário ter data, a tela pedia a agenda de "NaN-NaN-NaN" e recebia erro. O Inno espera a data.

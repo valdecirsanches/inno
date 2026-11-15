@@ -129,6 +129,8 @@ function paraColunas(nomeModelo, obj) {
     if (['BooleanField', 'NullBooleanField'].includes(c.tipo) && typeof v === 'boolean') valor = v ? 1 : 0;
     // TimeField recebendo data e hora (como o Django aceita): grava só a hora
     if (c.tipo === 'TimeField' && typeof v === 'string' && /^\d{4}-\d{2}-\d{2}[ T]/.test(v)) valor = v.slice(11);
+    // DateField recebendo datetime: grava só a data
+    if (c.tipo === 'DateField' && typeof v === 'string' && /^\d{4}-\d{2}-\d{2}[ T]/.test(v)) valor = v.slice(0, 10);
     saida[c.coluna] = valor;
   }
   return saida;
@@ -142,8 +144,10 @@ async function busca(nomeModelo, filtroAtributos) {
 
 /** Data e hora local no formato do Django (USE_TZ = False). */
 function agora() {
-  const d = new Date();
-  const us = String(d.getMilliseconds() * 1000).padStart(6, '0');
+  // microssegundos, como o datetime.now() do Python
+  const t = performance.timeOrigin + performance.now();
+  const d = new Date(Math.floor(t));
+  const us = String(Math.floor((t * 1000) % 1e6)).padStart(6, '0');
   return `${normalizaData(d)} ${doisDig(d.getHours())}:${doisDig(d.getMinutes())}:${doisDig(d.getSeconds())}.${us}`;
 }
 

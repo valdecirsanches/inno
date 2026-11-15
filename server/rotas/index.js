@@ -7,6 +7,7 @@ const MODULOS = [
   require('./home'),
   require('./pacientes'),
   require('./listas'),
+  require('./agenda'),
 ];
 
 // rotas que no Django tinham @csrf_exempt
