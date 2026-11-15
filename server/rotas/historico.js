@@ -256,12 +256,13 @@ async function consultasDoPaciente(pac, { ano = null, ordem = 'desc', ateHoje = 
 }
 
 module.exports = function (app) {
-  app.get('/historico/', a(async (req, res) => {
+  // o mesmo histórico está em /historico/ e em /prontuario/Historico/ (os dois include do AppClinic)
+  app.get(['/historico/', '/prontuario/Historico/'], a(async (req, res) => {
     await render(res, 'Prontuario/historico.html', { host: config.bancoExibido.host, db: config.bancoExibido.nome, usuario: req.user,
       data: formata(db.hoje(), 'j \\d\\e F \\d\\e Y') });
   }));
 
-  app.get('/historico/AdicionaConsultas/', a(async (req, res) => {
+  app.all(['/historico/AdicionaConsultas/', '/prontuario/Historico/AdicionaConsultas/'], a(async (req, res) => {
     const ano = req.GET.get('ano');
     const dTxt = req.GET.get('d');
     const d = dTxt ? dTxt.split(',') : null;

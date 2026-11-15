@@ -11,9 +11,8 @@ const os = require('os');
 const path = require('path');
 const R = path.join(__dirname, '..', '..');
 
-module.exports = async function base({ env = {}, antesDoServidor = null } = {}) {
-  const arq = path.join(os.tmpdir(), `inno-teste-${process.pid}-${Date.now()}.sqlite3`);
-  Object.assign(process.env, { DB_CLIENT: 'better-sqlite3', DB_FILE: arq, SECRET_KEY: 'x'.repeat(40), DEBUG: '', DB_NAME: 'teste' }, env);
+/** cria o banco SQLite de teste (tabelas do modelos.json + dados.json); devolve a conexão */
+function montaBanco(arq) {
   const M = require(R + '/server/modelos.json');
   const D = require(R + '/tools/impressos/dados.json');
   const Database = require(R + '/node_modules/better-sqlite3');
@@ -32,6 +31,13 @@ module.exports = async function base({ env = {}, antesDoServidor = null } = {}) 
       sq.prepare(`INSERT INTO "${m.tabela}" (${cs.map((c) => `"${c}"`).join(',')}) VALUES (${k.map(() => '?').join(',')})`).run(...k.map((x) => (typeof o[x] === 'boolean' ? +o[x] : o[x])));
     }
   }
+  return sq;
+}
+
+module.exports = async function base({ env = {}, antesDoServidor = null } = {}) {
+  const arq = path.join(os.tmpdir(), `inno-teste-${process.pid}-${Date.now()}.sqlite3`);
+  Object.assign(process.env, { DB_CLIENT: 'better-sqlite3', DB_FILE: arq, SECRET_KEY: 'x'.repeat(40), DEBUG: '', DB_NAME: 'teste' }, env);
+  const sq = montaBanco(arq);
   if (antesDoServidor) await antesDoServidor(sq);
   const app = require(R + '/server/index.js');
   const srv = await new Promise((ok) => { const s = app.listen(0, () => ok(s)); });
@@ -63,3 +69,4 @@ module.exports = async function base({ env = {}, antesDoServidor = null } = {}) 
   };
   return t;
 };
+module.exports.montaBanco = montaBanco;

@@ -21,7 +21,11 @@ function confere(senha, codificada) {
 }
 
 function codifica(senha) {
-  const sal = crypto.randomBytes(16).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 22);
+  // get_random_string(22) do Django: com menos de 22 letras o Django acha o sal
+  // fraco e regrava a senha no próximo login (must_update)
+  const ALFA = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let sal = '';
+  while (sal.length < 22) sal += ALFA[crypto.randomInt(ALFA.length)];
   const hash = crypto.pbkdf2Sync(String(senha), sal, ITERACOES, 32, 'sha256').toString('base64');
   return `pbkdf2_sha256$${ITERACOES}$${sal}$${hash}`;
 }

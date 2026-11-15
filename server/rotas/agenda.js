@@ -383,7 +383,7 @@ module.exports = function (app) {
       }
       ret = { success: msg };
     } catch (e) {
-      if (e.python) ret = { erro: [e.message] };
+      if (e.python) ret = { erro: e.args || [e.message] };   // dict(erro=e.args)
       else throw e;   // erro de rede: o Django não conseguia serializar a exceção (500)
     }
     json(res, ret);

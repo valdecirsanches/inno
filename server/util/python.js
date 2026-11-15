@@ -100,7 +100,7 @@ function djJson(campo, v) {
 
 /** KeyError do Python: parâmetro obrigatório da requisição */
 function exige(qd, chave) {
-  if (!qd.has(chave)) { const e = new Error(`MultiValueDictKeyError: '${chave}'`); e.python = true; throw e; }
+  if (!qd.has(chave)) { const e = new Error(`MultiValueDictKeyError: '${chave}'`); e.python = true; e.args = [chave]; throw e; }
   return qd.get(chave);
 }
 

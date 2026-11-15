@@ -91,7 +91,7 @@ O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As 
 
 - Entrar pela página `/login/` direto não leva mais a uma página "não encontrada" (`/login/None`).
 - Endereços chamados sem a barra final respondem direto, sem o redirecionamento extra.
-- A primeira vez que um usuário sem preferências salvas abre um paciente, o Django dava erro. O Inno cria as preferências com os valores padrão.
+- A primeira vez que um usuário sem preferências salvas abre um paciente (ou a agenda), o Django dava erro. O Inno cria as preferências com os valores padrão.
 - Impressos: o nome do arquivo com acento (resumo de atendimentos) vai no formato MIME (`=?utf-8?b?...?=`), porque o Node não envia latin-1 cru no cabeçalho.
 - Criar horários com intervalo negativo travava o AppClinic num laço sem fim; o Inno ignora esse intervalo.
 - Ao abrir a agenda, se a lista de médicos chegava antes do calendário ter data, a tela pedia a agenda de "NaN-NaN-NaN" e recebia erro. O Inno espera a data.

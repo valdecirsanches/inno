@@ -303,7 +303,11 @@ function registra(app, base, opc) {
     if (opc.permissao && !opc.permissao(req)) { drf.responde(res, { detail: 'Você não tem permissão para executar essa ação.' }, 403); return false; }
     return true;
   };
+  const pkCampo = m._porAtributo[m.pk];
+  const pkInteira = ['AutoField', 'BigAutoField', 'IntegerField'].includes(pkCampo.tipo);
   const objeto = async (req, res) => {
+    // get_object_or_404 do DRF: pk que não vira número (ValueError) é só "Não encontrado."
+    if (pkInteira && !/^\s*[-+]?\d+\s*$/.test(req.params.pk)) { drf.naoEncontrado(res, null); return null; }
     const q = aplicaFiltros(req, (await consulta(req, true)).q);
     if (!q._statements.some((x) => x.grouping === 'columns')) q.select(`${t}.*`);
     const l = await q.clone().where(`${t}.${db.coluna(nomeModelo, m.pk)}`, req.params.pk).first();
@@ -401,6 +405,7 @@ function registra(app, base, opc) {
     app.all(`${base}/:pk/${ac.url || ac.nome}/`, a(async (req, res) => {
       if (!ac.metodos.includes(req.method.toLowerCase())) return drf.responde(res, { detail: MSG.metodo(req.method) }, 405);
       if (!permitido(req, res)) return;
+      if (ac.semObjeto) return ac.fn(req, res, null);   // a ação dá erro antes do get_object
       const obj = await objeto(req, res);
       if (!obj) return;
       await ac.fn(req, res, obj);

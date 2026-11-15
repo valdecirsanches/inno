@@ -901,6 +901,19 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
   }));
 
   // o roteador registra "remedio" antes da prescrição
+  // Prontuario/Prescricoes/urls_api.py inclui o router duas vezes: em '' e em 'remedio'
+  // (sem barra). A segunda gera endereços colados: 'remedio' + rota do router
+  // (/api/prescricao/remedio = lista de prescrições, /api/prescricao/remedioremedio/ =
+  // remédios, /api/prescricao/remedio<pk>/ = detalhe de prescrição...). Com barra
+  // depois de 'remedio', vale o include normal.
+  app.use((req, res, next) => {
+    const m = req.path.match(/^\/api\/prescricao\/remedio(?!\/)(.*)$/);
+    if (m) {
+      const q = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+      req.url = `/api/prescricao/${m[1]}${q}`;
+    }
+    next();
+  });
   viewset.registra(app, '/api/prescricao/remedio', {
     modelo: RM, serializer: {}, paginar: false,
     filtros: { id: ['in'], fk_prescricao_id: ['exact'] },
@@ -959,6 +972,8 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
   }
   const download = a(async (req, res) => {
     const id = req.GET.get('extra');
+    // get_object_or_404(TbExtra, id=None): o filtro vira "id IS NULL" e dá 404
+    if (id === null) return require('../util/http').pagina404(res);
     const l = await db.tabela(EX).where(col(EX, 'id'), numero(id)).first();
     if (!l) return require('../util/http').pagina404(res);
     baixa(res, String(db.linha(EX, l).file));
@@ -1035,8 +1050,30 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
         exige(req.GET, 'paciente');
         json(res, { success: 'Sucesso!' });
       } },
+      // envia todos os arquivos de media/extras ao servidor de documentos da EDS
+      // (sem a pasta, o os.listdir dá erro 500; uma falha de envio também)
       { nome: 'uploadAllDocs', detalhe: false, metodos: ['get'], fn: async (req, res) => {
         exige(req.GET, 'paciente');
+        const requests = require('../util/requests');
+        const raiz = path.join(config.mediaRoot, 'extras');
+        if (!fs.existsSync(raiz)) throw erroPython(`[Errno 2] No such file or directory: '${raiz}'`);
+        const walk = function* (dir) {
+          const itens = fs.readdirSync(dir, { withFileTypes: true });
+          yield [dir, itens.filter((i) => i.isFile()).map((i) => i.name)];
+          for (const i of itens) if (i.isDirectory()) yield* walk(path.join(dir, i.name));
+        };
+        for (const pac of fs.readdirSync(raiz)) {
+          const base = path.join(raiz, pac);
+          if (!fs.statSync(base).isDirectory()) continue;
+          for (const [pasta, arquivos] of walk(base)) {
+            for (const nome of arquivos) {
+              await requests.post('http://docs.edssolution.com.br/upload', {
+                files: { file: { nome, dados: fs.readFileSync(path.join(pasta, nome)) } },
+                params: { sistema: 'appclinic', id_paciente: req.data, path: pasta },
+              });
+            }
+          }
+        }
         json(res, { success: 'Sucesso!' });
       } },
       { nome: 'downloadFile', detalhe: false, metodos: ['post'], fn: async () => { throw erroPython("request() got an unexpected keyword argument 'file_name'"); } },

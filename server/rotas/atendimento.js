@@ -254,7 +254,7 @@ module.exports = function (app) {
     serializer: { declarados },
     paginar: false,
     filtros: { id: ['exact'], data: ['exact'] },
-    busca: null,
+    busca: ['fk_medico', 'data'],
     consulta: (req, detalhe) => {
       const q = db.tabela(A);
       if (detalhe) return q;

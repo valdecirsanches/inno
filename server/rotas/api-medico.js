@@ -31,6 +31,7 @@ module.exports = function (app) {
     serializer: { declarados: [['deleted', S.pula], ['deleted_at', S.pula]] },
     paginar: false,
     filtros: { id: ['in'], fk_medico: ['exact'], dia_semana: ['exact'] },
+    busca: ['fk_medico', 'dia_semana'],
     consulta: (req, detalhe) => {
       const q = db.tabela(H);
       if (detalhe) return q;
@@ -124,7 +125,7 @@ module.exports = function (app) {
       json(res, { success: html });
     } },
     // horarios_load(self, request) sem o pk: o DRF chama com pk=... e dá erro sempre
-    { nome: 'horarios_load', url: 'horarios-load', detalhe: true, metodos: ['get'], fn: async () => {
+    { nome: 'horarios_load', url: 'horarios-load', detalhe: true, semObjeto: true, metodos: ['get'], fn: async () => {
       throw erroPython("horarios_load() got an unexpected keyword argument 'pk'");
     } },
   ];

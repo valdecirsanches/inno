@@ -62,7 +62,14 @@ function termos(texto) {
 }
 
 function aplicaBusca(q, nomeModelo, campos, texto) {
-  for (const t of termos(texto)) {
+  const ts = termos(texto);
+  // search_fields com uma chave estrangeira (ex.: 'fk_medico'): o Django recusa
+  // fk_medico__icontains e a busca dá erro 500 (AgendaViewSet, HorariosViewSet)
+  const m = db.modelo(nomeModelo);
+  if (ts.length && campos.some((n) => ['ForeignKey', 'OneToOneField'].includes((m._porAtributo[n] || {}).tipo))) {
+    const e = new Error('Related Field got invalid lookup: icontains'); e.python = true; throw e;
+  }
+  for (const t of ts) {
     q.where((w) => {
       campos.forEach((nome, i) => {
         const col = `${db.modelo(nomeModelo).tabela}.${db.coluna(nomeModelo, nome)}`;

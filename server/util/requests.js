@@ -40,7 +40,7 @@ function hostPorta(u) {
  * requests.request(metodo, url, params=..., headers=..., json=..., data=..., timeout=...)
  * json: objeto (serializado como o json.dumps do requests); data: texto já pronto.
  */
-async function request(metodo, url, { params = null, headers = {}, json = undefined, data = null, timeout = null } = {}) {
+async function request(metodo, url, { params = null, headers = {}, json = undefined, data = null, files = null, timeout = null } = {}) {
   let u;
   try {
     u = new URL(url);
@@ -50,13 +50,20 @@ async function request(metodo, url, { params = null, headers = {}, json = undefi
   }
   for (const [k, v] of Object.entries(params || {})) {
     if (v === null || v === undefined) continue;   // o requests omite parâmetros None
-    u.searchParams.append(k, typeof v === 'boolean' ? (v ? 'True' : 'False') : String(v));
+    // valor iterável (lista, dict, QueryDict): um parâmetro por item, como o requests
+    const itens = Array.isArray(v) ? v : (v && typeof v === 'object' ? (typeof v.keys === 'function' && !(v instanceof Map) ? v.keys() : Object.keys(v)) : [v]);
+    for (const x of itens) u.searchParams.append(k, typeof x === 'boolean' ? (x ? 'True' : 'False') : String(x));
   }
   const opc = { method: metodo, headers: Object.assign({}, headers), redirect: 'follow' };
   const temTipo = () => Object.keys(opc.headers).some((h) => h.toLowerCase() === 'content-type');
   if (json !== undefined) {
     opc.body = pyJson(json);
     if (!temTipo()) opc.headers['Content-Type'] = 'application/json';
+  } else if (files) {
+    // files={'campo': (nome, conteúdo)}: multipart/form-data
+    const fd = new FormData();
+    for (const [campo, arq] of Object.entries(files)) fd.append(campo, new Blob([arq.dados]), arq.nome);
+    opc.body = fd;
   } else if (data !== null) {
     opc.body = data;
   }
