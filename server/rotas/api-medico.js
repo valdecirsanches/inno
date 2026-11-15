@@ -59,10 +59,8 @@ module.exports = function (app) {
 
   // --------------------------------------------------------- médicos
   const M = 'TbMedicos';
-  const ser = viewset.criaSerializer(M, Object.assign({}, S.medico.opc, {
-    gravaveis: { fk_especialidade: S.relacionadoGravavel('TbEspecialidades', 'fk_especialidade_id') },
-  }));
-  const hash = (req, obj) => { if (req.method !== 'PATCH') obj.cpf_hash = cpfHash(req); };
+  const ser = serializerMedico();
+  const hash = hashDoCpf;
   const acoes = [
     { nome: 'cid10', detalhe: false, metodos: ['get'], fn: async (req, res) => {
       const busca = req.GET.get('search', '');
@@ -137,6 +135,17 @@ module.exports = function (app) {
     acoes,
   });
 };
+
+/** MedicoSerializer (também usado pelo MemedViewSet) */
+function serializerMedico() {
+  return viewset.criaSerializer('TbMedicos', Object.assign({}, S.medico.opc, {
+    gravaveis: { fk_especialidade: S.relacionadoGravavel('TbEspecialidades', 'fk_especialidade_id') },
+  }));
+}
+/** cpf_hash = HiddenField(default=CurrentCPFHash()): não vale no PATCH (parcial) */
+function hashDoCpf(req, obj) { if (req.method !== 'PATCH') obj.cpf_hash = cpfHash(req); }
+module.exports.serializerMedico = serializerMedico;
+module.exports.hashDoCpf = hashDoCpf;
 
 /** HorariosViewSet.cria_horarios */
 async function criaHorarios(req, res) {

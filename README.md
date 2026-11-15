@@ -37,6 +37,7 @@ pm2 save
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | o MySQL do AppClinic |
 | `MEDIA_ROOT` | a pasta `media/` do AppClinic (documentos dos pacientes) |
 | `DEBUG` | `1` mostra o erro completo na tela; só para desenvolvimento |
+| `MEMED_API_KEY`, `MEMED_SECRET_KEY`, `MEMED_DATA_TOKEN` | as chaves da Memed (as do `settings.py` do AppClinic) |
 
 O `.env` nunca vai para o GitHub.
 
@@ -53,7 +54,8 @@ O `.env` nunca vai para o GitHub.
 | 4b | Cadastros: especialidades, planos de saúde, médicos (tela, busca, horários, gravação), convênios e clínicas (telas e `convenio.json` / `clinica.json`), filtro e resumo de atendimentos | pronta |
 | 4c | API de médicos e horários (`/api/medico/`, `/api/medico/horario/`: lista, detalhe, gravação, CID-10, dados para a Memed, criar e limpar horários) | pronta |
 | 5 | Segurança (tela de usuários e `usuario.json`: lista, gravação e exclusão), painel (`/painel/`), logs de auditoria (`/logs/painel/`, `/logs/gerenciar/`), opções de presença do paciente (`/opcoesPresenca/`, `/confirmar-presenca-efetivo/`, `/cancelar-presenca-efetivo/`) | pronta |
-| 6 | API da Memed e do WhatsApp, admin do Django | a fazer |
+| 6a | API da Memed (`/api/memed/`: médico como prescritor, situação do cadastro, acesso da aba Memed do atendimento, sincronização de especialidades) | pronta |
+| 6b | API do WhatsApp (`/api/whatsapp/`, `/whatsapp/...`, `/webhook/`), admin do Django | a fazer |
 
 Enquanto a conversão não termina, use o Inno só para conferir os módulos prontos. O AppClinic continua sendo o sistema principal.
 
@@ -78,7 +80,7 @@ templates/           as telas do AppClinic, convertidas para Nunjucks
 static/              CSS, JS e imagens do AppClinic
 tools/               scripts da conversão (rodam uma vez, no AppClinic, não no servidor)
                      e tools/impressos/, que confere os PDFs contra os do AppClinic;
-                     tools/testes/ tem os testes das rotas (node tools/testes/etapa5.js)
+                     tools/testes/ tem os testes das rotas (node tools/testes/etapa5.js etc.)
 ```
 
 ## Diferenças em relação ao AppClinic

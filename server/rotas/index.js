@@ -18,6 +18,7 @@ const MODULOS = [
   require('./seguranca'),
   require('./painel'),
   require('./presenca'),
+  require('./api-memed'),
 ];
 
 // rotas que no Django tinham @csrf_exempt

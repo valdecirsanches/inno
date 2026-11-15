@@ -12,48 +12,14 @@ const db = require('../db');
 const { render } = require('../templates');
 const { erroPython } = require('../util/orm');
 const { formata } = require('../util/formato-data');
-const { pyFloat, pyReprTexto } = require('../util/python');
+const { pyJsonLoads: jsonLoads, pyReprJson: repr, pyBool: verdadeiro, pyStrValor: str } = require('../util/python');
 
 const a = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
-
-/** json.loads do Python, guardando quais números eram float (1.0 continua 1.0) */
-function jsonLoads(texto) {
-  return JSON.parse(texto, (k, v, ctx) => (typeof v === 'number' && ctx && /[.eE]/.test(ctx.source) ? { __float__: v } : v));
-}
-
 /** valor do JSONField como o Django lê do banco (texto inválido continua texto) */
 function valorJson(cru) {
   if (cru === null || cru === undefined) return null;
   if (typeof cru !== 'string') return cru;          // driver que já devolveu o objeto
   try { return jsonLoads(cru); } catch (e) { return cru; }
-}
-
-const ehFloat = (v) => v !== null && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 1 && '__float__' in v;
-
-/** repr() do Python para o que sai do json.loads */
-function repr(v) {
-  if (v === null || v === undefined) return 'None';
-  if (ehFloat(v)) return pyFloat(v.__float__);
-  if (typeof v === 'boolean') return v ? 'True' : 'False';
-  if (typeof v === 'number') return Number.isInteger(v) ? String(v) : pyFloat(v);
-  if (typeof v === 'string') return pyReprTexto(v);
-  if (Array.isArray(v)) return '[' + v.map(repr).join(', ') + ']';
-  return '{' + Object.entries(v).map(([k, x]) => `${pyReprTexto(k)}: ${repr(x)}`).join(', ') + '}';
-}
-
-/** bool() do Python */
-function verdadeiro(v) {
-  if (v === null || v === undefined || v === false || v === '' || v === 0) return false;
-  if (ehFloat(v)) return v.__float__ !== 0;
-  if (Array.isArray(v)) return v.length > 0;
-  if (typeof v === 'object') return Object.keys(v).length > 0;
-  return true;
-}
-
-/** str() do Python (o que o {{ }} do Django imprime) */
-function str(v) {
-  if (typeof v === 'string') return v;
-  return repr(v);
 }
 
 module.exports = function (app) {

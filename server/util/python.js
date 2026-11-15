@@ -200,3 +200,59 @@ module.exports.splitlines = splitlines;
 module.exports.pyLen = pyLen;
 module.exports.idadeF = idadeF;
 module.exports.pyReprValor = pyReprValor;
+
+// ------------------------------------------- valores vindos do json.loads
+/** json.loads do Python, guardando quais números eram float (1.0 continua 1.0) */
+function pyJsonLoads(texto) {
+  return JSON.parse(texto, (k, v, ctx) => (typeof v === 'number' && ctx && /[.eE]/.test(ctx.source) ? { __float__: v } : v));
+}
+
+const ehFloat = (v) => v !== null && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 1 && '__float__' in v;
+const ehDict = (v) => v !== null && typeof v === 'object' && !Array.isArray(v) && !ehFloat(v);
+
+/** repr() do Python para o que sai do json.loads */
+function pyReprJson(v) {
+  if (v === null || v === undefined) return 'None';
+  if (ehFloat(v)) return pyFloat(v.__float__);
+  if (typeof v === 'boolean') return v ? 'True' : 'False';
+  if (typeof v === 'number') return Number.isInteger(v) ? String(v) : pyFloat(v);
+  if (typeof v === 'string') return pyReprTexto(v);
+  if (Array.isArray(v)) return '[' + v.map(pyReprJson).join(', ') + ']';
+  return '{' + Object.entries(v).map(([k, x]) => `${pyReprTexto(k)}: ${pyReprJson(x)}`).join(', ') + '}';
+}
+
+/** str() do Python para o que sai do json.loads */
+function pyStrValor(v) { return typeof v === 'string' ? v : pyReprJson(v); }
+
+/** bool() do Python */
+function pyBool(v) {
+  if (v === null || v === undefined || v === false || v === '' || v === 0) return false;
+  if (ehFloat(v)) return v.__float__ !== 0;
+  if (Array.isArray(v)) return v.length > 0;
+  if (typeof v === 'object') return Object.keys(v).length > 0;
+  return true;
+}
+
+/** nome do tipo no Python (para as mensagens de erro) */
+function pyTipo(v) {
+  if (v === null || v === undefined) return 'NoneType';
+  if (ehFloat(v)) return 'float';
+  if (typeof v === 'boolean') return 'bool';
+  if (typeof v === 'number') return 'int';
+  if (typeof v === 'string') return 'str';
+  return Array.isArray(v) ? 'list' : 'dict';
+}
+
+/** dict.get(k, padrao), com o AttributeError de quem não é dict */
+function pyGet(v, k, padrao = null) {
+  if (!ehDict(v)) { const e = new Error(`'${pyTipo(v)}' object has no attribute 'get'`); e.python = true; throw e; }
+  return Object.prototype.hasOwnProperty.call(v, k) ? v[k] : padrao;
+}
+
+module.exports.pyJsonLoads = pyJsonLoads;
+module.exports.pyReprJson = pyReprJson;
+module.exports.pyStrValor = pyStrValor;
+module.exports.pyBool = pyBool;
+module.exports.pyTipo = pyTipo;
+module.exports.pyGet = pyGet;
+module.exports.ehDict = ehDict;
