@@ -1,0 +1,33 @@
+<div class="ibox-content">
+    <table id="tabelaAtestados"
+           data-toggle="table"
+           data-classes="table table-condensed table-hover table-no-bordered"
+           data-click-to-select="true"
+           data-total-field="count"
+           data-data-field="results"
+           data-unique-id="id"
+           data-url="/api/atestado/">
+        <thead>
+            <tr>
+                <th data-radio="true"></th>
+                <th data-field="fk_consulta" data-visible="false"></th>
+                <th data-field="fk_prontuario" data-visible="false"></th>
+                <th data-field="id" data-visible="false"></th>
+                <th data-field="dataSalvo">Data de emissão</th>
+                <th data-field="fk_usuario_nome">Usuário</th>
+                <th data-field="dt_referencia" data-formatter="dateFormatter">Data de referência</th>
+                <th data-field="mycid10">Cid 10</th>
+                <th data-field="hora_chegada">Chegada</th>
+                <th data-field="hora_saida">Saída</th>
+                <th data-field="afastado_por">Qtde de dias</th>
+                <th data-field="requerente">Solicitante</th>
+                <th data-field="remove"
+                    data-formatter="OptionsAtestado"
+                    data-events="EventsAtestado"
+                    data-align="center"
+                    class="col-md-3"
+                ></th>
+            </tr>
+        </thead>
+    </table>
+</div>

@@ -1,0 +1,32 @@
+<form method="post" role="form" id="formAgendar">
+    <input id="id_ag_id" type="hidden" name="id">
+    <div class="row">
+        <div id="id_fk_paciente_div" class="form-group col-md-12">
+            <select id="id_fk_paciente" name="fk_paciente" class="form-control" placeholder=" Nome ou prontuário..."></select>
+        </div>
+        <div id="id_data_div" class="form-group col-md-4">
+            <label for="id_data">Data:</label>
+            <input id="id_data" name="data" type="date" class="form-control" placeholder="Data...">
+        </div>
+        <div id="id_hora_div" class="form-group col-md-3">
+            <label for="id_hora">Hora: </label>
+            <input id="id_hora" name="hora" type="time" class="form-control" placeholder="Hora..." autofocus="true">
+        </div>
+        <div id="id_fk_procedimento_div" class="form-group col-md-5">
+            <label for="id_fk_procedimento">Ação: </label>
+            <select id="id_fk_procedimento" name="fk_acao" class="form-control" placeholder="Selecione Ação..."></select>
+        </div>
+        <div id="id_ag_fk_medico_div" class="form-group col-md-5">
+            <label for="id_ag_fk_medico">Medico: </label>
+            <select id="id_ag_fk_medico" name="fk_medico" class="form-control" placeholder="Selecione o Médico..."></select>
+        </div>
+        <div id="id_fk_especialidade_div" class="form-group col-md-4">
+            <label for="id_fk_especialidade">Tipo da consulta: </label>
+            <select id="id_fk_especialidade" name="fk_consulta" class="form-control" placeholder="Selecione Tipo da consulta..."></select>
+        </div>
+        <div id="id_guia_div" class="form-group col-md-3">
+            <label for="id_guia">Nº da Guia</label>
+            <input id="id_guia" name="guia" class="form-control">
+        </div>
+    </div>
+</form>

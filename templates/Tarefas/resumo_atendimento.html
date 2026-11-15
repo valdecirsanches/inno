@@ -1,0 +1,128 @@
+{% extends 'Base/base.html' %}
+
+
+{% block tarefas_diarias %}active{% endblock %}
+{% block tarefas_diarias_resumo_atendimento %}active{% endblock %}
+
+{% block head %}
+
+    <!-- Input Mask -->
+    <link href="/static/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+    <!-- Date picker -->
+    <link href="/static/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+
+    <!-- Data Tables -->
+    <link href="/static/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="/static/css/plugins/dataTables/dataTables.responsive.css" rel="stylesheet">
+    <link href="/static/css/plugins/dataTables/dataTables.tableTools.min.css" rel="stylesheet">
+
+
+{% endblock %}
+
+{% block iniciar %}
+<li>
+    <a href="#" onclick="FocaPesquisa()"><i class="fa fa-edit"></i> <span class="nav-label">Iniciar</span></a>
+</li>
+{% endblock %}
+
+{% block modal %}
+    <div class="modal inmodal" id="carregando"></div>
+
+    </div>
+{% endblock %}
+
+{% block cabecalho_botoes %}
+<div class="header fixed">
+    <div class="row">
+        <div class="pull-right">
+            <a id="botao_filtrar" class="btn btn-primary" onclick="FiltrarAtendimentos()"><i class="fa fa-search"></i> Filtrar</a>
+            <a id="botao_imprimir" class="btn btn-primary" onclick="ImprimirAtendimentos()"><i class="fa fa-print"></i> Imprimir</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block container_cabecalho %}
+{#    <div class="row wrapper border-bottom white-bg page-heading">#}
+{#        <div class="col-lg-10">#}
+{#            <ol class="breadcrumb" style="margin-top: 15px !important;">#}
+{#                <li>#}
+{#                    <a href="/">Home</a>#}
+{#                </li>#}
+{#                <li class="active">#}
+{#                    <strong>Resumo de Atendimento Médico</strong>#}
+{#                </li>#}
+{#            </ol>#}
+{#        </div>#}
+{#    </div>#}
+{% endblock %}
+
+{% block container_corpo %}
+<form action="../Cadastros" method="post" role="form"  id="iniciar_form"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <div class="col-lg-12 has-warning">
+        <div class="row">
+            <div class="ibox-title">
+                <h5>Resumo de atendimento por convênio/Médico</h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row" >
+                    <div class="col-lg-12 has-warning">
+                        <div class="row">
+                            <div id="id_fk_medico_div" class="form-group col-md-9">
+                                <label for="id_fk_medico">Médico</label>
+                                <select id="id_fk_medico" name="fk_medico" class="form-control"></select>
+                            </div>
+
+                            <div id="id_dt_div" class="form-group col-md-3">
+                                <label for="id_dt">Selecione a data de atendimento</label>
+                                <input id="id_dt" name="dt" type="date" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                {% include 'Tarefas/Tables/tabela_resumo_atendimento.html' %}
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block js %}
+
+    <!-- Input Mask -->
+    <script src="/static/js/plugins/jasny/jasny-bootstrap.min.js"></script>
+
+    <!-- Data picker -->
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.pt-BR.js"></script>
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.min.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+    <!-- Selectize -->
+    <script src="/static/js/plugins/selectize/standalone/selectize.min.js"></script>
+
+        <!-- Data Tables -->
+    <script src="/static/js/plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.responsive.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.tableTools.min.js"></script>
+
+    <!-- Iniciar -->
+    <script src="/static/javascripts/Cadastros/Convenio/convenio.js?{{ user.release }}"></script>
+
+    <!-- Cep -->
+    <script src="/static/javascripts/cep.js?{{ user.release }}"></script>
+
+{% endblock %}

@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script language="javascript" type="text/javascript">
+    function windowClose() {
+        window.open('','_parent','');
+        window.close();
+    }
+</script>
+    <!-- switchery -->
+    <link href="/static/css/plugins/switchery/switchery.min.css" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <title>Confirma Presença</title>
+
+    <style>
+        * {
+            margin: 0;
+            border: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+        body {
+            background: linear-gradient(45deg, #8302f6,rgb(7, 166, 230));
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            min-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+        }
+
+
+        .container {
+            background: #feffff;
+            max-width: 350px;
+            min-height: 40vh;
+            padding: 2rem;
+            box-shadow: 5px 5px;
+
+        }
+
+        .confirm {
+            display: flex;
+
+            min-width: 20vh;
+            min-height: 20vh;
+            padding: 20px;
+            margin-bottom: 20px;
+            align-content: center;
+
+            line-height: 15px;
+        }
+
+        a {
+            display: flex !important;
+            flex: 1;
+            justify-content: center;
+            align-items: center;
+        }
+        span {
+            flex: 1;
+            font: normal 48px Arial;
+            color:rgb(2, 8, 2);
+            justify-content: center;
+            align-items: center;
+            align-self: center;
+            {#text-decoration: none;#}
+        }
+
+        .title {
+            flex: 1;
+            font: normal 36px Arial;
+            color:rgb(233, 238, 233);
+            justify-content: center;
+            align-items: center;
+            align-self: center;
+            text-decoration: none;
+        }
+
+
+        div 
+            display: flex;
+            justify-content: center;
+        
+
+    </style>
+</head>
+<body >
+<main class="main.container">
+    <h1 class="title">INNO - consulta médica</h1>
+    <h3 class="title">{{ag.fk_clinica.endereco.upper}}, {{ag.fk_clinica.numero}} {{ag.fk_clinica.complemento}}</h3>
+    <h3 class="title">{{ag.fk_clinica.cidade}}, {{ag.fk_clinica.uf.upper}}</h3>
+    <h2 class="title">Confirmação de presença {{ag.data}}</h2>
+    <h2 class="title">Paciente: {{ag.fk_paciente.paciente}}</h2>
+    <h2 class="title">Dr. {{ag.fk_medico.medico}}</h2>
+
+    <div>
+        <div class="confirm">
+            <a href="/confirmar-presenca-efetivo/" class="btn btn-success confirm" onclick="Confirma001()">
+                <span><i class="fa fa-thumbs-up my_button">  Confirmar presença</i></span>
+            </a>
+        </div>
+    </div>
+
+    <div class="hero-button">
+        <div class="confirm">
+            <a href="/cancelar-presenca-efetivo/" class="btn btn-warning">
+                <span> <i class="fa fa-thumbs-down">  Cancelar Consulta</i></span>
+            </a>
+
+        </div>
+    </div>
+
+</main>
+</body>
+</html>
+
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/js/plugins/bootstrap-table-master/src/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+    <!-- MSGs -->
+    <link rel="stylesheet" href="/static/plugins/sweetalert2/dist/sweetalert2.css">
+
+    <link href="/static/css/animate.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+
+
+    <!-- SweetAlert -->
+    <script src="/static/plugins/sweetalert2/dist/sweetalert2.all.js"></script>
+
+    <!-- Mainly scripts -->
+    <script src="/static/js/jquery-2.1.1.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+
+    <script src="/static/javascripts/Base/base.js?1" type="text/javascript"></script>
+
+    <script src="/static/js/plugins/Lodash/lodash.min.js"></script>
+
+    <!-- Bootstrap table -->
+    <script src="/static/js/plugins/bootstrap-table-master/src/bootstrap-table.js"></script>
+    <script src="/static/js/plugins/bootstrap-table-master/src/extensions/editable/bootstrap-table-editable.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+    <script src="/static/js/plugins/bootstrap-table-master/dist/locale/bootstrap-table-pt-BR.js"></script>
+
+
+    <!-- Custom and plugin javascript -->
+    <script src="/static/js/inspinia.js"></script>
+    <script src="/static/js/plugins/pace/pace.min.js"></script>
+    <script>
+        paceOptions = {
+            elements: true
+        };
+    </script>
+    <script src="/static/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!-- Moment -->
+    <script src="/static/js/plugins/moment/moment-with-locales.js"></script>
+    <!-- MENU -->
+    <script src="/static/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+
+<script>
+
+    function Confirma001() {
+        $.ajax({
+            url: '/agenda/consultas/ConfirmacaoPresenca',
+            data: {
+                id: `{{ id }}`,
+                celular: `{{ celular }}`
+            },
+            success: Ret
+        });
+
+        function Ret(data) {
+            if (data.success) {
+                swal({
+                    title: 'Presença confirmada',
+                    text: 'Obrigado!!! ',
+                    type: "success",
+                    timer: 2000
+                }).then(function (isConfirm) {
+                    if (isConfirm) {
+                        {#window.open('', '_parent', '');#}
+                        windowClose();
+                    }
+
+                });
+                windowClose();
+            }
+        }
+    }
+
+</script>
+

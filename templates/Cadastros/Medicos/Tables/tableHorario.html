@@ -1,0 +1,24 @@
+<div class="table-responsive">
+<table id="tabelaHorario"
+       data-toggle="table"
+       data-classes="table table-condensed table-hover table-no-bordered"
+       data-click-to-select="true"
+{#       data-side-pagination="server"#}
+{#       data-pagination="true"#}
+{#       data-total-field="count"#}
+{#       data-data-field="results"#}
+       data-unique-id="id"
+{#       data-row-style="rowStyleHorario"#}
+       data-url="/api/medico/horario/">
+    <thead>
+    <tr>
+        <th data-field="id" data-visible="true">ID</th>
+        <th data-field="fk_medico">Medico</th>
+        <th data-field="dia_semana">Dia da Semana</th>
+        <th data-field="agenda_periodo">Periodo</th>
+        <th data-field="hora" data-align="center">Horário</th>
+        <th data-field="excluir" data-formatter="FormatoExcluirHorario" data-events="EventoExcluirHorario" data-align="center"><i class="fa fa-trash-o"></i> Opções</th>
+    </tr>
+    </thead>
+</table>
+</div>

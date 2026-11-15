@@ -1,0 +1,87 @@
+{% extends 'Base/base.html' %}
+
+
+{% block cadastros_auxiliares %}active{% endblock %}
+{% block cadastros_auxiliares_usuarios %}active{% endblock %}
+
+
+{% block head %}
+
+    <!-- Input Mask -->
+    <link href="/static/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+
+
+{% endblock %}
+
+{% block modal %}
+    {% include 'Cadastros/Usuarios/Modals/Pesquisa.html' %}
+{% endblock %}
+
+{% block cabecalho_botoes %}
+<div class="header fixed">
+    <div class="row ">
+        <a class="btn btn-default" onclick="ChamaPesquisaUsuario()"><i class="fa fa-search"></i> Pesquisa Usuário</a>
+        <div class="pull-right">
+            <a class="btn btn-default" onclick="ImprimeUsuarios()"><i class="fa fa-print"></i> Imprime</a>
+            <a class="btn btn-default" onclick="NovoUsuario()"><i class="fa fa-plus"></i> Novo usuário</a>
+            <a class="btn btn-default" onclick="SalvaUsuario()"><i class="fa fa-check"></i> Salvar Dados</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <ol class="breadcrumb" style="margin-top: 15px !important;">
+                <li>
+                    <a href="">Home</a>
+                </li>
+                <li class="active">
+                    <strong>Cadastro de usuários</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block container_corpo %}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                {% include 'Seguranca/Usuario/index.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+
+    <!-- Input Mask -->
+    <script src="/static/js/plugins/jquery-mask-plugin/jquery.mask.js"></script>
+
+    <!-- Selectize -->
+    <script src="/static/js/plugins/selectize/standalone/selectize.min.js"></script>
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.min.js"></script>
+
+    <!-- Usuario -->
+    <script src="/static/javascripts/Seguranca/usuario.js?{{ user.release }}"></script>
+
+    <!-- Cep -->
+    <script src="/static/javascripts/Base/cep.js?{{ user.release }}"></script>
+
+    <!-- Mascaras -->
+    <script src="/static/javascripts/Base/mascaras.js?{{ user.release }}"></script>
+
+{% endblock %}

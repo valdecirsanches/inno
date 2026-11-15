@@ -1,0 +1,38 @@
+
+<link href="/static/css/Cadastros/recibo.css?{{ user.release }}-3" rel="stylesheet">
+
+<div class="modal inmodal" id="recibo" role="dialog" aria-hidden="true" aria-labelledby="recibo_titulo">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content animated flipInY">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Fechar</span>
+                </button>
+                <h4 class="modal-title" id="recibo_titulo">Recibos</h4>
+                <p class="recibo-subtitulo">Emita um recibo novo ou dê dois cliques num recibo emitido para abri-lo.</p>
+            </div>
+
+            <div class="modal-body recibo-corpo">
+                <div class="recibo-coluna-form">
+                    {% include 'Cadastros/Pacientes/Forms/Recibo.html' %}
+                </div>
+
+                <div class="recibo-historico">
+                    <h5>Recibos emitidos <small>deste paciente</small></h5>
+                    <div class="recibo-lista">
+                        {% include 'Cadastros/Pacientes/Tables/Recibos.html' %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a id="novoRecibo" class="btn btn-primary" onclick="NovoRecibo()"><i class="fa fa-plus"></i> <span>Novo recibo</span></a>
+                <span class="recibo-espaco"></span>
+                <button type="button" class="btn recibo-fechar" data-dismiss="modal">Fechar</button>
+                <a id="imprimirRecibo" class="btn btn-primary" onclick="ImprimeRecibo()"><i class="fa fa-print"></i> <span>Imprimir</span></a>
+                <a id="salvarRecibo" class="btn btn-primary" onclick="SalvaRecibo()"><i class="fa fa-save"></i> <span>Salvar recibo</span></a>
+            </div>
+        </div>
+    </div>
+</div>

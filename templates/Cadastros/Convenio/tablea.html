@@ -1,0 +1,247 @@
+{% extends "Base/base.html" %}
+
+
+{% block cadastros_auxiliares %}active{% endblock %}
+{% block cadastros_auxiliares_convenios %}active{% endblock %}
+
+{% block head %}
+    {% include 'datatables.html' %}
+{% endblock %}
+
+{% block cadastro %}
+    <li class=" dropdown active">
+        <a class="collapsed" data-toggle="collapse" data-parent="#collapseNavbarLeft2" rel="popover-sidebar" data-container="body" data-placement="right"
+           data-content="Consulta associado... Gera lista permitindo acesso aos dados do paciente..." href="#uidb0490bb1401f28d0a7bed4338a9c96b0">
+          <i class="oc-partial-icon icm icm-clipboard3"></i>
+          <span class="oc-partial-menu-item">
+            Convênios
+            <b class="caret"></b>
+          </span>
+        </a>
+        <ul class="collapse dropdown-menu in" id="uidb0490bb1401f28d0a7bed4338a9c96b0">
+          <li class="">
+            <a href="" rel="popover-sidebar" data-container="body"
+               data-placement="right" data-content="Retornar a lista de Pacientes">Lista de Paciente</a>
+          </li>
+        </ul>
+    </li>
+{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2><i class="fa fa-cc-visa"></i> Cadastro de Convênios</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">
+                    <strong>Cadastro de Convênios</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+{% block modal %}
+
+<div class="modal inmodal" id="modal_convenio" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content animated flipInY">
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <div class="modal-title">
+                    <h4 class="modal-title">Convênios</h4>
+                </div>
+            </div>
+            <form method="post" role="form" id="formDadosConvenio">
+                <div class="modal-body" id="corpo">
+                    <div class="row">
+                        <div id="id_div" class="form-group col-md-2 disabled">
+                            <label for="id_id">ID:</label>
+                            <input id="id_id" name="id" type="text" class="form-control" value="">
+                        </div>
+                        <div class="form-group col-md-2" id="codigo_div">
+                            <label for="id_codigo">Código: </label>
+                            <input id="id_codigo" name="codigo" type="text" class="form-control"
+                                   value=""  placeholder="Codigo..." autofocus="true">
+                        </div>
+                        <div class="form-group col-md-6" id="nome_div">
+                            <label for="id_convenio">Nome do convênio: </label>
+                            <input id="id_convenio" name="convenio" type="text" class="form-control"
+                                   value=""  placeholder="Nome do convênio..." autofocus="true">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6" id="razao_div">
+                            <label for="id_razao">Razão social: </label>
+                            <input id="id_razao" name="razao" type="text" class="form-control"
+                                   value=""  placeholder="Razão social..." autofocus="true">
+                        </div>
+                        <div class="form-group col-md-4" id="cnpj_div">
+                            <label for="id_cnpj">CNPJ:</label>
+                            <input id="id_cnpj" name="cnpj" type="text" class="form-control"
+                                   value=""  placeholder="CNPJ..." autofocus="true">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-3">
+                            <label for="id_cep">CEP</label>
+                            <div class="input-group">
+                                <input id="id_cep" name="cep" type="text" maxlength="9" data-mask="99999-999"
+                                       class="form-control input-sm" placeholder="Digite o CEP" value="{% if p.cep %}{{ p.cep }}{% endif %}">
+                                <div class="input-group-addon btn" id="btn_busca_id" onclick="ValidarCEP()">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6" id="rua_div">
+                            <label for="id_endereco">Endereço: </label>
+                            <input id="id_endereco" name="endereco" type="text" class="form-control"
+                                   value=""  placeholder="Endereço..." autofocus="true">
+                        </div>
+                        <div class="form-group col-md-2" id="numero_div">
+                            <label for="id_numero">Numero: </label>
+                            <input id="id_numero" name="numero" type="text" class="form-control"
+                                   value=""  placeholder="Numero..." autofocus="true">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4" id="bairro_div">
+                            <label for="id_bairro">Bairro:</label>
+                            <input id="id_bairro" name="bairro" type="text" class="form-control"
+                                   value=""  placeholder="Bairro..." autofocus="true">
+
+                        </div>
+                        <div class="form-group col-md-4" id="cidade_div">
+                            <label for="id_cidade">Cidade: </label>
+                            <input id="id_cidade" name="cidade" type="text" class="form-control"
+                                   value=""  placeholder="Cidade..." autofocus="true">
+                        </div>
+                        <div class="form-group col-md-1" id="uf_div">
+                            <label for="id_uf">UF:</label>
+                            <input id="id_uf" name="uf" type="text" class="form-control"
+                                   value=""  placeholder="UF..." autofocus="true">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-3" id="telefone_div">
+                            <label for="id_telefone">Telefone:</label>
+                            <input id="id_telefone" name="telefone" type="text" class="form-control"
+                                   value=""  placeholder="Telefone..." autofocus="true">
+
+                        </div>
+                        <div class="form-group col-md-4" id="email_div">
+                            <label for="id_email">Email: </label>
+                            <input id="id_email" name="email" type="email" class="form-control"
+                                   value=""  placeholder="Email..." autofocus="true">
+                        </div>
+                        <div class="form-group col-md-5" id="anotacoes_div">
+                            <label for="id_anotacoes">Anotações:</label>
+                            <textarea id="id_anotacoes" name="anotacoes" type="text" class="form-control"
+                                   value=""  placeholder="Anotações..." autofocus="true">
+                            </textarea>
+                        </div>
+                        <div class="form-group col-md-5" id="anotacoes_div">
+                            <label for="id_comentario">Comentarios:</label>
+                            <textarea id="id_comentario" name="comentario" type="text" class="form-control"
+                                   value=""  placeholder="Comentarios..." autofocus="true">
+                            </textarea>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <a id="botao_convenio" class="btn btn-primary" onclick="SalvaConvenio()"><i class="fa fa-save"></i> Salvar</a>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+{% block cabecalho_botoes %}
+<div class="header fixed">
+    <div class="row">
+        <div class="pull-right">
+            <a id="botao_novo_convenio" class="btn btn-primary" onclick="NovoConvenio()"><i class="fa fa-file-o"></i> Novo Convênio</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block container_corpo %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Lista de todos os convênios</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-wrench"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#">Config option 1</a>
+                        </li>
+                        <li><a href="#">Config option 2</a>
+                        </li>
+                    </ul>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                {% include 'Cadastros/Convenio/Convenio.html' %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+
+    <!-- Data Tables -->
+    <script src="/static/js/plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.responsive.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.tableTools.min.js"></script>
+    <script src="/static/js/plugins/jeditable/jquery.jeditable.js"></script>
+    <!-- Page-Level Scripts -->
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+
+    <!-- Convenio -->
+    <script src="/static/javascripts/Cadastros/Convenio/convenio.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/datatables.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Cep -->
+    <script src="/static//js/"></script>
+
+{% endblock %}
+
+

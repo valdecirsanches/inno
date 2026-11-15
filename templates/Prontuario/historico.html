@@ -1,0 +1,196 @@
+{% extends 'Base/base.html' %}
+
+
+{% block prontuario %}active{% endblock %}
+{% block prontuario_historico %}active{% endblock %}
+
+{% block head %}
+
+    <!-- Input Mask -->
+    <link href="/static/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+    <!-- summernote -->
+    <link href="/static/css/plugins/summernote/summernote.css" rel="stylesheet">
+    <link href="/static/css/plugins/summernote/summernote-bs3.css" rel="stylesheet">
+
+
+{% endblock %}
+{##}
+{#{% block iniciar %}#}
+{#<li>#}
+{#    <a href="#" onclick="FocaPesquisa()"><i class="fa fa-edit"></i> <span class="nav-label">Iniciar</span></a>#}
+{#</li>#}
+{#{% endblock %}#}
+
+{% block modal %}
+    <div class="modal inmodal" id="carregando"></div>
+    {% include 'Cadastros/Pacientes/Modal/Recibo.html' %}
+{% endblock %}
+
+
+{% block container_cabecalho %}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-md-10">
+        <h2>Histórico</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">Prontuario</a>
+            </li>
+            <li class="active">
+                <strong>Histórico</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-md-2">
+        <h2><a id="btnPrintProntuario" class="btn btn-default hidden" onclick="ImprimeProntuario()">Imprimir Prontuario <i class="fa fa-print"></i></a></h2>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block container_corpo %}
+    <div class="wrapper wrapper-content animated fadeIn">
+        <div class="m-t-n-md row ibox-content m-b">
+            <div class="col-md-8">
+                <label for="pesquisa_str_iniciar">Pesquisar paciente</label>
+                <select placeholder="Pesquisa paciente por nome ou código..." id="pesquisa_str_iniciar" tabindex="0"></select>
+           </div>
+            <div class="col-md-2">
+                <label for="histDetalhes">Detalhes</label>
+                <select id="histDetalhes" name="agendamento" class="form-control"></select>
+            </div>
+            <div class="col-md-2">
+                <label for="histAno">Ano de Pesquise</label>
+                <input id="histAno" class="form-control ano" type="text" name="histAno" placeholder="Digite o ano">
+            </div>
+        </div>
+
+        <div id="corpo_consultas" class="m-t-n-lg">
+{#            <div hidden class="ibox float-e-margins row">#}
+{#                <div class="ibox-title">#}
+{#                    <h5>27/05/2016 - 10:00<small class="m-l-sm">CONSULTA 1° VEZ</small></h5>#}
+{#                    <div class="ibox-tools">#}
+{#                        <a class="collapse-link" title="Minimizar Consulta"><i class="fa fa-chevron-up"></i></a>#}
+{#                        <a href="/atendimento/?consulta=412834" title="Acessar consulta"><i class="fa fa-chevron-right"></i></a>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div class="ibox-content">#}
+{#                    <div class="panel panel-default m-t-n-sm">#}
+{#                        <div class="panel-heading">Queixa</div>#}
+{#                        <div class="panel-body  m-t-n-sm m-b-n-sm">#}
+{#                            <h2 class="m-b-n-sm">DOR DE CABEÇA</h2><br>#}
+{#                            <p class="m-b-n-xxs"><label>Historia:</label><br>#}
+{#                                DOR DE CABEÇA HA 10 ANOS#}
+{#                            </p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="panel panel-default m-t-n-sm">#}
+{#                        <div class="panel-heading">Exame Físico</div>#}
+{#                        <div class="panel-body m-t-n-sm m-b-n-sm">#}
+{#                            <p class="m-b-n-xxs"><label>  Altura:</label> 1,80 m <label class="m-l-md">  Peso:</label> 67 kg <label class="m-l-md">IMC:</label> 20.679012</p>#}
+{#                            <p class="m-b-n-xxs"><label>  Pressao arterial:</label> 12x8 <label class="m-l-md">  Pulso:</label> 67 </p>#}
+{#                            <p class="m-b-n-xxs">#}
+{#                                <label>Obs:</label><br>#}
+{#                                CIRURGIA#}
+{#                            </p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="panel panel-default m-t-n-sm">#}
+{#                        <div class="panel-heading">Hipótese Diagnóstica</div>#}
+{#                        <div class="panel-body m-t-n-sm m-b-n-sm">#}
+{#                            <p class="m-b-n-xxs"><label>Diagnostico:</label> Dor na coluna torácica;</p>#}
+{#                            <p class="m-b-n-xxs"><label>Outros diagnosticos:</label> Enxaqueca sem aura [enxaqueca comum]; </p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="panel panel-default m-t-n-sm">#}
+{#                        <div class="panel-heading">Evolução</div>#}
+{#                        <div class="panel-body m-t-n-sm m-b-n-sm">#}
+{#                            <p class="m-b-n-xxs">BENEDITO CARLOS SALIBA</p>#}
+{#                            <p class="m-b-n-xxs">RUA AMOREIRA 46</p>#}
+{#                            <p class="m-b-n-xxs">USO ORAL</p>#}
+{#                            <p class="m-b-n-xxs">GABAPENTINA 300MG ---------------------1CX</p>#}
+{#                            <p class="m-b-n-xxs">TOMAR 1CPS 1 X DIA</p>#}
+{#                            <p class="m-b-n-xxs"></p>#}
+{#                            <p class="m-b-n-xxs"></p>#}
+{#                            <p class="m-b-n-xxs">PEÇO CT CRANIO - DISESTESIAS HEMICORPO</p>#}
+{#                            <p class="m-b-n-xxs">PEÇO RM COLINA CERVICAL 0 DISESTESIAS</p>#}
+{#                            <p class="m-b-n-xxs">PEÇO ENMG - DISESTESIAS</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="panel panel-default m-t-n-sm">#}
+{#                        <div class="panel-heading">Exames</div>#}
+{#                        <div class="panel-body m-t-n-sm m-b-n-sm">#}
+{#                            <p class="m-b-n-xs"><label>01/06/2016</label></p>#}
+{#                            <p class="m-b-n-xxs">CEFALEIA INTRATAVEL</p>#}
+{#                            <p>CID 10 G43</p>#}
+{#                            <p class="m-b-n-xs"><label>29/06/2016</label></p>#}
+{#                            <p>LOMBALGIA</p>#}
+{#                            <p class="m-b-n-xs"><label>19/07/2016</label></p>#}
+{#                            <p>teste</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="panel panel-default m-t-n-sm">#}
+{#                        <div class="panel-heading">Prescrição</div>#}
+{#                        <div class="panel-body m-t-n-sm m-b-n-sm">#}
+{#                            <p class="m-b-n-xs"><label>29/06/2016</label></p>#}
+{#                            <p class="m-b-n-xxs">CID 10 G43 ENXAQUECA</p>#}
+{#                            <p class="m-b-n-xxs m-l-sm">SANDOMIGRAM COMPRIMIDOS -------------- 1 CX</p>#}
+{#                            <p class="m-b-n-xxs m-l-md">SANDOMIGRAM COMPRIMIDOS -------------- 1 CX</p>#}
+{#                            <p class="m-b-n-xxs m-l-sm">TOPAMAX CAPSULAS ----------------------- 30 CPS</p>#}
+{#                            <p class="m-b-n-xxs m-l-md">TOPAMAX CAPSULAS ----------------------- 30 CPS</p>#}
+{#                            <p class="m-b-n-xxs m-l-sm">RANITIDINA  100MG CAPSULAS --- 30 CPS</p>#}
+{#                            <p class="m-l-sm">TOPAZIL COMPRIMIDOS --------------------- 15 CX</p>#}
+{#                            <p class="m-b-n-xs"><label>06/07/2016</label></p>#}
+{#                            <p class="m-b-n-xxs">testes testes</p>#}
+{#                            <p class="m-b-n-xxs">testes testes</p>#}
+{#                            <p class="m-b-n-xxs">testes testes</p>#}
+{#                            <p class="m-b-n-xxs m-l-sm">teste comprimido ------------------------------- 15 cx</p>#}
+{#                            <p class="m-b-n-xxs m-l-sm">teste1 capsulas ------------------------------- 25 cps</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+        </div>
+    </div>
+{% endblock%}
+
+
+
+
+
+
+{% block js %}
+    <!-- Input Mask -->
+    <script src="/static/js/plugins/jquery-mask-plugin/jquery.mask.js"></script>
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.min.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+    <!-- Selectize -->
+    <script src="/static/js/plugins/selectize/standalone/selectize.min.js"></script>
+
+    <!-- Summernote -->
+    <script src="/static/js/plugins/summernote/summernote.min.js"></script>
+    <script src="/static/js/plugins/summernote/lang/summernote-pt-BR.js"></script>
+
+
+
+    <!-- detalhes historico -->
+    <script src="/static/javascripts/Prontuario/Historico/historico.js?{{ user.release }}-1" charset="UTF-8"></script>
+
+    <!-- Cep -->
+    <script src="/static/javascripts/Base/cep.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Mascaras -->
+    <script src="/static/javascripts/Base/mascaras.js?{{ user.release }}" type="application/javascript"></script>
+
+{% endblock %}

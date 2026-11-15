@@ -1,0 +1,38 @@
+<div class="ibox-content">
+    <div class="row m-t">
+        <H1>Evolução</H1>
+{#        <a class="btn btn-primary" onclick="CarregaEvolucoes()">Carrega evolucao</a>#}
+        <form method="post" role="form" id="formEvolucao" class="formAutoSave classEvolucao">
+            <div class="row m-b-n-lg">
+                <div id="id_evolucao_div" class="form-group col-md-12">
+                    <label for="id_evolucao">Evolução</label>
+                    <textarea id="id_evolucao"
+                              name="evolucao"
+                              class="form-control save_evolucao"
+{#                              cols="75"#}
+                              rows="5"
+                    ></textarea>
+                </div>
+            </div>
+            <input id="id_id_evolucao" name="id" type="hidden" value="0">
+            <input id="id_fk_prontuario" name="fk_prontuario" type="hidden">
+            <input id="id_fk_medico" name="fk_medico" type="hidden">
+            <input id="id_fk_consulta" name="fk_consulta" type="hidden">
+            <input id="id_fk_usuario" name="fk_usuario" type="hidden">
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <a>Salvo em <strong id="evolucao_data_salvo"></strong></a>
+                <div class="pull-right btn-group">
+                    {# <a id="SalvaEvolucao" class="btn btn-success btn-outline btn-evolucao"
+                       onclick="UpdateEvolucao()"
+                       alt="Salva todo o conteúdo digitado"
+                    ><i class="fa fa-save"></i> Salvar</a> #}
+                    {# <a id="CancelaEvolucao" class="btn btn-danger btn-outline btn-evolucao" #}
+                       {# onclick="CancelaEvolucao()"><i class="fa fa-times"></i></a> #}
+                </div>
+            </div>
+            <div id="id_ultima_evolucao"></div>
+        </form>
+    </div>
+</div>
+

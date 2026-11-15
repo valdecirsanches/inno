@@ -1,0 +1,290 @@
+/* Acesso à Memed — cadastro do médico (.memed-acesso) e atendimento (.memed-atd) */
+
+.memed-acesso,
+.memed-atd {
+    --mm-ink: #2f4050;
+    --mm-text: #4a5866;
+    --mm-muted: #8a96a3;
+    --mm-line: #e7eaec;
+    --mm-soft: #f7f8f9;
+    --mm-ok: #1ab394;
+    --mm-ok-soft: #e8f7f3;
+    --mm-warn: #c27c0e;
+    --mm-warn-soft: #fdf3e3;
+    --mm-bad: #d9434f;
+    --mm-bad-soft: #fcecee;
+    /* tinta de carimbo: a única cor própria desta tela */
+    --mm-tinta: #2c3e8f;
+    --mm-radius: 6px;
+    color: var(--mm-text);
+}
+
+/* ---------- Carimbo do prescritor ---------- */
+.memed-carimbo {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 220px;
+    max-width: 100%;
+    padding: 10px 20px 9px;
+    border: 2px solid var(--mm-tinta);
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 4px var(--mm-tinta);
+    color: var(--mm-tinta);
+    text-align: center;
+    line-height: 1.25;
+    transform: rotate(-0.6deg);
+    background: #fff;
+}
+.memed-carimbo-nome {
+    font-weight: 700;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    overflow-wrap: anywhere;
+}
+.memed-carimbo-crm {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+.memed-carimbo-esp {
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 1px;
+}
+/* sem habilitação: o carimbo aparece "sem tinta" */
+.memed-carimbo.is-apagado {
+    opacity: .5;
+    border-style: dashed;
+    box-shadow: none;
+}
+.memed-carimbo.is-vazio {
+    border-style: dashed;
+    box-shadow: none;
+    color: var(--mm-muted);
+    border-color: var(--mm-line);
+}
+
+/* ---------- Selo de situação ---------- */
+.memed-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--mm-soft);
+    color: var(--mm-muted);
+    white-space: nowrap;
+}
+.memed-chip::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.memed-chip.is-ok { background: var(--mm-ok-soft); color: var(--mm-ok); }
+.memed-chip.is-warn { background: var(--mm-warn-soft); color: var(--mm-warn); }
+.memed-chip.is-bad { background: var(--mm-bad-soft); color: var(--mm-bad); }
+
+/* ---------- Cartões (cadastro do médico) ---------- */
+.memed-acesso .memed-card {
+    background: #fff;
+    border: 1px solid var(--mm-line);
+    border-radius: var(--mm-radius);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+}
+.memed-acesso .memed-card h4 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--mm-ink);
+}
+.memed-acesso .memed-nota {
+    margin: 0 0 12px;
+    font-size: 12px;
+    color: var(--mm-muted);
+}
+
+.memed-situacao {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px 24px;
+}
+.memed-situacao-texto {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+.memed-situacao-texto p {
+    margin: 8px 0 0;
+    font-size: 13px;
+    max-width: 62ch;
+}
+.memed-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+.memed-acoes .btn { border-radius: 4px; }
+.memed-acoes .btn .fa { margin-right: 5px; }
+
+/* resposta da Memed */
+.memed-retorno {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: var(--mm-radius);
+    font-size: 13px;
+    background: var(--mm-soft);
+}
+.memed-retorno.is-ok { background: var(--mm-ok-soft); }
+.memed-retorno.is-bad { background: var(--mm-bad-soft); color: #8c2630; }
+.memed-retorno dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 3px 14px;
+    margin: 8px 0 0;
+}
+.memed-retorno dt { font-weight: 600; color: var(--mm-ink); }
+.memed-retorno dd { margin: 0; overflow-wrap: anywhere; }
+
+/* checklist */
+.memed-checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 6px 16px;
+}
+.memed-checklist li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--mm-soft);
+    font-size: 13px;
+}
+.memed-checklist .fa { width: 16px; text-align: center; }
+.memed-checklist .is-ok .fa { color: var(--mm-ok); }
+.memed-checklist .is-falta .fa { color: var(--mm-bad); }
+.memed-checklist .is-falta span { color: var(--mm-ink); font-weight: 600; }
+.memed-checklist a {
+    margin-left: auto;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* dados pessoais que só a Memed pede */
+.memed-pessoais {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--mm-line);
+}
+.memed-pessoais .form-group { margin: 0; flex: 0 1 200px; }
+.memed-pessoais label { font-size: 12px; color: var(--mm-text); font-weight: 600; }
+
+.memed-rodape {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--mm-muted);
+}
+
+/* ---------- Aba Memed do atendimento ---------- */
+.memed-atd .memed-barra {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 22px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid var(--mm-line);
+    border-radius: var(--mm-radius);
+}
+.memed-atd .memed-carimbo { min-width: 190px; padding: 7px 14px 6px; }
+.memed-atd .memed-carimbo-nome { font-size: 13px; }
+.memed-atd .memed-carimbo-crm,
+.memed-atd .memed-carimbo-esp { font-size: 12px; }
+.memed-atd .memed-barra-texto { flex: 1 1 240px; min-width: 0; font-size: 13px; }
+.memed-atd .memed-barra-texto p { margin: 6px 0 0; }
+.memed-atd .memed-barra .btn { border-radius: 4px; }
+
+.memed-atd .memed-aviso {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-radius: var(--mm-radius);
+    font-size: 13px;
+    background: var(--mm-warn-soft);
+    color: #6b4708;
+}
+.memed-atd .memed-aviso.is-bad { background: var(--mm-bad-soft); color: #8c2630; }
+.memed-atd .memed-aviso .fa { margin-top: 2px; }
+.memed-atd .memed-aviso p { margin: 0; }
+.memed-atd .memed-aviso p + p { margin-top: 4px; }
+
+.memed-faltas {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-left: 2px;
+}
+.memed-faltas span {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .7);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.memed-atd .memed-estado {
+    margin-top: 10px;
+    padding: 36px 16px;
+    text-align: center;
+    border: 1px dashed var(--mm-line);
+    border-radius: var(--mm-radius);
+    color: var(--mm-muted);
+    font-size: 13px;
+}
+.memed-atd .memed-estado .fa { font-size: 22px; display: block; margin-bottom: 8px; }
+.memed-atd .memed-estado .btn { margin-top: 10px; }
+
+.memed-atd #prescricao-memed {
+    position: relative;
+    width: 100%;
+    min-height: 700px;
+    margin-top: 10px;
+}
+.memed-atd #prescricao-memed:empty { min-height: 0; margin: 0; }
+
+@media (max-width: 767px) {
+    .memed-carimbo { min-width: 0; width: 100%; }
+    .memed-atd .memed-barra { padding: 12px; }
+    .memed-atd #prescricao-memed { min-height: 600px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .memed-carimbo { transform: none; }
+}
+
+/* o rodapé fixo do sistema não cobre o último cartão */
+.memed-acesso { padding-bottom: 48px; }
+
+/* botões brancos não herdam o cinza do texto ao redor (parecia desativado) */
+.memed-acesso .btn-white,
+.memed-atd .btn-white { color: var(--mm-ink); }
+.memed-acesso .btn-white .fa,
+.memed-atd .btn-white .fa { color: var(--mm-muted); }

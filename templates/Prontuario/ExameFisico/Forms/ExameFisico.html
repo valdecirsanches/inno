@@ -1,0 +1,45 @@
+
+    <div class="ibox-content">
+        <H1>Exame físico</H1>
+        <form method="post" role="form" id="formExameFisico" class="classExameFisico formAutoSave"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <input id="id_id_exame_fisico" name="id" type="hidden" value="0">
+            <div class="row m-b-n-lg">
+                <div id="id_altura_div" class="form-group col-md-2">
+                    <label for="id_altura">Altura</label>
+                    <input id="id_altura" name="altura" type="text" class="form-control save_exame_fisico" onblur="CalculaIMC()"> m
+                </div>
+                <div id="id_peso_div" class="form-group col-md-2">
+                    <label for="id_peso">Peso</label>
+                    <input id="id_peso" name="peso" type="text" class="form-control save_exame_fisico" onblur="CalculaIMC()"> Kg
+                </div>
+                <div id="id_freq_cardiaca_div" class="form-group col-md-2">
+                    <label for="id_imc">IMC</label>
+                    <input id="id_imc" name="imc" type="text" class="form-control save_exame_fisico">
+                </div>
+                <div id="id_pressao_art_div" class="form-group col-md-3">
+                    <label for="id_pressao_art">Pressão arterial</label>
+                    <input id="id_pressao_art" name="pressao_art" type="text" class="form-control save_exame_fisico">
+                </div>
+                <div id="id_pulso_div" class="form-group col-md-3">
+                    <label for="id_pulso">Pulso</label>
+                    <input id="id_pulso" name="pulso" type="text" class="form-control save_exame_fisico">
+                </div>
+                <div id="id_obs_exame_fisico_div" class="form-group col-md-12">
+                    <label for="id_obs_exame_fisico">Observaçoes Gerais</label>
+                    <textarea id="id_obs_exame_fisico"
+                              name="obs_exame_fisico"
+                              class="form-control save_exame_fisico"
+                              cols="75"
+                              rows="5"></textarea
+                    >
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <a>Salvo em <strong id="data_exame_fisico"></strong></a>
+                {# <div class="pull-right">
+                    <a id="SalvaExameFisico" class="btn btn-primary btn-outline btnAutoSave" onclick="SalvaExameFisico()"><i class="fa fa-save"></i> Salvar</a>
+                </div> #}
+            </div>
+        </form>
+    </div>

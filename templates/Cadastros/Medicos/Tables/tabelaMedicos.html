@@ -1,0 +1,47 @@
+<!--div class="">
+<a onclick="fnClickAddRow();" href="javascript:void(0);" class="btn btn-primary ">Adicionar Histórico</a>
+</div-->
+<table
+        class="table table-striped table-bordered table-hover " id="editable" >
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Código</th>
+            <th>Nome do médico</th>
+            <th>Especialidade</th>
+            <th>Telefone</th>
+            <th>Celular</th>
+            <th>Status</th>
+            <th>Opções</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for m in medicos %}
+            <tr>
+                <input type="hidden" id="md{{ m.pk }}" value="{{ m.medico }}">
+                <th>000{{ m.id }}</th>
+                <th id="cd{{ m.pk }}">{{ m.codigo }}</th>
+                <td id="nm{{ m.pk }}">{{ m.medico }}</td>
+                <td id="es{{ m.pk }}">{{ m.fk_especialidade.descricao }}</td>
+                <td id="tl{{ m.pk }}">{{ m.telefone }}</td>
+                <td id="cl{{ m.pk }}">{{ m.celular }}</td>
+                <td id="st{{ m.pk }}">{% if m.ativo == 'True' %} ATIVO {% else %}INATIVO {% endif %}</td>
+                <th> <a id="{{ m.pk }}" class="" onclick="CarregarMedico(this.id)">
+                    <i class="fa fa-edit"></i></a>
+
+                    <a id="{{ m.pk }}" class="" onclick="">
+                    <i class="fa fa-trash"></i></a>
+                </th>
+            </tr>
+        {% endfor %}
+    </tbody>
+    <!--tfoot>
+        <tr>
+            <th>Rendering engine</th>
+            <th>Browser</th>
+            <th>Platform(s)</th>
+            <th>Engine version</th>
+            <th>CSS grade</th>
+        </tr>
+    </tfoot-->
+</table>

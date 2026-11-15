@@ -1,0 +1,23 @@
+<div class="table-responsive">
+    <table id="tabelaConsultas"
+           data-toggle="table"
+           data-classes="table table-condensed table-hover table-no-bordered"
+           data-row-style="rowStyle"
+           data-unique-id="id"
+           >{# sem data-url: a lista é preenchida por TabelaMedico() (listaAtendimento.js); a busca automática era desperdiçada #}
+        <thead>
+            <tr class="bg-default">
+                <th data-field="id" data-visible="false"></th>
+                <th data-field="id_pac" data-visible="false"></th>
+                <th data-field="hora_chegada" data-align="center">Chegada</th>
+                <th data-field="hr_format" data-align="center">Hora</th>
+                <th data-field="pac" data-formatter="FormatoPaciente" data-events="EventoPaciente">Nome do Paciente</th>
+                <th data-field="procedimento">Procedimento</th>
+                <th data-field="conv">Convenio</th>
+                <th data-field="stt" data-align="center">Status</th>
+		<th data-field="necesp" data-align="center">Especial</th>
+                <th data-field="opcoes" data-formatter="FormatoAtendimento" data-events="EventoAtendimento" data-align="center"></th>
+            </tr>
+        </thead>
+    </table>
+</div>

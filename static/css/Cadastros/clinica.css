@@ -1,0 +1,399 @@
+/* Tela de cadastro de clínicas — estilos restritos a .clinica-page */
+
+.clinica-page {
+    --cl-ink: #2f4050;
+    --cl-text: #4a5866;
+    --cl-muted: #8a96a3;
+    --cl-line: #e7eaec;
+    --cl-surface: #ffffff;
+    --cl-soft: #f7f8f9;
+    --cl-primary: #1ab394;
+    --cl-primary-dark: #149c81;
+    --cl-wa: #25d366;
+    --cl-wa-bubble: #e7f8ee;
+    --cl-wa-bubble-line: #bfe9d0;
+    --cl-chat-bg: #efeae2;
+    --cl-radius: 6px;
+    color: var(--cl-text);
+}
+/* espaço para o rodapé fixo do sistema não cobrir o fim da página */
+.row.clinica-page {
+    padding-bottom: 48px;
+}
+
+/* ---------- Cabeçalho da página ---------- */
+.clinica-cabecalho h2 {
+    color: var(--cl-ink);
+    font-weight: 600;
+}
+.clinica-cabecalho h2 .fa {
+    color: var(--cl-primary);
+    margin-right: 6px;
+}
+.clinica-cabecalho .clinica-subtitulo {
+    color: var(--cl-muted);
+    margin: 4px 0 10px;
+    font-size: 13px;
+}
+
+/* ---------- Cartões ---------- */
+.clinica-page .clinica-card {
+    background: var(--cl-surface);
+    border: 1px solid var(--cl-line);
+    border-radius: var(--cl-radius);
+    margin-bottom: 20px;
+}
+.clinica-page .clinica-card-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--cl-line);
+}
+.clinica-page .clinica-card-topo h3 {
+    margin: 0;
+    font-size: 14px;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--cl-ink);
+}
+.clinica-page .clinica-card-topo h3 small {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--cl-muted);
+}
+
+/* ---------- Lista de clínicas ---------- */
+.clinica-page .clinica-lista .modal-body {
+    padding: 0;
+}
+.clinica-page .clinica-lista .bootstrap-table .table {
+    margin: 0;
+}
+.clinica-page .clinica-lista .fixed-table-container {
+    border: 0;
+}
+/* o cabeçalho do cartão já diz o que é a lista; o bootstrap-table
+   exibe o dele com estilo inline, por isso o !important */
+.clinica-page .clinica-lista .fixed-table-header,
+.clinica-page .clinica-lista table thead {
+    display: none !important;
+}
+.clinica-page .clinica-lista .fixed-table-container {
+    padding-top: 0 !important;
+}
+/* rowStyle() do clinica.js marca as linhas como .ATENDIDO, que no tema
+   (style.css, carregado depois e com !important) pinta tudo de azul */
+.clinica-page #tabelaClinica.table > tbody > tr.ATENDIDO > td {
+    background-color: transparent !important;
+}
+.clinica-page #tabelaClinica.table-hover > tbody > tr.ATENDIDO:hover > td {
+    background-color: var(--cl-soft) !important;
+}
+.clinica-page #tabelaClinica > tbody > tr > td {
+    padding: 12px 18px;
+    border-top: 1px solid var(--cl-line);
+    vertical-align: middle;
+    color: var(--cl-ink);
+    font-weight: 500;
+    line-height: 1.35;
+}
+.clinica-page #tabelaClinica > tbody > tr:first-child > td {
+    border-top: 0;
+}
+.clinica-page #tabelaClinica > tbody > tr > td:last-child {
+    width: 1%;
+    white-space: nowrap;
+    padding-left: 4px;
+}
+/* botões editar/excluir gerados pelo clinica.js: mais discretos */
+.clinica-page #tabelaClinica .edit,
+.clinica-page #tabelaClinica .del {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    margin: 0 0 0 4px !important;
+    line-height: 28px;
+    border-radius: var(--cl-radius);
+    background: transparent;
+    border: 1px solid var(--cl-line);
+    color: var(--cl-muted);
+    font-size: 13px;
+}
+.clinica-page #tabelaClinica .edit:hover,
+.clinica-page #tabelaClinica .edit:focus {
+    color: var(--cl-primary);
+    border-color: var(--cl-primary);
+}
+.clinica-page #tabelaClinica .del:hover,
+.clinica-page #tabelaClinica .del:focus {
+    color: #ed5565;
+    border-color: #ed5565;
+}
+.clinica-page #tabelaClinica .no-records-found td {
+    color: var(--cl-muted);
+    font-weight: 400;
+    text-align: center;
+    cursor: default;
+}
+
+/* ---------- Formulário ---------- */
+.clinica-page .clinica-secao {
+    padding: 18px 18px 6px;
+    border-top: 1px solid var(--cl-line);
+}
+.clinica-page .clinica-secao:first-of-type {
+    border-top: 0;
+}
+.clinica-page .clinica-secao-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cl-ink);
+}
+.clinica-page .clinica-secao-titulo .fa {
+    width: 16px;
+    text-align: center;
+    color: var(--cl-muted);
+}
+.clinica-page .clinica-secao-whatsapp .clinica-secao-titulo .fa {
+    color: var(--cl-wa);
+}
+.clinica-page .clinica-secao-ajuda {
+    margin: -8px 0 14px 24px;
+    font-size: 12px;
+    color: var(--cl-muted);
+}
+
+.clinica-page .clinica-campos {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 14px;
+}
+.clinica-page .clinica-campos > .form-group {
+    margin-bottom: 14px;
+    min-width: 0;
+}
+.clinica-page .c-12 { grid-column: span 12; }
+.clinica-page .c-9  { grid-column: span 9; }
+.clinica-page .c-8  { grid-column: span 8; }
+.clinica-page .c-6  { grid-column: span 6; }
+.clinica-page .c-5  { grid-column: span 5; }
+.clinica-page .c-4  { grid-column: span 4; }
+.clinica-page .c-3  { grid-column: span 3; }
+.clinica-page .c-2  { grid-column: span 2; }
+
+.clinica-page .classClinica label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cl-text);
+}
+.clinica-page .classClinica .form-control {
+    height: 36px;
+    border: 1px solid #dfe3e7;
+    border-radius: var(--cl-radius);
+    box-shadow: none;
+    color: var(--cl-ink);
+    transition: border-color .15s, box-shadow .15s;
+}
+.clinica-page .classClinica .form-control::placeholder {
+    color: #b3bcc5;
+    text-transform: none;
+}
+.clinica-page .classClinica .form-control:focus {
+    border-color: var(--cl-primary);
+    box-shadow: 0 0 0 3px rgba(26, 179, 148, .15);
+    outline: 0;
+}
+
+/* conexão do WhatsApp */
+.clinica-page .clinica-conexao {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 14px;
+}
+.clinica-page .clinica-conexao .btn {
+    border-radius: var(--cl-radius);
+}
+.clinica-page #btn_id_whatsappHost {
+    background: var(--cl-wa);
+    border-color: var(--cl-wa);
+    color: #fff;
+}
+.clinica-page #btn_id_whatsappHost:hover,
+.clinica-page #btn_id_whatsappHost:focus {
+    background: #1fb859;
+    border-color: #1fb859;
+}
+.clinica-page #btnReiniciarWhatsapp {
+    background: var(--cl-surface);
+    border-color: #dfe3e7;
+    color: var(--cl-text);
+}
+.clinica-page #btnReiniciarWhatsapp:hover,
+.clinica-page #btnReiniciarWhatsapp:focus {
+    border-color: #f8ac59;
+    color: #c9822f;
+}
+.clinica-page #whatsappQrPanel {
+    border: 1px dashed var(--cl-wa-bubble-line);
+    border-radius: var(--cl-radius);
+    background: var(--cl-soft);
+}
+
+/* mensagens: desenhadas como a conversa que o paciente vê */
+.clinica-page .clinica-conversa {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding: 14px;
+    margin-bottom: 14px;
+    border-radius: var(--cl-radius);
+    background: var(--cl-chat-bg);
+}
+.clinica-page .clinica-mensagem {
+    margin: 0;
+    min-width: 0;
+}
+.clinica-page .clinica-mensagem label {
+    margin-bottom: 6px;
+    color: #54656f;
+}
+.clinica-page .clinica-mensagem label small {
+    display: block;
+    font-weight: 400;
+    color: #7a8a93;
+}
+.clinica-page .clinica-balao {
+    position: relative;
+}
+.clinica-page .clinica-balao::before {
+    /* "rabinho" do balão */
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -7px;
+    border-top: 0 solid transparent;
+    border-right: 8px solid var(--cl-surface);
+    border-bottom: 10px solid transparent;
+}
+.clinica-page .classClinica .clinica-balao textarea.form-control {
+    height: auto;
+    min-height: 120px;
+    resize: vertical;
+    padding: 9px 11px;
+    border: 0;
+    border-radius: 0 8px 8px 8px;
+    background: var(--cl-surface);
+    box-shadow: 0 1px 1px rgba(11, 20, 26, .13);
+    font-size: 13px;
+    line-height: 1.45;
+    color: #111b21;
+}
+.clinica-page .classClinica .clinica-balao textarea.form-control:focus {
+    box-shadow: 0 0 0 2px var(--cl-wa);
+}
+
+/* barra de ações */
+.clinica-page .clinica-acoes {
+    position: sticky;
+    bottom: 50px; /* fica acima do rodapé fixo do sistema */
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--cl-line);
+    border-radius: 0 0 var(--cl-radius) var(--cl-radius);
+    background: rgba(255, 255, 255, .96);
+}
+.clinica-page .clinica-acoes .clinica-acoes-dica {
+    margin-right: auto;
+    font-size: 12px;
+    color: var(--cl-muted);
+}
+.clinica-page .btn-clinica-primario {
+    background: var(--cl-primary);
+    border: 1px solid var(--cl-primary);
+    color: #fff;
+    border-radius: var(--cl-radius);
+    font-weight: 600;
+    padding: 7px 18px;
+}
+.clinica-page .btn-clinica-primario:hover,
+.clinica-page .btn-clinica-primario:focus {
+    background: var(--cl-primary-dark);
+    border-color: var(--cl-primary-dark);
+    color: #fff;
+}
+.clinica-page .btn-clinica-secundario {
+    background: var(--cl-surface);
+    border: 1px solid #dfe3e7;
+    color: var(--cl-ink);
+    border-radius: var(--cl-radius);
+    font-weight: 600;
+    padding: 5px 12px;
+}
+.clinica-page .btn-clinica-secundario:hover,
+.clinica-page .btn-clinica-secundario:focus {
+    border-color: var(--cl-primary);
+    color: var(--cl-primary);
+}
+
+/* foco visível pelo teclado em todos os botões da tela */
+.clinica-page .btn:focus-visible,
+.clinica-page a.btn:focus-visible {
+    outline: 2px solid var(--cl-primary);
+    outline-offset: 2px;
+}
+
+/* estado vazio: aparece quando o clinica.js esconde o formulário (após salvar) */
+.clinica-page .clinica-vazio {
+    display: none;
+    padding: 56px 24px;
+    text-align: center;
+    color: var(--cl-muted);
+}
+.clinica-page #id_TelaClinica.hidden + .clinica-vazio {
+    display: block;
+}
+.clinica-page .clinica-vazio > .fa {
+    font-size: 34px;
+    color: #c9d1d8;
+    margin-bottom: 12px;
+}
+.clinica-page .clinica-vazio h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--cl-ink);
+}
+.clinica-page .clinica-vazio p {
+    margin: 0 0 16px;
+}
+
+/* ---------- Telas menores ---------- */
+@media (max-width: 991px) {
+    .clinica-page .c-9, .clinica-page .c-8, .clinica-page .c-6, .clinica-page .c-5 { grid-column: span 12; }
+    .clinica-page .c-4 { grid-column: span 6; }
+    .clinica-page .c-3, .clinica-page .c-2 { grid-column: span 6; }
+    .clinica-page .clinica-conversa { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+    .clinica-page .c-4, .clinica-page .c-3, .clinica-page .c-2 { grid-column: span 12; }
+    .clinica-page .clinica-acoes .clinica-acoes-dica { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .clinica-page .classClinica .form-control { transition: none; }
+}

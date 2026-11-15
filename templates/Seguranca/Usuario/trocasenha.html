@@ -1,0 +1,55 @@
+{% extends "Base/base_user.html" %}
+
+{% block cabecalho %}
+  <h3>
+    <strong>Congregção Cristã no Brasil</strong> <br><span>Alterar Senha</span>
+  </h3>
+  <h5>Por favor, informe sua senha antiga, por segurança, e então informe sua nova senha duas vezes para que possamos verificar se você digitou corretamente.</h5>
+{% endblock %}
+
+{% block conteudo %}
+    <form class="m-t" role="form" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <input type="hidden" value="{{ next_url }}" name="next" />
+        {% if form.errors %}
+            <div class="text-center">
+                {% for key, error in form.errors %}
+                    {% if key == 'username' %}{% elif key == 'password' %}{% else %}{{ key }} : {{ error }}{% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-group password required">
+            {% if form.password.errors %}
+                <div class="text-center">
+                    {% for error in form.password.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <input class="form-control" name="old_password" placeholder="Senha Atual" type="password" required="">
+        </div>
+        <div class="form-group password required">
+            {% if form.password.errors %}
+                <div class="text-center">
+                    {% for error in form.password.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <input class="form-control" name="new_password1" placeholder="Nova Senha" type="password" required="">
+        </div>
+        <div class="form-group password required">
+            {% if form.password.errors %}
+                <div class="text-center">
+                    {% for error in form.password.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <input class="form-control" name="new_password2" placeholder="Senha(novamente)" type="password" required="">
+        </div>
+        <div class="form-group actions">
+            <button class="btn btn-primary block full-width m-b" name="commit" type="submit">Alterar Senha</button>
+        </div>
+    </form>
+{% endblock %}

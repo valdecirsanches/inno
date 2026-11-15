@@ -1,0 +1,54 @@
+<div class="modal inmodal" id="ModalWhatsApp"  class="classWhatsApp" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated fadeInUp">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title">Envia LEMBRETE via WhatsApp</h4>
+            </div>
+            <div class="modal-body" id="corpo">
+                <form method="post" role="form" id="form_whatsapp">
+
+                    <div class="row">
+                        <input type="text" class="hidden" id="agenda_whatsapp_id" value="">
+                        <input type="hidden" id="dia_semana">
+                        <input type="hidden" id="destinatario_whatsapp" value="">
+                        <div class="form-group col-md-8">
+                            <label for="destinatario_whatsapp_id">Destinatário</label>
+                            <input id="destinatario_whatsapp_id" name="destinatario_whatsapp" type="text"
+                                   class="form-control" value="">
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="celular_whatsapp_id">Celular</label>
+                            <input id="celular_whatsapp_id" name="celular_whatsapp" type="text"
+                                   class="form-control" required="required" autofocus="True" value="">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-12" >
+                            <label for="mensagem_whatsapp_id">Mensagem</label>
+                            <textarea id="mensagem_whatsapp_id"
+                                      name="mensagem_whatsapp"
+                                      class="form-control"
+                                      rel="autosize"
+                                      placeholder="Mensagem"
+                                      rows="15"
+                                      readonly
+                                      >
+                            </textarea>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Desistir</button>
+                <a class="btn btn-primary" onclick="EnviaWhatsApp()"><i class="fa fa-comments"></i>  Enviar</a>
+            </div>
+        </div>
+    </div>
+</div>

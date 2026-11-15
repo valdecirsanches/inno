@@ -1,0 +1,34 @@
+<table id="tabelaPrescricaoRemedios"
+       data-toggle="table"
+       data-classes="table table-condensed table-hover table-no-bordered"
+       data-unique-id="id"
+       data-click-to-select="true"
+{#               data-detail-view="true"#}
+{#               data-detail-formatter="detailFormatter"#}
+       data-url="/api/prescricao/remedio/">
+    <thead>
+    <tr>
+        <th data-field="id" data-visible="false"></th>
+        <th data-field="fk_prescricao_id" data-visible="false"></th>
+
+{#        <th data-field="nome" data-editable-placement="right" data-editable="true">#}
+        <th data-field="nome" class="swal2-fade">
+            <a class="add btn btn-success btn-outline btn-sm btn-remedio" onclick="AddRemedio()" title="Adicionar">
+            <i class="fa fa-file-o"></i>
+            </a>
+            <a class="add btn btn-success btn-outline btn-sm pnl-remedio btn-remedio hide" onclick="UpdateRemedio()" title="Salvar">
+            <i class="fa fa-save"></i>
+            </a>
+            <a class="add btn btn-success btn-outline btn-sm pnl-remedio btn-remedio hide" onclick="$('.pnl-remedio').addClass('hide')" title="Cancela ediçã">
+            <i class="fa fa-times"></i>
+            </a>
+
+            Remédio</th>
+        <th data-field="tipo" data-editable-placement="right" >Dosagem</th>
+        <th data-field="qtdade" data-editable-placement="right" >Qtde</th>
+        <th data-field="unidade" data-editable-placement="right" >Unidade</th>
+        <th data-field="descricao" data-editable-placement="left">Posologia</th>
+        <th class="col-md-3" data-field="remove" data-formatter="RemedioOptions" data-events="RemedioEvents" data-align="center"></th>
+    </tr>
+    </thead>
+</table>

@@ -1,0 +1,67 @@
+
+<link href="/static/css/Prontuario/memed.css?{{ user.release }}-3" rel="stylesheet">
+
+{# Aba "Prescrições Memed" do cadastro do médico.                              #}
+{# A situação vem do servidor (/api/memed/<id>/situacao/) e é redesenhada      #}
+{# por memedPainel() em indexMedico.js sempre que um médico é aberto ou salvo. #}
+<form action="" class="classMedico" method="post" role="form" id="formMedicoPrescricoes">
+    <div class="memed-acesso medico">
+
+        <div class="memed-card">
+            <div class="memed-situacao">
+                <div id="memedCarimbo" class="memed-carimbo is-vazio" aria-label="Carimbo do prescritor">
+                    <span class="memed-carimbo-nome">Nenhum médico aberto</span>
+                    <span class="memed-carimbo-crm">CRM</span>
+                </div>
+                <div class="memed-situacao-texto">
+                    <span id="memedChip" class="memed-chip">Aguardando</span>
+                    <p id="memedExplica">Abra um médico na lista para ver se ele pode prescrever pela Memed.</p>
+                </div>
+            </div>
+
+            <div class="memed-acoes">
+                <button type="button" id="btnHabilitaMemed" class="btn btn-primary hidden" onclick="memedDoctorHabilita()">
+                    <i class="fa fa-check"></i>Habilitar na Memed
+                </button>
+                <button type="button" id="btnUpdateMemed" class="btn btn-primary hidden" onclick="memedDoctorDataUpdate()">
+                    <i class="fa fa-refresh"></i>Enviar dados atualizados
+                </button>
+                <button type="button" id="btnRecoveryMemed" class="btn btn-white hidden" onclick="memedDoctorDataRead()">
+                    <i class="fa fa-search"></i>Consultar situação na Memed
+                </button>
+            </div>
+
+            <div id="memedRetorno" class="memed-retorno hidden" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="memed-card">
+            <h4>Dados que a Memed exige</h4>
+            <p class="memed-nota">Conferidos no cadastro salvo. Clique em "preencher" para ir até o campo.</p>
+            <ul id="memedChecklist" class="memed-checklist"></ul>
+
+            <div class="memed-pessoais">
+                <div class="form-group">
+                    <label for="id_data_nascimento">Data de nascimento</label>
+                    <input id="id_data_nascimento" name="data_nascimento" type="date" class="form-control input-sm">
+                </div>
+                <div class="form-group">
+                    <label for="id_genero">Gênero</label>
+                    <select id="id_genero" name="genero" class="form-control input-sm">
+                        <option value="">Selecione</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Feminino</option>
+                    </select>
+                </div>
+            </div>
+            <p class="memed-nota" style="margin: 10px 0 0;">Estes dois campos só são usados pela Memed e são salvos junto com o cadastro do médico.</p>
+        </div>
+
+        <div class="memed-card memed-rodape">
+            <span>A lista de especialidades vem da Memed. Atualize quando faltar alguma especialidade no cadastro.</span>
+            <button type="button" id="btnEspecialidade" class="btn btn-white btn-sm" onclick="SyncronizeEspecialidade()">
+                <i class="fa fa-download"></i> Atualizar especialidades
+            </button>
+        </div>
+
+    </div>
+</form>

@@ -1,0 +1,108 @@
+<form method="post" role="form" id="formDadosConvenio" class="classConvenio">
+    <div class="modal-body" id="corpo">
+        <div class="row">
+            <input id="id_id" name="id" class="hidden">
+{#            <div id="id_div" class="form-group col-md-2 disabled">#}
+{#                <label for="id_id">ID:</label>#}
+{#                <input id="id_id" name="id" type="text" class="form-control" value="">#}
+{#            </div>#}
+            <div class="form-group col-md-2" id="codigo_div">
+                <label for="id_codigo">Código: </label>
+                <input id="id_codigo" name="codigo" type="text" class="form-control"
+                       value=""  placeholder="Codigo..." autofocus="true">
+            </div>
+            <div class="form-group col-md-6" id="nome_div">
+                <label for="id_convenio">Nome do convênio: </label>
+                <input id="id_convenio" name="convenio" type="text" class="form-control"
+                       value=""  placeholder="Nome do convênio..." autofocus="true">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-6" id="razao_div">
+                <label for="id_razao">Razão social: </label>
+                <input id="id_razao" name="razao" type="text" class="form-control"
+                       value=""  placeholder="Razão social..." autofocus="true">
+            </div>
+            <div class="form-group col-md-4" id="cnpj_div">
+                <label for="id_cnpj">CNPJ:</label>
+                <input id="id_cnpj" name="cnpj" type="text" class="form-control"
+                       value=""  placeholder="CNPJ..." autofocus="true">
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-3">
+                <label for="id_cep">CEP</label>
+                <div class="input-group">
+                    <input id="id_cep" name="cep" type="text" maxlength="9" data-mask="99999-999"
+                           class="form-control input-sm" placeholder="Digite o CEP" value="{% if p.cep %}{{ p.cep }}{% endif %}">
+                    <div class="input-group-addon btn" id="btn_busca_id" onclick="ValidarCEP()">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6" id="rua_div">
+                <label for="id_endereco">Endereço: </label>
+                <input id="id_endereco" name="endereco" type="text" class="form-control"
+                       value=""  placeholder="Endereço..." autofocus="true">
+            </div>
+            <div class="form-group col-md-2" id="numero_div">
+                <label for="id_numero">Numero: </label>
+                <input id="id_numero" name="numero" type="text" class="form-control"
+                       value=""  placeholder="Numero..." autofocus="true">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-4" id="bairro_div">
+                <label for="id_bairro">Bairro:</label>
+                <input id="id_bairro" name="bairro" type="text" class="form-control"
+                       value=""  placeholder="Bairro..." autofocus="true">
+
+            </div>
+            <div class="form-group col-md-4" id="cidade_div">
+                <label for="id_cidade">Cidade: </label>
+                <input id="id_cidade" name="cidade" type="text" class="form-control"
+                       value=""  placeholder="Cidade..." autofocus="true">
+            </div>
+            <div class="form-group col-md-1" id="uf_div">
+                <label for="id_uf">UF:</label>
+                <input id="id_uf" name="uf" type="text" class="form-control"
+                       value=""  placeholder="UF..." autofocus="true">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-3" id="telefone_div">
+                <label for="id_telefone">Telefone:</label>
+                <input id="id_telefone" name="telefone" type="text" class="form-control"
+                       value=""  placeholder="Telefone..." autofocus="true">
+
+            </div>
+            <div class="form-group col-md-4" id="email_div">
+                <label for="id_email">Email: </label>
+                <input id="id_email" name="email" type="email" class="form-control"
+                       value=""  placeholder="Email..." autofocus="true">
+            </div>
+            <div class="form-group col-md-5" id="anotacoes_div">
+                <label for="id_anotacoes">Anotações:</label>
+                <textarea id="id_anotacoes" name="anotacoes" type="text" class="form-control"
+                          value=""  placeholder="Anotações..." autofocus="true">
+                            </textarea>
+            </div>
+            <div class="form-group col-md-5" id="anotacoes_div">
+                <label for="id_comentario">Comentarios:</label>
+                <textarea id="id_comentario" name="comentario" type="text" class="form-control"
+                          value=""  placeholder="Comentarios..." autofocus="true">
+                            </textarea>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="form-group col-md-12 col-lg-12 text-right">
+    <div class="hr-line-solid"></div>
+    <div class="col-md-6 text-left">
+        <a id="botao_novo_plano" class="btn btn-primary" onclick="AddConvenio()"><i class="fa fa-pencil"></i> Novo</a>
+    </div>
+    <div class="col-md-6 text-right">
+        <a id="btnSalvaConvenio" class="btn btn-primary" onclick="SalvaConvenio()"><i class="fa fa-save"></i> Salvar</a>
+    </div>
+</div>

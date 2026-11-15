@@ -1,0 +1,112 @@
+<form action="" method="post" role="form"  id="formComplementosPaciente" class="classPaciente">
+    <div class="row">
+        <div class="col-md-9 col-lg-10">
+            <div id="id_cep_div" class="form-group col-md-5 col-lg-3">
+                <label for="id_cep">CEP</label>
+                <div class="input-group">
+                    <input id="id_cep" name="cep" type="text" maxlength="9" class="form-control cep" placeholder="Digite o CEP">
+                    <div class="input-group-addon btn" id="btn_busca_id" onclick="BuscaCep('id_cep', 'id_endereco', 'id_endereco_numero', 'id_bairro', 'id_cidade', 'id_estado', 'id_cidade_ibge' )">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="id_endereco_div" class="form-group col-md-7">
+                <label for="id_endereco">Logradouro</label>
+                <input id="id_endereco" name="endereco" maxlength="50" class="form-control">
+            </div>
+            <div id="id_endereco_numero_div" class="form-group col-md-2">
+                <label for="id_endereco_numero">N°</label>
+                <input id="id_endereco_numero" name="endereco_numero" maxlength="10" class="form-control">
+            </div>
+            <div id="id_bairro_div" class="form-group col-md-5 col-lg-4">
+                <label for="id_bairro">Bairro</label>
+                <input id="id_bairro" name="bairro" maxlength="50" class="form-control">
+            </div>
+            <div id="id_cidade_div" class="form-group col-md-5 col-lg-4">
+                <label for="id_cidade">Cidade</label>
+                <input id="id_cidade" name="cidade" maxlength="50" class="form-control">
+            </div>
+            <div id="id_cidade_ibge_div" class="form-group col-md-3 col-lg-2">
+                <label for="id_cidade_ibge">IBGE</label>
+                <input id="id_cidade_ibge" name="cidade_ibge" maxlength="10" class="form-control">
+            </div>
+            <div id="id_estado_div" class="form-group col-md-3 col-lg-2">
+                <label for="id_estado">UF</label>
+                <input id="id_estado" name="estado" maxlength="2" class="form-control">
+            </div>
+        </div>
+        <div class="row col-md-3 col-lg-2">
+            <div id="id_complento_div" class="form-group">
+                <label for="id_complento">Complemento</label>
+                <textarea id="id_complento" name="complento" class="form-control" rows="5">
+                    {{ p.complento }}
+                </textarea>
+            </div>
+        </div>
+    </div>
+    <div id="id_telefone_div" class="form-group col-md-3" >
+        <label for="id_telefone">Telefone</label>
+        <input id="id_telefone" type="text" name="telefone" class="form-control cel">
+    </div>
+    <div id="id_celular_div" class="form-group col-md-3">
+        <label for="id_celular">Celular</label>
+        <input id="id_celular" type="text" name="celular" class="form-control">
+    </div>
+    <div id="id_email_div" class="form-group col-md-3">
+        <label for="id_email">Endereço eletrônico(E-Mail)</label>
+        <input id="id_email" name="email" class="form-control">
+    </div>
+    <div id="id_mae_div" class="form-group col-md-3 col-lg-3">
+        <label for="id_mae">Nome da mãe</label>
+        <input id="id_mae" name="mae" type="text" class="form-control">
+    </div>
+
+    <div class="row">
+        <div class="col-md-9 col-lg-10">
+            <div id="id_reg_conv_div" class="form-group col-md-4">
+                <label for="id_reg_conv">Detalhes do Convênio</label>
+                <input id="id_reg_conv" name="reg_conv" class="form-control">
+            </div>
+            <div id="id_empresa_div" class="form-group col-md-4">
+                <label for="id_empresa">Empresa</label>
+                <input id="id_empresa" name="empresa" class="form-control">
+            </div>
+            <div id="id_carteirinha_div" class="form-group col-md-4">
+                <label for="id_carteirinha">Identificação(Carteirinha)</label>
+                <input id="id_carteirinha" name="carteirinha" class="form-control">
+            </div>
+            <div id="id_fk_convenio_div" class="form-group col-md-4">
+                <label for="id_fk_convenio">Convênio</label>
+                <select id="id_fk_convenio" name="fk_convenio" class="form-control"></select>
+            </div>
+            <div id="id_fk_plano_div" class="form-group col-md-4">
+                <label for="id_fk_plano">Plano de saúde</label>
+                <select id="id_fk_plano" name="fk_plano" class="form-control"></select>
+            </div>
+            <div id="id_fk_medico_div" class="form-group col-md-4">
+                <label for="id_fk_medico">Médico</label>
+                <select id="id_fk_medico" name="fk_medico" class="form-control"></select>
+            </div>
+        </div>
+        <div class="row col-md-3 col-lg-2">
+            <div id="id_obs_div" class="form-group">
+                <label for="id_obs">Anotações</label>
+                <textarea id="id_obs" name="obs" class="form-control" rows="5">
+                </textarea>
+            </div>
+
+        </div>
+    </div>
+    <br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+</form>

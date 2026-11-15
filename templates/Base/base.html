@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppClinic 2.0 | EDSSolution </title>
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/js/plugins/bootstrap-table-master/src/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
+
+    {% block head %}
+        <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+        <!-- MSGs -->
+        <link rel="stylesheet" href="/static/plugins/sweetalert2/dist/sweetalert2.css">
+
+    {% endblock %}
+    <link href="/static/css/animate.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+
+
+
+</head>
+
+<body class="fixed-sidebar">
+    {% block modal %}
+    {% endblock %}
+    <div id="wrapper">
+        <nav class="navbar-default navbar-static-side" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li class="nav-header">
+                        <span class="bi bi-whatsapp" style="color: #00aa88" >WhatsApp</span>
+                        <iconify-icon icon="bi:whatsapp" style="color:#46b446"></iconify-icon>
+                        <h3 style="color: #dbdcec"> Release: {{ user.release }}</h3>
+                        <h5>{{ user.hostdb }}/{{ user.database }}</h5>
+
+                        <div class="dropdown profile-element">
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                                <span class="clear">
+                                    <span class="block m-t-xs">
+
+                                        <strong class="font-bold">{{ user.login }} / {{ user.fk_clinica.nome }}<b class="caret"></b></strong>
+                                    </span>
+                                    <span class="text-muted text-xs block"></span>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                                <li><a href="/mudar_senha/">Trocar senha</a></li>
+                                {% if user.is_superuser %}
+                                    <li><a href="/logs/painel/">Gerenciar logs</a></li>
+                                {% endif %}
+                                <li class="divider"></li>
+                                <li><a href="/logout/">Logout</a></li>
+                            </ul>
+                        </div>
+                        <div class="logo-element">
+                            EDS
+                        </div>
+                    </li>
+                    {% block principal %}
+                    <li>
+                        <a href="/"><i class="fa fa-th-large"></i> <span class="nav-label">Principal</span></a>
+                    </li>
+                    {% endblock %}
+                    {% block iniciar %}
+                    <li>
+                        <a href="/cadastros/paciente/"><i class="fa fa-group"></i> <span class="btn-xs nav-label ">Iniciar</span></a>
+                    </li>
+                    {% endblock %}
+
+                    <li class="{% block prontuario %} {% endblock %}">
+                        <a href="#" data-toggle="tooltip" data-placement="right" title="Algumas opções para adminstração do sistema..."><i class="fa fa-stethoscope"></i>
+                            <span class="nav-label">
+                                Prontuários
+                            </span><span class="fa arrow"></span>
+                        </a>
+                        <ul class="nav nav-second-level">
+                            <li class="{% block prontuario_historico %}{% endblock %}">
+                                <a href="/prontuario/Historico/">
+                                    <i class="fa fa-history"></i>Historico
+                                </a>
+                            </li>
+                             {% block atendimento %}
+                            <li class="{% block prontuario_atendimento %}{% endblock %}">
+                                <a href="/atendimento/">
+                                    <i class="fa fa-user-md"></i>Atendimentos
+                                </a>
+                            </li>
+                            {% endblock %}
+                        </ul>
+                    </li>
+
+                    {% block agenda_consultas %}
+                    <li>
+                        <a href="/agenda/consultas/"><i class="fa fa-calendar"></i>
+                            <span class="nav-label">
+                                Agenda
+                                <span class="fa arrow"></span>
+                            </span>
+                        </a>
+                    </li>
+                    {% endblock %}
+
+                    {% block menu_cadastros_auxiliares %}
+                    <li class="{% block cadastros_auxiliares %}{% endblock %}">
+                        <a href="#"><i class="fa fa-folder-open"></i> <span class="nav-label">Cadastros auxiliares</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li class="{% block cadastros_auxiliares_clinica %}{% endblock %}">
+                                <a href="/cadastros/clinica/">
+                                    <i class="fa fa-user-md"></i>Clínicas
+                                </a>
+                            </li>
+                            <li class="{% block cadastros_auxiliares_medicos %}{% endblock %}">
+                                <a href="/cadastros/medicos/">
+                                    <i class="fa fa-user-md"></i>Médicos
+                                </a>
+                            </li>
+
+                            <li class="{% block cadastros_auxiliares_convenios %}{% endblock %}">
+                                <a href="/cadastros/convenio/">
+                                    <i class="fa fa-folder-open"></i>Convênios
+                                </a>
+                            </li>
+                            <li class="{% block cadastros_auxiliares_especialidade %}{% endblock %}">
+                                <a href="/cadastros/especialidades/">
+                                    <i class="fa fa-stethoscope"></i>Especialidades
+                                </a>
+                            </li>
+                            <li class="{% block cadastros_auxiliares_planos %}{% endblock %}">
+                                <a href="/cadastros/planos/">
+                                    <i class="fa fa-group"></i>Planos de saúde
+                                </a>
+                            </li>
+{#                            <li class="{% block cadastros_auxiliares_especialidades %}{% endblock %}">#}
+{#                                <a href="">#}
+{#                                    <i class="fa fa-medkit"></i>Especialidades médicas#}
+{#                                </a>#}
+{#                            </li>#}
+                            <li class="{% block cadastros_auxiliares_usuarios %}{% endblock %}">
+                                <a href="/seguranca/">
+                                    <i class="fa fa-medkit"></i>Usuários
+                                </a>
+                            </li>
+{#                            <li class="{% block cadastros_auxiliares_prescricoes %}{% endblock %}">#}
+{#                                <a href="/configuracoes/prescricoes/">#}
+{#                                    <i class="fa fa-medkit"></i>Prescrições#}
+{#                                </a>#}
+{#                            </li>#}
+{#                            <li class="{% block cadastros_auxiliares_exames %}{% endblock %}">#}
+{#                                <a href="/configuracoes/exames/">#}
+{#                                    <i class="fa fa-medkit"></i>Exames#}
+{#                                </a>#}
+{#                            </li>#}
+{#                            <li class="{% block cadastros_auxiliares_relatorios %}{% endblock %}">#}
+{#                                <a href="/configuracoes/relatorios/">#}
+{#                                    <i class="fa fa-medkit"></i>Relatórios#}
+{#                                </a>#}
+{#                            </li>#}
+                        </ul>
+                    </li>
+                    {% endblock %}
+                    {% block menu_tarefas_diarias %}
+                    <li class="{% block tarefas_diarias %}{% endblock %}">
+                        <a href="#"><i class="fa fa-exchange"></i> <span class="nav-label">Tarefas diárias</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+
+                            <li class="{% block tarefas_diarias_gerar_agendas %}{% endblock %}" >
+                                <a href="/agenda/consultas/GerarAgendasView/">
+                                <i class="fa fa-cc-visa"></i>Gerar Agendas</a></li>
+
+                            <li class="{% block tarefas_diarias_resumo_atendimento %}{% endblock %}" >
+                                <a href="/cadastros/ResumoAtendimento/">
+                                <i class="fa fa-cc-visa"></i>Resumo de atendimento</a></li>
+
+                            <li class="{% block tarefas_diarias_resumo_tarefas %}{% endblock %}" >
+                                <a href="/painel/">
+                                <i class="fa fa-cc-visa"></i>Painel</a></li>
+
+                        </ul>
+                    </li>
+                    {% endblock %}
+
+                </ul>
+            </div>
+        </nav>
+        <div id="page-wrapper" class="gray-bg">
+            <div class="row border-bottom">
+                <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+                    <div class="navbar-header">
+                        <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+                    </div>
+                    <ul class="nav navbar-top-links navbar-right">
+                        <li>
+                            <a href="/logout/">
+                                <i class="fa fa-sign-out"></i> Log out
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            {% block container_cabecalho %}
+            <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>Advanced Form Elements</h2>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="../index.html">Home</a>
+                        </li>
+                        <li>
+                            <a>Forms</a>
+                        </li>
+                        <li class="active">
+                            <strong>Advanced Form Elements</strong>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            {% endblock %}
+            <div class="wrapper wrapper-content animated fadeInRight">
+                {% block container_corpo %}
+                    <div class="row">
+                        <div class="col-lg-10">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <h5>Selectize select <small>http://harvesthq.github.io/chosen/</small></h5>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                            <li>
+                                                <a href="http://translate.google.com/translate_tts?tl=pt-br&q=%C3%93la,%20Kananda!%20Tudo%20bem?%20Quero%20dizer%20que%20seu%20namorado%20%C3%A9%20apaixonado%20e%20n%C3%A3o%20%C3%A9%20capaz%20de%20viver%20sem%20voc%C3%AA">Kananda, clique aqui!</a>
+                                            </li>
+                                            <li>
+                                                <a href="/static/Princesa.mp3">Se gostar, clique aqui também</a>
+                                            </li>
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <p>
+                                        With chosen select uesr can fase chose from large in select input.
+                                    </p>
+                                    <div class="form-group">
+                                        <label class="font-noraml">Basic example</label>
+                                        <div class="input-group">
+                                            <select data-placeholder="Choose a Country..." id="selectize-paciente" style="width:350px;" tabindex="2">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="font-noraml">Basic example</label>
+                                        <div class="input-group">
+                                            <select data-placeholder="Choose a Country..." id="selectize-repo" style="width:350px;" tabindex="2">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endblock %}
+            </div>
+
+            <div class="fixed-nav">
+
+            </div>
+
+            {% block cabecalho_botoes %}
+
+            {% endblock %}
+
+            <div class="footer fixed">
+                <div class="pull-right hidden-xs ">
+                    <script language=javascript type="text/javascript">
+                        dayName = new Array ("domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado");
+                        monName = new Array ("janeiro", "fevereiro", "março", "abril", "maio", "junho","julho", "agosto","setembro", "outubro", "novembro", "dezembro");
+                        now = new Date;
+                        document.write ("<strong > Hoje é " + dayName[now.getDay() ] + ", " +
+                                now.getDate () + " de " + monName [now.getMonth() ]   +  " de "  +     now.getFullYear () + ".</strong>")
+                    </script>
+
+                </div>
+                <input type="hidden" id="connect" name="connect" value="{{ user.hostdb }}/{{ user.database }}">
+                <div class="hidden-xs hidden-sm">
+                      <script language=javascript type="text/javascript">
+                        now = new Date
+                        xx = document.getElementById('connect')
+
+                        document.write("<strong>Copyright</strong> &copy; Edssolution Tecnologia 1989-"+
+                                now.getFullYear () + "<small>  (Conectado à "+xx.value+")</small>")
+                    </script>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mainly scripts -->
+    <script src="/static/js/jquery-2.1.1.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
+
+    <script src="/static/javascripts/Base/base.js?{{ user.release }}" ></script>
+    <script src="/static/javascripts/Base/baseObject.js?{{ user.release }}"></script>
+    <script src="/static/javascripts/Base/baseService.js?{{ user.release }}-1"></script>
+    <script src="/static/javascripts/Base/baseTable.js?{{ user.release }}"></script>
+    <script src="/static/javascripts/Base/baseForm.js?{{ user.release }}"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+    <script src="/static/javascripts/Base/mascaras.js?{{ user.release }}"></script>
+
+    <script src="/static/js/plugins/Lodash/lodash.min.js"></script>
+
+    <!-- Bootstrap table -->
+    <script src="/static/js/plugins/bootstrap-table-master/src/bootstrap-table.js"></script>
+    <script src="/static/js/plugins/bootstrap-table-master/src/extensions/editable/bootstrap-table-editable.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+    <script src="/static/js/plugins/bootstrap-table-master/dist/locale/bootstrap-table-pt-BR.js"></script>
+
+
+    <!-- Custom and plugin javascript -->
+    <script src="/static/js/inspinia.js"></script>
+    <script src="/static/js/plugins/pace/pace.min.js"></script>
+    <script>
+        paceOptions = {
+            elements: true
+        };
+    </script>
+    <script src="/static/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!-- Moment -->
+    <script src="/static/js/plugins/moment/moment-with-locales.js"></script>
+    <!-- MENU -->
+    <script src="/static/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+
+    <!-- SweetAlert -->
+    <script src="/static/plugins/sweetalert2/dist/sweetalert2.all.js"></script>
+
+    <script src="https://code.iconify.design/iconify-icon/1.0.2/iconify-icon.min.js"></script>
+
+
+    {% block js %}
+
+    {% endblock %}
+
+
+    </body>
+
+</html>

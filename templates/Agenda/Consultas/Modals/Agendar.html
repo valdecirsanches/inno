@@ -1,0 +1,55 @@
+<div class="modal inmodal" id="modalAgendar" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content animated fadeInUp">
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <div class="modal-title">
+                    <h4 id="id_title_agendar" class="modal-title" >Agendar consultas médicas</h4>
+                </div>
+            </div>
+            <div class="modal-body" id="corpo">
+                <div class="row">
+                    {% include 'Agenda/Consultas/Forms/Agendar.html' %}
+                </div>
+                <div class="row">
+                    {% include 'Agenda/Consultas/Table/Agendar.html' %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="pull-left"><a id="dadosAgendamento" class="m-t-md"></a></div>
+                <button id="btnNovoProntuario"
+                        class="btn btn-primary"
+                        onclick="CadastroProntuario()">
+                    <i class="fa fa-pencil"></i> Adicionar Paciente
+                </button>
+                <button id="btnAlteraProntuario"
+                        class="btn btn-primary"
+                        onclick="CadastroProntuario(selecionaPaciente.getValue())">
+                    <i class="fa fa-pencil"></i> Editar dados do paciente
+                </button>
+                <button id="btnSalvarAgendamento"
+                        class="btn btn-primary"
+                        onclick="SalvaAgendamento()">
+                    <i class="fa fa-pencil"></i> Salvar
+                </button>
+                <button id="btnExcluirReceita"
+                        class="btn btn-danger hidden"
+                        onclick="ExcluirReceita()">
+                    <i class="fa fa-trash"></i> Excluir
+                </button>
+                <button id="btnHorarioLivre"
+                        class="btn btn-warning hidden"
+                        onclick="HorarioLivre()">
+                    <i class="fa fa-chain-broken"></i> Livre
+                </button>
+                <button class="btn btn-primary"
+                        data-dismiss="modal">
+                    <i class="fa fa-close"></i> Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

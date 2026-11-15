@@ -1,0 +1,74 @@
+{% extends "Base/base.html" %}
+
+
+
+{% block container_corpo %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="container-fluid">
+                    <form action="../../static" method="post" role="form"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        <div class="form-group">
+                            <div class="form-group col-md-5">
+                                <input type="text" class="form-control" name="dados" value=""
+                                       placeholder="Nome do paciente ou nº do prontuário..." required="" autofocus="">
+                            </div>
+                            <div class="form-group col-md-1">
+                                <input type="submit" ID="btn_pesc" class="btn btn-primary" value="Buscar">
+                            </div>
+                            <div class="form-group col-md-1">
+                                <a id="" class="btn btn-primary" href=""><i class="icm icm-pencil5"></i> Novo prontuário</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Prontuário</th>
+                    <th>Nome do paciente</th>
+                    <th>Idade</th>
+                    <th class="hidden-xs hidden-sm">Nº Celular</th>
+                    <th class="hidden-xs hidden-sm">Médico</th>
+                    <th class="hidden-xs">Plano de saúde</th>
+                    <th><i class="icm icm-pencil5" > </i></th>
+                    <th><i class="icm icm-bubbles"></i></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for prt in lista_prontuarios %}
+                    <tr id="{{ prt.pk }}">
+                        <td>{{ prt.codigo }}</td>
+                        <td>{{ prt.paciente }}</td>
+                        <td>{{ prt.idade }}</td>
+                        <td class="hidden-xs hidden-sm">{{ prt.celular }}</td>
+                        <td class="hidden-xs hidden-sm">{{ prt.fk_medico.medico }}</td>
+                        <td class="hidden-xs hidden-sm">{{ prt.fk_convenio.nome }}</td>
+                        <td><a id="" href=""><i class="icm icm-pencil5" > </i></a></td>
+                        <td><a id="" href=""><i class="icm icm-bubbles"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <ul class="pager">
+            <li class="previous {% if not lista_prontuarios.has_previous %}disabled{% endif %}">
+                <a href="?page={% if lista_prontuarios.has_previous %}{{ lista_prontuarios.previous_page_number }}{% endif %}">
+                    &laquo; Anterior
+                </a>
+            </li>
+            <li class="next {% if not lista_prontuarios.has_next %}disabled{% endif %}">
+                <a href="?page={% if lista_prontuarios.has_next %}{{ lista_prontuarios.next_page_number }}{% endif %}">
+                    &raquo; Proximo
+                </a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/javascripts/Cadastros/Pacientes/iniciar.js"></script>
+    <script src="/static/javascripts/Cadastros/Pacientes/recibo.js"></script>
+{% endblock %}

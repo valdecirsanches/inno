@@ -1,0 +1,9 @@
+# segredos e dados: nunca no repositório
+.env
+env
+*.sqlite3
+media/
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store

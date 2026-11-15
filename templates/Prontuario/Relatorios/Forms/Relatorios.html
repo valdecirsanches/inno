@@ -1,0 +1,54 @@
+{#<div class="row m-t">#}
+<div class="ibox-content">
+    <H1>Relatório</H1>
+    <div id="div_relatorio">
+        <form action="" method="post" role="form" id="formRelatorio" class="classProntuarioRelatorio">
+            <input id="id_id_relatorio" name="id" type="hidden" value="0">
+            <input id="id_fk_prontuario" name="fk_prontuario" type="hidden">
+            <input id="id_fk_consulta" name="fk_consulta" type="hidden">
+            <input id="id_fk_medico" name="fk_medico" type="hidden">
+            <div class="row m-b-n-lg">
+                <div id="id_titulo_div" class="form-group col-md-12">
+                    <label for="id_titulo_relatorio">Titulo</label>
+                    <input id="id_titulo_relatorio" name="titulo" type="text" class="form-control save_relatorio">
+                </div>
+                <div id="id_texto_div" class="form-group col-md-12">
+                    <label for="id_texto_relatorio">Texto</label>
+                    <textarea id="id_texto_relatorio"
+                              name="texto"
+                              class="form-control save_relatorio"
+                              cols="75"
+                              rows="6"></textarea>
+                </div>
+                <div id="id_cid10_div" class="form-group col-md-12">
+                    <label for="id_cid10_relatorio">CID 10</label>
+                    <select
+                            id="id_cid10_relatorio"
+                            name="cid10"
+                            class="form-control select_CID10 js-example-basic-multiple save_relatorio"
+                            data-format="formatRepoSelectionCID10"
+                            data-change="changeCID10"
+                            multiple="multiple"
+                    >
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <a>Salvo em <strong id="relatorio_data_salvo"></strong></a>
+        <div class="pull-right">
+            <div class="btn-group">
+                <a id="SelicionaRelatorio" class="btn btn-success btn-outline" onclick="SelecionaRelatorio()"><i class="fa fa-chain"></i> Padrões</a>
+                <a id="AdicionaRelatorioPadrao" class="btn btn-success btn-outline" onclick="AdicionaRelatorioPadrao()"><i class="fa fa-plus"></i></a>
+            </div>
+            {#            <a id="ClonarRelatorio" class="btn btn-success btn-outline" onclick="ClonarRelatorio($('#id_id_relatorio').val())"><i class="fa fa-copy"></i> Clonar</a>#}
+            <a id="btnAddRelatorio" class="btn btn-success btn-outline" onclick="AddRelatorio()" hidden><i class="fa fa-plus"></i> Novo</a>
+            <a id="ImprimirRelatorio" class="btn btn-success btn-outline btn-relatorio" onclick="ImprimeRelatorio()"><i class="fa fa-print"></i> Imprimir</a>
+            {# <a id="SalvaRelatorio" class="btn btn-primary btn-outline  btn-relatorio" onclick="UpdateRelatorio(false)"><i class="fa fa-save"></i> Salvar</a> #}
+        </div>
+    </div>
+</div>
+{#</div>#}
+

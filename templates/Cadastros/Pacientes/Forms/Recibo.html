@@ -1,0 +1,66 @@
+<form method="post" role="form" id="formRecibo" class="classRecibo">
+    <input id="id_fk_paciente" name="fk_paciente" type="hidden">
+    <input id="id_fk_usuario" name="fk_usuario" type="hidden">
+    <input id="id_codigo" name="codigo" type="hidden">
+
+    <div class="recibo-folha">
+
+        <div class="recibo-topo">
+            <h5 class="recibo-titulo">Recibo</h5>
+            <div id="id_id_div" class="form-group recibo-controle">
+                <label for="id_id">Nº de controle</label>
+                <input id="id_id" name="id" type="number" class="form-control input-sm" readonly>
+            </div>
+        </div>
+
+        <div class="row">
+            <div id="id_valor_div" class="form-group col-sm-5 recibo-valor">
+                <label for="id_valor">Valor</label>
+                <div class="input-group">
+                    <span class="input-group-addon">R$</span>
+                    <input id="id_valor" name="valor" type="text" class="form-control input-sm"
+                           inputmode="decimal" placeholder="0,00"
+                           onkeyup="$(this).val(SupraValor(this.value))">
+                </div>
+            </div>
+            <div id="id_paciente_nome_div" class="form-group col-sm-7 recibo-pagador">
+                <label for="id_paciente_nome">Recebemos de</label>
+                <input id="id_paciente_nome" name="paciente_nome" type="text" class="form-control input-sm" readonly>
+            </div>
+        </div>
+
+        <div id="id_valor_extenso_div" class="form-group">
+            <label for="id_valor_extenso">A quantia de <small>(por extenso, preenchido ao digitar o valor)</small></label>
+            <textarea id="id_valor_extenso" name="valor_extenso" class="form-control input-sm" rows="2"></textarea>
+        </div>
+
+        <div id="id_referencia_div" class="form-group">
+            <label for="id_referencia">Referente a <small>(histórico)</small></label>
+            <textarea id="id_referencia" name="referencia" class="form-control input-sm" required="" autofocus="" rows="2"
+                      placeholder="Ex.: consulta médica"></textarea>
+        </div>
+
+        <div class="row">
+            <div id="id_fk_medico_div" class="form-group col-sm-6">
+                <label for="id_fk_medico">Médico</label>
+                <select id="id_fk_medico" name="fk_medico" class="form-control input-sm"></select>
+            </div>
+            <div id="id_data_recibo_div" class="form-group col-sm-3 col-xs-6">
+                <label for="id_data_recibo">Data do recibo</label>
+                <input id="id_data_recibo" name="data_recibo" type="date" class="form-control input-sm">
+            </div>
+            <div id="id_emissao_div" class="form-group col-sm-3 col-xs-6">
+                <label for="id_emissao">Data de emissão</label>
+                <input id="id_emissao" name="emissao" type="date" class="form-control input-sm">
+            </div>
+        </div>
+
+        <div class="recibo-picote" aria-hidden="true"></div>
+
+        <div id="id_usuario_div" class="form-group recibo-emissor">
+            <label for="id_usuario">Emitido por</label>
+            <input id="id_usuario" name="usuario" type="text" class="form-control input-sm" readonly>
+        </div>
+
+    </div>
+</form>

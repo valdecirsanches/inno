@@ -1,0 +1,420 @@
+{% extends 'Base/base.html' %}
+
+{% block body %}
+<body class="high emerald-default htmls htmls_tables">
+{% endblock %}
+
+{% block modal %}
+<div class="modal fade" id="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header ">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+        Id et dolores eveniet consequuntur dignissimos laborum omnis qui in sit hic quae. voluptatem molestiae dignissimos perspiciatis sunt explicabo ut eligendi sed. voluptas rerum aliquid autem deserunt blanditiis placeat accusantium quisquam pariatur
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block container_cabecalho %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-6">
+            <h3 class="em-page-header v-mid-row thin">
+                <i class="icm icm-pencil5 text-gradient-info-dk"></i>
+                <span class="text-gradient-info-dk">
+                    Prontuário Eletrônico
+                </span>
+            </h3>
+        </div>
+        <div class="col-sm-6 text-right-sm text-right-md text-right-lg">
+            <ul class="breadcrumb breadcrumb-top">
+                <li><i class="fa fa-home"></i> Home</li>
+                <li class="active">
+                    Prontuário Eletrônico
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block container_corpo %}
+<div class="container-fluid">
+    <div class="row " rel="panels">
+        <div class="col-md-12 panels " id="rid690039f4aa0432318fd14c6e6bd1ea859">
+            <div class="panel panel-default gradient-diag1" id="rid690039f4aa0432318fd14c6e6bd1ea8511">
+                <div class="panel-heading panel-handle panel-colorize">
+                    <div class="panel-actions pull-right panel-actions-reveal">
+                        <span class="panel-actions-reveal-hide animated fadeInRight">
+                            <span class="panel-action panel-classify">
+                                <select rel="classselector">
+                                    <option>panel-none</option>
+                                    <option>panel-default</option>
+                                    <option>panel-light</option>
+                                    <option>panel-dark</option>
+                                    <option>panel-inverse</option>
+                                    <option>panel-warning</option>
+                                    <option>panel-danger</option>
+                                    <option>panel-primary</option>
+                                    <option>panel-info</option>
+                                    <option>panel-success</option>
+                                </select>
+                            </span>
+                            <span class="panel-action panel-fullscreen">
+                                <i class="fa fa-expand"></i>
+                            </span>
+                            <span class="panel-action panel-collapse">
+                                <i class="fa fa-minus"></i>
+                            </span>
+                            <span class="panel-action panel-close">
+                                <i class="fa fa-times"></i>
+                            </span>
+                        </span>
+                        &nbsp;&nbsp;
+                        <i class="fa fa-bars panel-actions-reveal-icon"></i>
+                    </div>
+                    <div class="panel-title">
+                        <span class="panel-title-edtitable" data-type="text">
+                            Prontuário
+                        </span>
+                    </div>
+                </div>
+                <div class="panel-body-collapse collapse in">
+                    <div class="panel-body ">
+                        <form action="." method="post" role="form"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            <div class="row">
+                                <div class="form-group col-md-1 has-warning">
+                                    <label for=""></label>
+                                    <input name="" type="number" value=""
+                                           class="form-control" id=""  required="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                </div>
+                                <div class="form-group col-md-2 has-warning">
+                                    <label for=""></label>
+                                    <input name="" type="date" value=""
+                                           class="form-control" id=""  required="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                </div>
+                                <div class="form-group col-md-1 has-warning">
+                                    <label for=""></label>
+                                    <input name="" type="number" value=""
+                                           class="form-control" id=""  required="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                </div>
+                                <div class="form-group col-md-6 has-warning">
+                                    <label for=""></label>
+                                    <input name="" type="text" value=""
+                                           class="form-control" id=""  required="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                </div>
+                                <div class="form-group col-md-2 has-warning">
+                                    <label for=""></label>
+                                    <input name="" type="number" value=""
+                                           class="form-control" id=""  required="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-2 has-warning">
+                                    <label for=""></label>
+                                    <input name="" type="number" value=""
+                                           class="form-control" id=""  required="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                </div>
+                                <div class="form-group col-md-2 has-warning">
+                                    <label for=""></label>
+                                    <input name="" type="date" value=""
+                                           class="form-control" id=""  required="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                </div>
+                                <div class="form-group col-md-1 has-warning">
+                                    <label for=""></label>
+                                    <input name="" type="text" value=""
+                                           class="form-control" id=""  required="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                </div>
+                                <div class="form-group col-md-1 has-warning">
+                                    <label for=""></label>
+                                    <input name="" type="text" value=""
+                                           class="form-control" id=""  required="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                </div>
+                                <div class="form-group col-md-4 has-warning">
+                                    <label for=""></label>
+                                    <input name="" type="text" value=""
+                                           class="form-control" id=""  required="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="panel-heading panel-colorize">Endereço</div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            <div class="row">
+                                                <div class="form-group col-md-3 has-warning">
+                                                    <label for="cep">CEP</label>
+                                                    <div class="input-group">
+                                                        <input name="cep" type="text" maxlength="9" value="{% if associado.cepresi %}{{ associado.cepresi }}{% endif %}"
+                                                               class="form-control" id="cep" placeholder="Digite o CEP" required="required">
+                                                        <div class="input-group-addon btn" id="btn_busca_id">
+                                                            <span class="glyphicon glyphicon-search"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-md-7 has-warning">
+                                                    <label for="rua">Logradouro</label>
+                                                    <input name="rua" id="rua" maxlength="50" value="{% if associado.enderesi %}{{ associado.enderesi }}{% endif %}"
+                                                           class="form-control" placeholder="" required="required" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                                </div>
+                                                <div class="form-group col-md-2 has-warning">
+                                                    <label for="numero">N°</label>
+                                                    <input name="numero" id="numero" maxlength="50" value="{% if associado.numresi %}{{ associado.numresi }}{% endif %}"
+                                                           class="form-control" required="required">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-md-3 has-warning">
+                                                    <label for="bairro">Bairro</label>
+                                                    <input name="bairro" id="bairro"  maxlength="50" value="{% if associado.bairresi %}{{ associado.bairresi }}{% endif %}"
+                                                           class="form-control" placeholder="" required="required" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                                </div>
+                                                <div class="form-group col-md-2 has-warning">
+                                                    <label for="cidade">Cidade</label>
+                                                    <input name="cidade" id="cidade" maxlength="50" value="{% if associado.cidaresi %}{{ associado.cidaresi }}{% endif %}"
+                                                           class="form-control" placeholder="" required="required" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                                </div>
+                                                <div class="form-group col-md-1 has-warning">
+                                                    <label for="uf">UF</label>
+                                                    <input name="uf" id="uf" maxlength="2" value="{% if associado.ufresi %}{{ associado.ufresi }}{% endif %}"
+                                                           class="form-control" placeholder="" required="required" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                                </div>
+                                                <div class="form-group col-md-2 has-warning">
+                                                    <label for="ibge">Código IBGE</label>
+                                                    <input name="ibge" id="ibge" maxlength="50" value="{% if associado.cod_cidade %}{{ associado.cod_cidade }}{% endif %}"
+                                                           class="form-control" placeholder="" required="required">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            <label for="complemento">Complemento</label>
+                                            <textarea name="complemento" id="complemento"  maxlength="50" value="{% if associado.complemento %}{{ associado.complemento }}{% endif %}"
+                                                      class="form-control" placeholder="" rows="5"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-2 has-warning">
+                                    <div class="col-md-2">
+                                        <label for="sms_id">SMS</label>
+                                        <input type="checkbox" id="sms_id" rel="icheck" checked>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <label for="ibge"></label>
+                                        <input name="ibge" id="ibge" maxlength="50" value="{% if associado.cod_cidade %}{{ associado.cod_cidade }}{% endif %}"
+                                               class="form-control" placeholder="" required="required">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="row"></div>
+                                <div class="row"></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" rel="panels">
+        <div class="col-md-6 panels" id="rid690039f4aa0432318fd14c6e6bd1ea851">
+            <div class="panel panel-default gradient-diag1" id="rid690039f4aa0432318fd14c6e6bd1ea852">
+                <div class="panel-heading panel-handle panel-colorize">
+                    <div class="panel-actions pull-right panel-actions-reveal">
+                        <span class="panel-actions-reveal-hide animated fadeInRight">
+                            <span class="panel-action panel-classify">
+                                <select rel="classselector">
+                                    <option>panel-none</option>
+                                    <option>panel-default</option>
+                                    <option>panel-light</option>
+                                    <option>panel-dark</option>
+                                    <option>panel-inverse</option>
+                                    <option>panel-warning</option>
+                                    <option>panel-danger</option>
+                                    <option>panel-primary</option>
+                                    <option>panel-info</option>
+                                    <option>panel-success</option>
+                                </select>
+                            </span>
+                            <span class="panel-action panel-fullscreen">
+                                <i class="fa fa-expand"></i>
+                            </span>
+                            <span class="panel-action panel-collapse">
+                                <i class="fa fa-minus"></i>
+                            </span>
+                            <span class="panel-action panel-close">
+                                <i class="fa fa-times"></i>
+                            </span>
+                        </span>
+                        &nbsp;&nbsp;
+                        <i class="fa fa-bars panel-actions-reveal-icon"></i>
+                    </div>
+                    <div class="panel-title">
+                        <span class="panel-title-edtitable" data-type="text">
+                            Exames
+                        </span>
+                    </div>
+                </div>
+                <div class="panel-body-collapse collapse in">
+                    <div class="panel-body ">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr class="row-mid">
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="row-mid">
+                                        <td>
+                                            Alvin Gray
+                                        </td>
+                                        <td>makenzie_abbott@fastmail.com</td>
+                                        <td class="text-muted">$6451</td>
+                                    </tr>
+                                    <tr class="row-mid">
+                                        <td>
+                                            Kaylin Christensen
+                                        </td>
+                                        <td>isabelle-chappell@yahoo.com</td>
+                                        <td class="text-muted">$6251</td>
+                                    </tr>
+                                    <tr class="row-mid">
+                                        <td>
+                                            Alondra Hester
+                                        </td>
+                                        <td>dwayneboswell@mail.com</td>
+                                        <td class="text-muted">$7720</td>
+                                    </tr>
+                                    <tr class="row-mid">
+                                        <td>
+                                            Justice Farrell
+                                        </td>
+                                        <td>moses-merritt@me.com</td>
+                                        <td class="text-muted">$7080</td>
+                                    </tr>
+                                    <tr class="row-mid">
+                                        <td>
+                                            Terry Puckett
+                                        </td>
+                                        <td>madelineglover@fastmail.com</td>
+                                        <td class="text-muted">$6075</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Coluna da Esquerda-->
+        </div>
+        <div class="col-md-6 panels" id="rid690039f4aa0432318fd14c6e6bd1ea855">
+            <div class="panel panel-default gradient-diag1" id="rid690039f4aa0432318fd14c6e6bd1ea856">
+                <div class="panel-heading panel-handle panel-colorize">
+                    <div class="panel-actions pull-right panel-actions-reveal">
+                        <span class="panel-actions-reveal-hide animated fadeInRight">
+                            <span class="panel-action panel-classify">
+                                <select rel="classselector">
+                                    <option>panel-none</option>
+                                    <option>panel-default</option>
+                                    <option>panel-light</option>
+                                    <option>panel-dark</option>
+                                    <option>panel-inverse</option>
+                                    <option>panel-warning</option>
+                                    <option>panel-danger</option>
+                                    <option>panel-primary</option>
+                                    <option>panel-info</option>
+                                    <option>panel-success</option>
+                                </select>
+                            </span>
+                            <span class="panel-action panel-fullscreen">
+                                <i class="fa fa-expand"></i>
+                            </span>
+                            <span class="panel-action panel-collapse">
+                                <i class="fa fa-minus"></i>
+                            </span>
+                            <span class="panel-action panel-close">
+                                <i class="fa fa-times"></i>
+                            </span>
+                        </span>
+                        &nbsp;&nbsp;
+                        <i class="fa fa-bars panel-actions-reveal-icon"></i>
+                    </div>
+                    <div class="panel-title">
+                        <span class="panel-title-edtitable" data-type="text">
+                            Consultas
+                        </span>
+                    </div>
+                </div>
+                <div class="panel-body-collapse collapse in">
+                    <div class="panel-body ">
+                        <div class="table-responsive">
+                            <table class="table table-houver">
+                                <thead>
+                                    <tr class="row-mid">
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="row-mid">
+                                        <td>
+                                            Alvin Gray
+                                        </td>
+                                        <td>makenzie_abbott@fastmail.com</td>
+                                        <td class="text-muted">$6451</td>
+                                    </tr>
+                                    <tr class="row-mid">
+                                        <td>
+                                            Kaylin Christensen
+                                        </td>
+                                        <td>isabelle-chappell@yahoo.com</td>
+                                        <td class="text-muted">$6251</td>
+                                    </tr>
+                                    <tr class="row-mid">
+                                        <td>
+                                            Alondra Hester
+                                        </td>
+                                        <td>dwayneboswell@mail.com</td>
+                                        <td class="text-muted">$7720</td>
+                                    </tr>
+                                    <tr class="row-mid">
+                                        <td>
+                                            Justice Farrell
+                                        </td>
+                                        <td>moses-merritt@me.com</td>
+                                        <td class="text-muted">$7080</td>
+                                    </tr>
+                                    <tr class="row-mid">
+                                        <td>
+                                            Terry Puckett
+                                        </td>
+                                        <td>madelineglover@fastmail.com</td>
+                                        <td class="text-muted">$6075</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

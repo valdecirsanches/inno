@@ -1,0 +1,16 @@
+{% extends "Base/base_user.html" %}
+
+{% block cabecalho %}
+    <h3>Registresse no {{ nmsistema }}</h3>
+    <p>Crie a sua conta para acessar o sistema.</p>
+{% endblock %}
+
+{% block conteudo %}
+<form class="m-t" role="form" method="POST">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    {{ form.as_p }}
+
+    <input type='submit' value='Registrar' />
+</form>
+{% endblock %}

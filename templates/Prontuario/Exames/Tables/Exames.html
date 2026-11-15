@@ -1,0 +1,39 @@
+<div class="ibox-content">
+    <table id="tabelaExames"
+           data-toggle="table"
+           data-classes="table table-condensed table-hover table-no-bordered"
+           data-unique-id="id"
+           data-click-to-select="true"
+           data-total-field="count"
+           data-data-field="results"
+           data-url="/api/exames/">
+        <thead>
+        <tr>
+            <th data-radio="true"></th>
+            <th data-field="id" data-visible="false"></th>
+
+            {#                <th data-field="edit" data-formatter="editFormatter" data-events="editExamesEvents" data-align="center"></th>#}
+            <th data-field="data_salvo" data-formatter="dateFormatter" >Data</th>
+            <th data-field="fk_medico.medico">Médico</th>
+            <th data-field="descricao">Descrição</th>
+            <th data-field="pedido">Pedido</th>
+            <th data-field="cid10">CID 10</th>
+            <th data-field="remove"
+                data-formatter="OptionsExame"
+                data-events="EventsExame"
+                data-align="center"
+                class="col-md-3"
+            ></th>
+        </tr>
+        </thead>
+    </table>
+</div>
+
+
+
+{#<script>#}
+{#function ExameParams(params) {#}
+{#    params.id_prontuario = $('.classAtendimento #id_fk_prontuario').val();#}
+{#    return params#}
+{#}#}
+{#</script>#}

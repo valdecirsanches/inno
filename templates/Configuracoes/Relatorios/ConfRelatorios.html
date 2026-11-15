@@ -1,0 +1,73 @@
+{% extends "Base/base.html" %}
+
+
+{% block cadastros_auxiliares %}active{% endblock %}
+{% block cadastros_auxiliares_relatorios %}active{% endblock %}
+
+{% block head %}
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+    <!-- switchery -->
+    <link href="/static/css/plugins/switchery/switchery.min.css" rel="stylesheet">
+
+    <!-- iCheck -->
+    <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+
+    <!-- sweet alert -->
+{#    <link href="/static/plugins/sweetalert-master/dist/sweetalert.css" rel="stylesheet">#}
+    <!-- MSGs -->
+    <link rel="stylesheet" href="/static/plugins/sweetalert2/dist/sweetalert2.css">
+
+
+
+{% endblock %}
+
+{% block container_cabecalho %}
+{% endblock %}
+
+{% block container_corpo %}
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>Relatórios</h5>
+        </div>
+        <div class="ibox-content">
+            {% include 'Configuracoes/Relatorios/Forms/Relatorios.html' %}
+        </div>
+        <div class="ibox-content">
+            {% include 'Configuracoes/Relatorios/Tables/Relatorios.html' %}
+        </div>
+    </div>
+    <form method="post" role="form" id="formAtendimento"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <input id="id_fk_prontuario" name="fk_prontuario" type="hidden">
+        <input id="id_fk_consulta" name="fk_consulta" type="hidden">
+        <input id="id_fk_medico" name="fk_medico" type="hidden">
+    </form>
+
+{% endblock %}
+
+{% block js %}
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- Selectize -->
+    <script src="/static/js/plugins/selectize/standalone/selectize.min.js"></script>
+
+    <!-- iCheck -->
+    <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+
+    <!-- Switchery -->
+    <script src="/static/js/plugins/switchery/switchery.min.js"></script>
+
+    <!-- sweet alert -->
+{#///    <script src="/static/plugins/sweetalert-master/dist/sweetalert.min.js"></script>#}
+    <!-- MSGs -->
+    <link rel="stylesheet" href="/static/plugins/sweetalert2/dist/sweetalert2.css">
+
+    <!-- Exames -->
+    <script src="/static/javascripts/Configuracoes/Relatorios/Relatorios.js?{{ user.release }}" type="application/javascript"></script>
+
+{% endblock %}

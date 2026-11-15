@@ -1,0 +1,29 @@
+<div class="modal-body" id="corpo">
+    <div  class="form-group col-md-12 col-lg-12">
+        <div class="form-group col-md-3 col-lg-3" >
+            <table id="tabelaPrescricao"
+                   data-toggle="table"
+                   data-classes="table table-condensed table-hover table-no-bordered"
+                   data-row-style="rowStyle"
+                   data-click-to-select="true"
+                   data-search="true"
+                   data-height="450"
+                   data-unique-id="id"
+                   data-url="/configuracoes/prescricoes/CarregaConfPrescricoes/">
+                <thead>
+                <tr>
+                    <th data-field="id" data-visible="false"></th>
+                    <th data-field="fk_medico_id" data-visible="false"></th>
+                    {#            <th data-field="edit" data-formatter="editFormatter" data-events="editRemedioEvents" data-align="center"></th>#}
+                    <th data-field="nome">Tipo Receita</th>
+                    <th data-field="buttons" data-width="120px" data-formatter="ButtonPrescricao" data-events="EventPrescricao" data-align="center"></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div id="id_TelaPrescricaox"  class="form-group col-md-9 col-lg-9" style="background-color: #dceaf8">
+            <div class="row"> {% include 'Configuracoes/Prescricoes/form.html' %}</div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,20 @@
+<div class="modal-body" id="corpo">
+    <table id="tabelaClinica"
+           data-toggle="table"
+           data-classes="table table-condensed table-hover table-no-bordered"
+           data-row-style="rowStyle"
+           data-height="550"
+           data-unique-id="id"
+           data-id-field="id"
+           data-select-item-name="id"
+
+           data-url="/cadastros/clinica/clinica.json">
+        <thead>
+        <tr>
+            <th data-field="id" data-visible="false"></th>
+            <th data-field="nome">Nome da clínica</th>
+            <th data-field="edit" data-formatter="OpcoesClinica" data-events="EventsClinica" data-align="center"></th>
+        </tr>
+        </thead>
+    </table>
+</div>

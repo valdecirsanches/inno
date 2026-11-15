@@ -1,0 +1,57 @@
+{% extends "Base/base.html" %}
+
+
+{% block principal_ativa %}active{% endblock %}
+
+{% block head %}
+    <!-- iCheck -->
+    <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+{% endblock %}
+
+{% block container_cabecalho %}
+<div class="col-lg-10">
+    <h2>{{ nmsistema }}</h2>
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Home</a>
+        </li>
+        <li class="active">
+            <strong>Apresentação</strong>
+        </li>
+    </ol>
+</div>
+{% endblock %}
+
+{% block container_corpo %}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <h1>Use Flat UI to style the checkboxes(<a href="https://github.com/wenzhixin/bootstrap-table/issues/383" target="_blank">#383</a>.)</h1>
+        <table id="table"
+               data-toggle="table"
+               data-pagination="true"
+               data-url="/static/data1.json">
+            <thead>
+            <tr>
+                <th data-field="state" data-checkbox="true"></th>
+                <th data-field="id">ID</th>
+                <th data-field="name">Item Name</th>
+                <th data-field="price">Item Price</th>
+            </tr>
+            </thead>
+        </table>
+</div>
+{% endblock %}
+
+{% block js %}
+    <!-- iCheck -->
+    <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+<script>
+    var $table = $('#table');
+    $(function () {
+        $table.on('post-body.bs.table', function () {
+            $(':checkbox').iCheck({
+                checkboxClass: 'icheckbox_square'
+            });
+        })
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "Base/base.html" %}
+
+
+{% block cadastros_auxiliares %}active{% endblock %}
+{% block cadastros_auxiliares_prescricoes %}active{% endblock %}
+
+{% block head %}
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+    <!-- switchery -->
+    <link href="/static/css/plugins/switchery/switchery.min.css" rel="stylesheet">
+
+    <!-- iCheck -->
+    <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+
+    <!-- sweet alert -->
+{#    <link href="/static/plugins/sweetalert-master/dist/sweetalert.css" rel="stylesheet">#}
+    <!-- MSGs -->
+    <link rel="stylesheet" href="/static/plugins/sweetalert2/dist/sweetalert2.css">
+
+{% endblock %}
+
+{% block container_cabecalho %}
+     <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2><i class="fa fa-group"></i> Configuração de prescrição</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">
+                    <strong>Configuração de prescrição</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block container_corpo %}
+    <div class="row">
+        <div class="col-lg-12" style="background-color: #dceaf8">
+            {% include 'Configuracoes/Prescricoes/table.html' %}
+        </div>
+    </div>
+
+{#    <form method="post" role="form" id="formAtendimento">#}
+{#        <input id="id_fk_prontuario" name="fk_prontuario" type="hidden">#}
+{#        <input id="id_fk_consulta" name="fk_consulta" type="hidden">#}
+{#        <input id="id_fk_medico" name="fk_medico" type="hidden">#}
+{#    </form>#}
+{% endblock %}
+
+{% block js %}
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- Selectize -->
+    <script src="/static/js/plugins/selectize/standalone/selectize.min.js"></script>
+
+    <!-- iCheck -->
+    <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+
+    <!-- Switchery -->
+    <script src="/static/js/plugins/switchery/switchery.min.js"></script>
+
+    <!-- sweet alert -->
+{#///    <script src="/static/plugins/sweetalert-master/dist/sweetalert.min.js"></script>#}
+    <!-- MSGs -->
+    <link rel="stylesheet" href="/static/plugins/sweetalert2/dist/sweetalert2.css">
+
+    <!-- Prescricoes -->
+    <script src="/static/javascripts/Configuracoes/Prescricoes/Prescricoes.js?{{ user.release }}" type="application/javascript"></script>
+
+{% endblock %}

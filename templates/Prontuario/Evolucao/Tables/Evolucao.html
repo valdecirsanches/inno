@@ -1,0 +1,36 @@
+<div class="ibox-content">
+    <table id="tabelaEvolucao"
+           data-toggle="table"
+           data-classes="table table-condensed table-hover table-no-bordered"
+           data-unique-id="id"
+           data-row-style="rowStyleEvolucao"
+           data-click-to-select="true"
+           data-total-field="count"
+           data-data-field="results"
+           data-url="/api/evolucao/">
+        <thead>
+        <tr>
+            <th data-radio="true"></th>
+            <th data-field="id" data-visible="false"></th>
+            <th data-field="data_salvo" data-formatter="dateFormatter" >Data</th>
+            <th data-field="fk_medico.medico">Médico</th>
+            <th data-field="evolucao">Evolução</th>
+            <th data-field="remove"
+                data-formatter="OptionsEvolucao"
+                data-events="EventsEvolucao"
+                data-align="center"
+                class="col-md-3"
+            ></th>
+        </tr>
+        </thead>
+    </table>
+</div>
+
+
+
+{#<script>#}
+{#function ExameParams(params) {#}
+{#    params.id_prontuario = $('.classAtendimento #id_fk_prontuario').val();#}
+{#    return params#}
+{#}#}
+{#</script>#}

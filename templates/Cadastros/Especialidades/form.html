@@ -1,0 +1,27 @@
+<form id="formDadosEspecialidade" action="" method="post" role="form" class="classEspecialidade">
+    <div class="modal-body" id="corpo">
+        <div class="row">
+            <div class="form-group col-md-3 has-warning">
+                <input id="id_id" class="hidden">
+                <label for="id_grupo">Grupo</label>
+                <input id="id_grupo" name="grupo" type="text" value=""
+                       class="form-control" required="required" style="text-transform: uppercase;">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-12 has-warning">
+                <label for="id_nome">Nome da especialidade</label>
+                <input id="id_nome" name="nome" type="text" value=""
+                       class="form-control" required="required" style="text-transform: uppercase;">
+            </div>
+        </div>
+    </div>
+</form>
+<div class="form-group col-md-12 col-lg-12 text-right">
+    <div class="col-md-6 text-left">
+        <a id="btnAddEspecialidade" class="btn btn-primary" onclick="addEspecialidade()"><i class="fa fa-pencil"></i> Novo</a>
+    </div>
+    <div class="col-md-6 text-right">
+        <a id="btnSalvaEspecialidade" class="btn btn-primary" onclick="SalvaEspecialidade()"><i class="fa fa-save"></i> Salvar</a>
+    </div>
+</div>

@@ -1,0 +1,121 @@
+
+<div class="ibox-content">
+    <H1><p>Atestado</p></H1>
+    <div class="row">
+        <div id="div_atestado">
+            <form method="post" role="form" id="formAtestado" class="classAtestado">
+                <input id="id_id_atestado" name="id" type="hidden" value="0">
+                <input id="id_fk_prontuario" name="fk_prontuario" type="hidden">
+                <input id="id_fk_consulta" name="fk_consulta" type="hidden">
+                <input id="id_fk_usuario" name="fk_usuario" type="hidden">
+                <div class="row">
+
+                    <div id="id_fk_medico_div" class="form-group col-md-12">
+                        <label for="id_fk_medico">Médico</label>
+
+                        <select
+                                id="id_fk_medico"
+                                name="fk_medico"
+                                class="form-control select_medico save_atestado"
+                                data-format="formatRepoSelectionMedico"
+                                data-change="changeRemoveSelect2"
+                        >
+                        </select>
+                    </div>
+                    <div id="id_dt_referencia_div" class="form-group col-md-2">
+                        <label for="id_dt_referencia">Data de Referência: </label>
+                        <input id="id_dt_referencia" name="dt_referencia" type="date" class="form-control save_atestado">
+                    </div>
+                    <div id="id_requerente_div" class="form-group col-md-3">
+                        <label for="id_requerente">Solicitante: </label>
+                        <input id="id_requerente" name="requerente" type="text" class="form-control save_atestado" placeholder="Solicitante caso não seja o paciente...">
+                    </div>
+                    <div id="id_hora_chegada_div" class="form-group col-md-2">
+                        <label for="id_hora_chegada">Hora da chegada: </label>
+                        <input id="id_hora_chegada" name="hora_chegada" type="time" class="form-control save_atestado">
+                    </div>
+                    <div id="id_hora_saida_div" class="form-group col-md-2">
+                        <label for="id_hora_saida">Hora da saída: </label>
+                        <input id="id_hora_saida" name="hora_saida" type="time" class="form-control save_atestado">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label>Finalidade da presença: </label>
+                        <select id="id_para" name="para" class="form-control save_atestado">
+                            <option value="C">Consulta</option>
+                            <option value="A">Acompanhante</option>
+                            <option value="O">Outra finalidade</option>
+                        </select>
+                    </div>
+                    <div id="id_finalidade_div" class="col-md-2 hide">
+                        <label>Descreva a finalidade: </label>
+                        <input id="id_para_outra_finalidade" name="para_outra_finalidade" class="form-control save_atestado" type="text">
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4>Outros sim, comunicamos que:</h4>
+                        <select id="id_volta" name="volta" class="form-control save_atestado">
+                            <option value="A">Pode voltar ao trabalho em seguida</option>
+                            <option value="A1">Deverá ficar afastado o restante do dia de hoje</option>
+                            <option value="B">Deverá ficar afastado do trabalho no dia de hoje</option>
+                            <option value="C">Deverá ficar afastado do trabalho</option>
+                            <option value="D1">Acidente de trabalho: Ser encaminhado ao INSS</option>
+                            <option value="D2">Acidente de trabalho: Voltar com as guias de acidente</option>
+                            <option value="E1">Acidente de trabalho: Afastado(a) por prazo superior a 15 dias: Ser encaminhado ao INSS</option>
+                            <option value="E2">Acidente de trabalho, Afastado(a) por prazo superior a 15 dias: Comparecer c/impressos do INSS p/ peenchimento do laudo pericial </option>
+                        </select>
+                    </div>
+                    <div id="id_volta_c_div" class="col-md-4 hide">
+                        <div class="col-md-12 inline">
+                            <h4 for="id_comparecer_em">Afastado:</h4>
+                            <div class="col-md-2"><button class="btn">por</button> </div>
+                            <div class="col-md-4 inline">
+                                <input id="id_afastado_por" name="afastado_por" type="number" class="form-contro save_atestado">
+                            </div>
+                            <div class="col-md-2"><button class="btn"> dias a contar desta data</button> </div>
+                        </div>
+                    </div>
+                    <div id="id_volta_e_div" class="col-md-4 hide">
+                        <div class="col-md-5">
+                            <label for="id_comparecer_em">Comparecer em:</label>
+                            <input id="id_comparecer_em" name="comparecer_em"  type="date" class="form-control m-l-lg m-r-xs save_atestado">
+                        </div>
+                        <div class="col-md-5">
+                            <label for="id_comparecer_as">Às:</label>
+                            <input id="id_comparecer_as" name="comparecer_as"  type="time" class="form-control m-r-lg m-l-xs save_atestado">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div id="id_cid10_div" class="form-group col-md-12">
+                    <label for="id_cid10_atestado">CID 10</label>
+                    <select
+                            id="id_cid10_atestado"
+                            name="cid"
+                            class="form-control select_CID10 save_atestado"
+                            data-format="formatRepoSelectionCID10"
+                            data-change="changeCID10"
+                            multiple="multiple"
+                    >
+                    </select>
+                </div>
+            </form>
+            <div class="text-right">
+                <a id="btnAddAtestado" class="btn btn-success btn-outline " onclick="AddAtestado()"><i class="fa fa-file"></i> Novo</a>
+                <a id="ImprimeAtestado" class="btn btn-success btn-outline btn-atestado" onclick="ImprimeAtestado()"><i class="fa fa-print"></i> Imprimir</a>
+                {# <a id="SalvaAtestado" class="btn btn-primary btn-outline btn-atestado btn-atestado" onclick="UpdateAtestado()"><i class="fa fa-save"></i> Salvar dados</a> #}
+                {#                <a id="CancelaAtestado" class="btn btn-danger btn-outline btn-atestado" onclick="CancelaAtestado()"><i class="fa fa-save"></i> Cancelar edição</a>#}
+            </div>
+            <div class="form-inline col-md-12">
+                <label id="id_emissor">....</label> Em
+                <label id="id_data_salvo">....</label>
+            </div>
+            </form>
+        </div>
+        {% include 'Prontuario/Atestado/Tables/Atestado.html' %}
+
+    </div>
+</div>

@@ -1,0 +1,57 @@
+<form action="" id="formMedicoHorarios" method="post" role="form" class="form-horizontal classHorario">
+    <div class="form-group">
+        <label for="id_dia_matutino" class="col-sm-2 control-label">Atendimento Matutino</label>
+        <div class="col-lg-10">
+            <div class="col-xs-4">
+                <input id="id_dia_matutino" name="dia_matutino" class="form-control">
+            </div>
+            <label class="col-xs-2 control-label">Turno</label>
+            <div class="col-xs-3">
+                <input id="id_hora_inicio_matutino" name="hora_inicio_matutino" type="time" class="form-control" placeholder="Horario inicial">
+            </div>
+            <div class="col-xs-3">
+                <input id="id_hora_fim_matutino" name="hora_fim_matutino" type="time" class="form-control" placeholder="Horario final">
+            </div>
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <label for="id_dia_vespertino" class="col-sm-2 control-label">Atendimento Vespertino</label>
+        <div class="col-lg-10">
+             <div class="col-xs-4">
+                <input id="id_dia_vespertino" name="dia_vespertino" class="form-control">
+             </div>
+            <label class="col-xs-2 control-label">Turno</label>
+            <div class="col-xs-3">
+                <input id="id_hora_inicio_vespertino" name="hora_inicio_vespertino" type="time" class="form-control" placeholder="Horario inicial">
+            </div>
+            <div class="col-xs-3">
+                <input id="id_hora_fim_vespertino" name="hora_fim_vespertino" type="time" class="form-control" placeholder="Horario final">
+            </div>
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <label for="id_duracao_consulta" class="col-sm-2 control-label">Duração da consulta</label>
+        <div class="col-sm-2">
+            <input id="id_duracao_consulta" name="duracao_consulta" type="number" class="form-control" value="0">
+        </div>
+        <label for="id_intervalo_encaixes" class="col-sm-2 control-label">Intervalo de encaixes</label>
+        <div class="col-sm-2">
+            <input id="id_intervalo_encaixes" name="intervalo_encaixes" type="number" class="form-control"  value="0">
+        </div>
+        <label for="id_intervalo_balcao" class="col-sm-2 control-label">Intervalo de balcão</label>
+        <div class="col-sm-2">
+            <input id="id_intervalo_balcao" name="intervalo_balcao" type="number" class="form-control"  value="0">
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <div class="form-group m-b-n-lg ">
+        <label for="id_dia_receita" class="col-sm-2 control-label">Receitas</label>
+        <div class="col-lg-10">
+            <div class="col-xs-4">
+                <select id="id_dia_receita" name="dia_receita" class="form-control"></select>
+            </div>
+        </div>
+    </div>
+</form>

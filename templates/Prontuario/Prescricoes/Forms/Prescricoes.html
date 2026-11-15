@@ -1,0 +1,98 @@
+<div class="ibox-content clearfix" style="height: auto; width: auto;">
+    <div class="col-lg-12">
+        <h1>Prescrição</h1>
+        <div id="div_prescricao">
+            <div  class="resizable-panels form-group col-md-5 bg-success">
+                <form action="" method="post" role="form" id="formPrescricao" class="classPrescricao">
+
+                    <input id="id_id_prescricao" name="id" type="hidden" value="0">
+                    <input id="id_fk_prontuario" name="fk_prontuario" type="hidden">
+                    <input id="id_fk_consulta" name="fk_consulta" type="hidden">
+                    <input id="id_fk_medico" name="fk_medico" type="hidden">
+
+                    <div id="id_cont_esp_div" class="form-group col-md-6">
+                        <label for="id_cont_esp">Controle especial
+                            <input id="id_cont_esp" name="cont_esp" type="checkbox" value="1" class="form-control save_prescricao">
+                        </label>
+                    </div>
+                    <div id="id_data_prescricao_div" class="form-group col-md-6 ">
+                        <label for="id_data_prescricao">Data</label>
+                        <input id="id_data_prescricao" name="data_prescricao" type="date" class="form-control save_prescricao">
+                    </div>
+                    <div id="id_prescricao_div" class="form-group col-md-12">
+                        <label for="id_prescricao">Genérico</label>
+                        <textarea id="id_prescricao"
+                                  wrap="wrap"
+                                  name="prescricao"
+                                  class="form-control save_prescricao"
+                                  cols="175"
+                                  rows="15"
+                        ></textarea>
+                    </div>
+                    {#                </div>#}
+                </form>
+                <div class="form-group">
+                    <a>Salvo em <strong id="prescricao_data_salvo"></strong></a>
+                </div>
+
+            </div>
+            <div class="form-group col-md-7 resizable-panels" id="div_remedios">
+                {% include 'Prontuario/Prescricoes/Tables/Remedios.html' %}
+                <div class="hr-line-dashed"></div>
+                <form action="" method="post" role="form"  id="formPrescricaoRemedio" class="classPrescricaoRemedio">
+                    <div class="row primary hide pnl-remedio" id="div_remedio">
+                        <input id="id_remedio" name="remedio" class="form-control hidden">
+                        <input id="id_fk_prescricao" name="fk_prescricao" class="form-control hidden">
+                        <div id="id_nome_div" class="form-group col-md-4">
+                            <label for="id_nome">Remédio</label>
+
+                            <input id="id_nome" name="nome" class="form-control save_prescricao_remedio">
+                        </div>
+                        <div id="id_tipo_div" class="form-group col-md-3">
+                            <label for="id_tipo">Dosagem</label>
+                            <input id="id_tipo" name="tipo" class="form-control save_prescricao_remedio">
+                        </div>
+                        <div id="id_telefone_div" class="form-group col-md-2">
+                            <label for="id_qtdade">Qtde</label>
+                            <input id="id_qtdade" name="qtdade" class="form-control save_prescricao_remedio" type="number">
+                        </div>
+                        <div id="id_ramal_div" class="form-group col-md-2">
+                            <label for="id_unidade">Unidade</label>
+                            <input id="id_unidade" name="unidade" class="form-control save_prescricao_remedio">
+                        </div>
+                        <div id="id_descricao_div" class="form-group col-md-11">
+                            <label for="id_descricao">Forma de uso</label>
+                            <textarea id="id_descricao"
+                                      name="descricao"
+                                      class="form-control save_prescricao_remedio"
+                                      cols="75"
+                                      rows="3"
+                            ></textarea>
+                        </div>
+                        {#                    <div class="col-md-1">#}
+                        {#                        <button id="SalvarRemedio" class="btn btn-default m-t-lg" onclick="SalvaPrescricao('remedio')"><i class="fa fa-check"></i></button>#}
+                        {#                    </div>#}
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-12 col-lg-12">
+            <div class="pull-left">
+                {#                <div class="pull-right">#}
+                <div class="btn-group">
+                    <a id="SelicionaPrescricao" class="btn btn-success btn-outline " onclick="SelecionaPrescricao()"><i class="fa fa-chain"></i> Padrões</a>
+                    <a id="AdicionaPrescricaoPadrao" class="btn btn-success btn-outline" onclick="AdicionaPrescricaoPadrao()"><i class="fa fa-plus"></i></a>
+                </div>
+                {#                    <a id="DuplicarPrescricao" class="btn btn-success btn-outline" onclick="ClonarPrescricao($('#id_id_prescricao').val())"><i class="fa fa-copy"></i> Clonar</a>#}
+                <a id="btnAddPrescricao" class="btn btn-success btn-outline" onclick="AddPrescricao()" hidden><i class="fa fa-plus"></i> Novo</a>
+                <a id="ImprimirPrescricao" class="btn btn-success btn-outline btn-prescricao" onclick="ImprimePrescricao()"><i class="fa fa-print"></i> Imprimir</a>
+                {# <a id="SalvaPrescricao" class="btn btn-primary btn-outline btn-prescricao" onclick="UpdatePrescricao()"><i class="fa fa-save"></i> Salvar</a> #}
+                {#                    <a id="CancelaEdicaoPrescricao" class="btn btn-warning"#}
+                {#                       onclick="if(prescricao.object.id) {ReadPrescricao(prescricao.object.id)} else {AddPrescricao()}">#}
+                {#                        <i class="fa fa-times"></i> Desistir</a>#}
+                {#                </div>#}
+            </div>
+        </div>
+    </div>
+</div>
+

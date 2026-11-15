@@ -1,0 +1,78 @@
+# Inno
+
+O AppClinic (EDS Solution / INNO Osasco) reescrito em **Node.js**, sem Django e sem Python.
+
+- **Mesmas telas:** os templates, CSS, JavaScript e imagens são os do AppClinic 2.0.17. Quem usa não percebe a troca.
+- **Mesmo banco:** usa o MySQL do AppClinic, com as mesmas tabelas. Os usuários entram com as senhas que já usam, e os dois sistemas podem rodar juntos enquanto você compara.
+- **Mesmos endereços e respostas:** cada rota devolve o mesmo HTML e o mesmo JSON que o Django devolvia. Isso foi conferido por um teste automático que roda os dois lado a lado no mesmo banco.
+
+## Instalação
+
+Requisito: Node.js 18 ou mais novo.
+
+```bash
+git clone git@github.com:valdecirsanches/inno.git
+cd inno
+npm install --omit=dev
+cp .env.exemplo .env      # e preencha: SECRET_KEY e os dados do MySQL
+npm start
+```
+
+O Inno sobe na porta do `.env` (`PORTA`, padrão 8002), então dá para usar junto com o AppClinic na 8001.
+
+Para manter rodando no servidor, use o `pm2`:
+
+```bash
+npm install -g pm2
+pm2 start server/index.js --name inno
+pm2 save
+```
+
+## Configuração (.env)
+
+| Variável | Para quê |
+|---|---|
+| `PORTA` | porta do servidor |
+| `SECRET_KEY` | chave das sessões. Gere com `node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"` |
+| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | o MySQL do AppClinic |
+| `MEDIA_ROOT` | a pasta `media/` do AppClinic (documentos dos pacientes) |
+| `DEBUG` | `1` mostra o erro completo na tela; só para desenvolvimento |
+
+O `.env` nunca vai para o GitHub.
+
+## O que já está convertido
+
+| Etapa | Módulos | Situação |
+|---|---|---|
+| 1 | Login, saída, troca de senha, tela inicial, menu, cadastro de pacientes (busca, cadastro, consultas, recibos), listas de convênios, planos e médicos | pronta |
+| 2 | Agenda e atendimento | a fazer |
+| 3 | Prontuário, recibos impressos e demais PDFs | a fazer |
+| 4 | WhatsApp, Memed, painéis, configurações e o restante | a fazer |
+
+Enquanto a conversão não termina, use o Inno só para conferir os módulos prontos. O AppClinic continua sendo o sistema principal.
+
+## Como está organizado
+
+```
+server/
+  index.js           servidor (Express)
+  config.js          lê o .env
+  db.js              acesso ao MySQL; converte cada coluna para o tipo que o Django usava
+  modelos.json       definição das tabelas (exportada dos modelos do AppClinic)
+  templates.js       telas (Nunjucks), imprimindo valores como o Django
+  seguranca/         senhas no formato do Django, sessão, CSRF, login obrigatório
+  util/modelo.js     validação e gravação como o formulário e o save() do Django,
+                     com o log de auditoria em tb_usuarios_log
+  rotas/             uma pasta por módulo, com os mesmos endereços
+templates/           as telas do AppClinic, convertidas para Nunjucks
+static/              CSS, JS e imagens do AppClinic
+tools/               scripts da conversão (rodam uma vez, no AppClinic, não no servidor)
+```
+
+## Diferenças em relação ao AppClinic
+
+O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As exceções, todas a favor do usuário:
+
+- Entrar pela página `/login/` direto não leva mais a uma página "não encontrada" (`/login/None`).
+- Endereços chamados sem a barra final respondem direto, sem o redirecionamento extra.
+- A primeira vez que um usuário sem preferências salvas abre um paciente, o Django dava erro. O Inno cria as preferências com os valores padrão.

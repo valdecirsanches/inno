@@ -1,0 +1,31 @@
+<div class="row m-t">
+    <div class="col-lg-4">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="file-manager">
+                    <h5>Envio de documentos:</h5>
+{#                    <a class="btn btn-default btn-outline" onclick="RastrearImagens()">Rastrear imagens</a>#}
+                    <form id="my-awesome-dropzone" class="dropzone"
+                          action="/prontuario/Extras/uploadFile.json"
+                          method="post"
+                          enctype="multipart/form-data">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        <input id="id_fk_prontuario_extras" name="fk_prontuario" type="hidden">
+                        <input id="id_fk_consulta_extras" name="fk_consulta" type="hidden">
+                        <input id="id_fk_medico_extras" name="fk_medico" type="hidden">
+                    </form>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8 animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-12" id="listaArquivos">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+

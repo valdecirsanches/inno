@@ -1,0 +1,80 @@
+
+
+<div class="table-responsive">
+    <table id="tabelaConsultas"
+           data-toggle="table"
+           data-classes="table table-condensed table-hover table-no-bordered"
+           data-row-style="rowStyle"
+           data-unique-id="id"
+           data-query-params="Params"
+           data-show-fullscreen="true"
+           data-icons-prefix="icon"
+           data-icons="icons"
+           data-method="GET"
+           data-url="/agenda/consultas/CarregaConsultas/">
+        <thead>
+            <tr class="bg-default">
+                <th data-field="check" data-checkbox="true"></th>
+
+                <th data-field="proced"  data-visible="false"></th>
+                <th data-field="id_age" data-visible="false"></th>
+                <th data-field="confirmacao" data-visible="false"></th>
+                <th data-field="confirmacao_dh" data-visible="false"></th>
+                <th data-field="ultimaAlteracao" data-visible="false"></th>
+                <th data-field="periodo" data-visible="false"></th>
+                <th data-field="nome_med" data-visible="false"></th>
+                <th data-field="hr_format"
+                    data-formatter="FormatoHora"
+                    data-events="EventoHora"
+                    data-align="center">Hora
+                </th>
+                <th data-field="hr_chegada"
+                    data-formatter="FormatoChegada"
+                    data-events="EventoChegada"
+                    data-align="center">Chegada
+                </th>
+
+                <th data-field="hr_opcoes"
+{#                    data-class="col-4"#}
+                    data-width="100px"
+                    data-formatter="FormatoHrOpcoes"
+                    data-events="EventoHrOpcoes">
+                    <a class="btn btn-outline" title="Exclui horários selecionados" onclick="HrsExclui()"><i class="fa fa-trash-o"></i></a>
+                </th>
+                <th data-field="cod_pac">Cód.</th>
+                <th data-field="pac" data-formatter="FormatoPaciente" data-events="EventoPaciente">Nome do Paciente</th>
+
+                <th data-field="conv" data-formatter="FormatoConvenio" data-events="EventoConvenio">Convênio</th>
+                <th data-field="cel">Telefone</th>
+                <th data-field="status" data-align="center" data-cell-style="cellStyle">Status</th>
+                <th data-field="stt" data-formatter="FormatoStatus" data-events="EventoStatus" data-align="left" data-cell-style="cellStyle"></th>
+                <th data-field="necesp" data-align="center">Especial</th>
+                <th data-field="sms"
+                    data-formatter="FormatoSms"
+                    data-events="EventoSms"
+                    data-align="center">
+                    <a class="btn btn-outline" title="Envia SMS a todos os pacientes marcados" onclick="sms_a_todos()"><i class="fa fa-comments"></i></a>
+                </th>
+                <th data-field="whatsapp"
+                    data-formatter="FormatoWhatsApp"
+                    data-events="EventoWhatsApp"
+                    data-align="center"
+                    data-width="110px">
+                    <a class="btn btn-outline" title="Envia Whatsapp a todos os pacientes marcados" onclick="whatsapp_a_todos()"><i class="fa fa-phone-square"></i></a>
+                </th>
+
+
+            </tr>
+
+
+        </thead>
+    </table>
+</div>
+
+
+
+<script>
+function Params(params) {
+    return params
+}
+</script>

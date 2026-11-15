@@ -1,0 +1,81 @@
+{% extends "Base/base.html" %}
+
+
+{% block body %}
+<body class="high emerald-default htmls htmls_components htmls_components_calendar">
+{% endblock %}
+
+{% block agenda %}
+              <li class=" dropdown active">
+                <a class="collapsed" data-toggle="collapse" data-parent="#collapseNavbarLeft2" rel="popover-sidebar" data-container="body" data-placement="right"
+                   data-content="We styled the Bootstrap elements beautifuly, and added several of our own!" href="#uidb0490bb1401f28d0a7bed4338a9c96b0">
+                  <i class="oc-partial-icon icm icm-calendar2"></i>
+                  <span class="oc-partial-menu-item">
+                    Agenda
+                    <b class="caret"></b>
+                  </span>
+                </a>
+                <ul class="collapse dropdown-menu in" id="uidb0490bb1401f28d0a7bed4338a9c96b0">
+                  <li class="">
+                    <select id="medico" name="medico" class="form-control">
+                    {% if dentistas == 'undefined' %}
+                      <option value="0">Selecione Médico...</option>
+                    {% else %}
+                      {% for m in medicos %}
+                        <option value="{{ m.id }}">{{ m.nome }}</option>
+                      {% endfor %}
+                    {% endif %}
+                    </select>
+                  </li>
+                  <li class="">
+                    <div rel='datepicker_agenda' class="datepicker-full"></div>
+                  </li>
+                </ul>
+              </li>
+{% endblock %}
+
+{% block container_cabecalho %}
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-6">
+              <h3 class="em-page-header v-mid-row thin">
+                <i class="icm icm-calendar2 text-gradien  t-info-dk"></i>
+                <span class="text-gradient-info-dk">
+                  Agenda
+                </span>
+              </h3>
+            </div>
+            <div class="col-sm-6 text-right-sm text-right-md text-right-lg">
+              <ul class="breadcrumb breadcrumb-top">
+                <li>
+                  <i class="fa fa-home"></i>
+                  WebClinic
+                </li>
+                <li class="active">
+                  Agenda
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+{% endblock %}
+
+{% block container_corpo %}
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <div rel="fullcalendar">
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/javascripts/agenda.js?{{ user.release }}" type="application/javascript"></script>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends "Base/base.html" %}
+
+
+{% block head %}
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+    <!-- select2 -->
+    <link href="/static/css/plugins/select2/select2.css" rel="stylesheet">
+    <link href="/static/css/plugins/select2/select2-bootstrap.css" rel="stylesheet">
+
+
+    <!-- switchery -->
+    <link href="/static/css/plugins/switchery/switchery.min.css" rel="stylesheet">
+
+    <!-- iCheck -->
+    <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+
+    <!-- summernote -->
+    <link href="/static/js/plugins/summernote/summernote.css" rel="stylesheet">
+    <!--link href="/static/js/plugins/summernote/summernote-bs3.css" rel="stylesheet"-->
+
+{#    <!-- sweet alert -->#}
+{#    <link href="/static/plugins/sweetalert-master/dist/sweetalert.css" rel="stylesheet">#}
+
+    <!-- MSGs -->
+    <link rel="stylesheet" href="/static/plugins/sweetalert2/dist/sweetalert2.css">
+
+    <!-- DROPZONE -->
+    <link href="/static/css/plugins/dropzone/basic.css" rel="stylesheet">
+    <link href="/static/css/plugins/dropzone/dropzone.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block modal %}
+    {% include 'Cadastros/Pacientes/Modal/Cadastrar.html' %}
+    {% include 'Prontuario/Exames/Modals/Exames.html' %}
+    {% include 'Prontuario/Prescricoes/Modals/Prescricoes.html' %}
+    {% include 'Prontuario/Relatorios/Modals/Relatorios.html' %}
+{% endblock %}
+{% block prontuario %} active {% endblock %}
+{% block prontuario_atendimento %} active {% endblock %}
+
+
+{% block atendimento %}
+    <li class="active">
+        <a href="/atendimento/"> <span class="nav-label">Atendimento médico</span><span class="fa arrow"></span></a>
+        <ul class="nav nav-third-level">
+            <li id="li_resumo" class="active" onclick="CarregaResumo($('#id_fk_consulta_atual').val())"><a data-toggle="tab" href="#resumo">Resumo</a></li>
+            <li id="li_anamnese" class="my-anamnese"><a data-toggle="tab" href="#anamnese">Anamnese</a></li>
+            <li id="li_exameFisico" class="my-exame-fisico"><a data-toggle="tab" href="#exameFisico">Exame físico</a></li>
+            <li id="li_hipoteseDiagnostica" class="my-giagnostico"><a data-toggle="tab" href="#hipoteseDiagnostica">Hipotese diagnóstica</a></li>
+            <li id="li_evolucao" class="my-evolucao"><a data-toggle="tab" href="#evolucao">Evolução</a></li>
+            <li id="li_exames" class="my-exame"><a data-toggle="tab" href="#exames">Exames</a></li>
+            <li id="li_prescricoes" class="my-prescricao"><a data-toggle="tab" href="#prescricoes">Prescrições</a></li>
+            <li id="li_memed">
+                <a data-toggle="tab" href="#memed" id="botaoShowPrescricao">
+                    <span class="fa fa-eyedropper"></span> Memed
+                </a>
+            </li>
+            <li id="li_relatoios" class="my-relatorio"><a data-toggle="tab" href="#relatorios">Relatórios</a></li>
+            <li id="li_atestado" onclick="horaSaida()" class="my-atestado"><a data-toggle="tab" href="#atestado">Atestado</a></li>
+            <li id="li_anexos"><a data-toggle="tab" href="#anexos">Imagens e anexos</a></li>
+        </ul>
+    </li>
+{% endblock %}
+
+{% block cabecalho_botoes %}
+
+{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-md-10">
+            <h2><a id="nome_cab" onclick="Cadastro()">Nome Do Paciente</a>
+                <input type="checkbox" id="id_pront_fisico" name="prontuario_fisico" class="m-n-t-md">
+            </h2>
+            <ol class="breadcrumb">
+                <li>Idade: <span id="idade_cab"></span> anos</li>
+                <li><span id="tipo_cas"></span></li>
+                <li><span id="convenio"></span></li>
+                <li><span id="onde_mora"></span></li>
+                <li><span id="profissao"></span></li>
+            </ol>
+        </div>
+        <div class="col-md-2">
+            <div class="text-center pull-right">
+                <div id="cronometro" class="m-b-n-sm">
+                    <h2 id="time-container">00:00</h2>
+                </div>
+                <h2><a id="EncerraAtendimento" class="btn btn-danger" onclick="EncerraAtendimento()">Encerrar Consulta</a></h2>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block container_corpo %}
+    <div class="wrapper wrapper-content animated fadeIn">
+        <div class="tab-content m-t-n-lg">
+            <div id="resumo" class="tab-pane active">
+                {% include 'Prontuario/Resumo/Forms/Resumo.html' %}
+            </div>
+            
+            <div id="anamnese" class="tab-pane">
+                {% include 'Prontuario/Anamnese/Forms/Anamnese.html' %}
+            </div>
+
+            <div id="exameFisico" class="tab-pane">
+                {% include 'Prontuario/ExameFisico/Forms/ExameFisico.html' %}
+            </div>
+            <div id="exames" class="tab-pane">
+                {% include 'Prontuario/Exames/Forms/Exames.html' %}
+                {% include 'Prontuario/Exames/Tables/Exames.html' %}
+            </div>
+            <div id="hipoteseDiagnostica" class="tab-pane">
+                {% include 'Prontuario/HipoteseDiagnostica/Forms/HipoteseDiagnostica.html' %}
+            </div>
+            <div id="evolucao" class="tab-pane">
+                {% include 'Prontuario/Evolucao/Forms/Evolucao.html' %}
+            </div>
+            <div id="prescricoes" class="tab-pane">
+                {% include 'Prontuario/Prescricoes/Forms/Prescricoes.html' %}
+                {% include 'Prontuario/Prescricoes/Tables/Prescricoes.html' %}
+            </div>
+            <div id="memed" class="tab-pane">
+                {% include 'Prontuario/Memed/Memed.html' %}
+            </div>
+            <div id="relatorios" class="tab-pane">
+                {% include 'Prontuario/Relatorios/Forms/Relatorios.html' %}
+                {% include 'Prontuario/Relatorios/Tables/Relatorios.html' %}
+            </div>
+            <div id="atestado" class="tab-pane">
+                {% include 'Prontuario/Atestado/Forms/Atestado.html' %}
+            </div>
+            <div id="anexos" class="tab-pane">
+                {% include 'Prontuario/Extras/Forms/Extras.html' %}
+            </div>
+        </div>
+    </div>
+
+    <form method="post" role="form" id="formAtendimento" class="classAtendimento"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <input id="id_fk_prontuario" name="fk_prontuario" type="hidden">
+        <input id="id_fk_consulta_atual" name="fk_consulta" type="hidden">
+        <input id="id_fk_medico_att" name="fk_medico" type="hidden">
+    </form>
+
+{% endblock %}
+
+{% block js %}
+
+    <!-- Input Mask -->
+    <script src="/static/js/plugins/jquery-mask-plugin/jquery.mask.js"></script>
+    <script src="/static/js/plugins/jasny/jasny-bootstrap.min.js"></script>
+
+    <!-- Data picker -->
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.pt-BR.js"></script>
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+    <!-- Selectize -->
+    <script src="/static/js/plugins/selectize/standalone/selectize.min.js"></script>
+
+    <!-- Select2 -->
+    <script src="/static/js/plugins/select2/select2.full.js"></script>
+    <script src="/static/js/plugins/select2/i18n/pt-BR.js"></script>
+
+    <!-- Base -->
+{#    <script src="/static/javascripts/Base/base.js?{{ user.release }}" charset="UTF-8"></script>#}
+    <script src="/static/javascripts/Base/baseTable.js?{{ user.release }}" charset="UTF-8"></script>
+
+    <!-- Cep -->
+    <script src="/static/javascripts/cep.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Mascaras -->
+    <script src="/static/javascripts/Base/mascaras.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- iCheck -->
+    <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+
+    <!-- Switchery -->
+    <script src="/static/js/plugins/switchery/switchery.min.js"></script>
+
+    <!-- Summernote -->
+    <script src="/static/js/plugins/summernote/summernote.min.js"></script>
+    <script src="/static/js/plugins/summernote/lang/summernote-pt-BR.js"></script>
+
+{#    <script src="/static/js/plugins/jsPDF/jspdf.min.js"></script>#}
+
+{#    <!-- sweet alert -->#}
+{#    <script src="/static/plugins/sweetalert-master/dist/sweetalert.min.js"></script>#}
+
+    <!-- DROPZONE -->
+    <script src="/static/js/plugins/dropzone/dropzone.js"></script>
+
+    <!-- Agenda Consulta -->
+    <script src="/static/javascripts/Agenda/indexAgenda.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- medico -->
+    <script src="/static/javascripts/Cadastros/Medico/selectMedico.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Cadastros/Medico/selectCid10.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- atestado -->
+    <script src="/static/javascripts/Prontuario/Atestado/index.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/Atestado/Atestado.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- exame -->
+    <script src="/static/javascripts/Prontuario/Exames/index.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/Exames/Exames.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- evolucao -->
+    <script src="/static/javascripts/Prontuario/Evolucao/index.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/Evolucao/Evolucao.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Relatorio -->
+    <script src="/static/javascripts/Prontuario/Relatorios/index.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/Relatorios/Relatorios.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Hipotese Diagnostica -->
+    <script src="/static/javascripts/Prontuario/HipoteseDiagnostica/index.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/HipoteseDiagnostica/HipoteseDiagnostica.js?{{ user.release }}" type="application/javascript"></script>
+
+     <!-- Prescricoes -->
+    <script src="/static/javascripts/Prontuario/Prescricoes/index.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/Prescricoes/Prescricoes.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/Prescricoes/indexRemedio.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/Prescricoes/Remedio.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Atendimento -->
+    <script src="/static/javascripts/Prontuario/Anamnese/Anamnese.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/Extras/Extras.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/ExameFisico/ExameFisico.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Prontuario/Resumo/Resumo.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Atendimento/atendimento.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Memed: acesso por médico (token do servidor) -->
+    <script src="/static/javascripts/Prontuario/Memed/acesso.js?{{ user.release }}-1" type="application/javascript"></script>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+<form method="post" role="form" id="formAgendar" class="classAgendar">
+    <input id="id_ag_id" type="hidden" name="id">
+    <div class="row">
+        <div id="id_hora_div" class="form-group col-md-2">
+{#            <label for="id_hora">Hora</label>#}
+            <input id="id_hora" type="time" name="hora" class="form-control">
+        </div>
+        <div id="id_fk_paciente_div" class="form-group col-md-10">
+            <select id="id_fk_paciente" name="fk_paciente" class="form-control" placeholder=" Nome ou prontuário ou CPF(ex. 000.000.000-00)"></select>
+        </div>
+        <div id="id_fk_procedimento_div" class="form-group col-md-4">
+            <label for="id_fk_procedimento">Procedimento: </label>
+            <select id="id_fk_procedimento" name="fk_procedimento" class="form-control" placeholder="Selecione o procedimento..."></select>
+        </div>
+        <div id="id_fk_especialidade_div" class="form-group col-md-4">
+            <label for="id_fk_especialidade">Especialidade: </label>
+            <select id="id_fk_especialidade" name="fk_especialidade" class="form-control" placeholder="Selecione a especialidade..."></select>
+        </div>
+        <div id="id_guia_div" class="form-group col-md-4">
+            <label for="id_guia">Nº da Guia</label>
+            <input id="id_guia" name="guia" class="form-control">
+        </div>
+    </div>
+</form>

@@ -1,0 +1,19 @@
+<table id="tabelaMedico"
+       data-toggle="table"
+       data-classes="table table-condensed table-hover table-no-bordered"
+       data-row-style="rowStyleMed"
+       data-click-to-select="true"
+       data-side-pagination="server"
+       data-pagination="true"
+       data-total-field="count"
+       data-data-field="results"
+       data-unique-id="id"
+       data-url="/api/medico/">
+    <thead>
+    <tr>
+        <th data-field="medico" data-width="300px">Nome</th>
+        <th data-field="id" data-visible="false">   </th>
+        <th data-field="Buttons" data-width="120px" data-formatter="ButtonsMedico" data-events="EventsMedico"></th>
+    </tr>
+    </thead>
+</table>

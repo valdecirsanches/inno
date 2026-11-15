@@ -1,0 +1,27 @@
+<div class="ibox-content">
+    <table id="tabelaRelatorios"
+           data-toggle="table"
+           data-classes="table table-condensed table-hover table-no-bordered"
+{#           data-row-style="rowStyleRelatorio"#}
+           data-click-to-select="true"
+           data-unique-id="id"
+
+           data-url="/api/relatorio/">
+        <thead>
+            <tr>
+                <th data-radio="true"></th>
+                <th data-field="id" data-visible="false"></th>
+                <th data-field="dataSalvo">Data</th>
+                <th data-field="titulo">Titulo</th>
+                <th data-field="mycid10">CID 10</th>
+                <th data-field="edit"
+                    data-formatter="OptionsRelatorio"
+                    data-events="EventsRelatorio"
+                    data-align="center"
+                    class="col-md-4"
+                ></th>
+{#                <th data-field="remove" data-formatter="ExcludeDuplicarFormatter" data-events="excludeRelatorioEvents" data-align="center"></th>#}
+            </tr>
+        </thead>
+    </table>
+</div>

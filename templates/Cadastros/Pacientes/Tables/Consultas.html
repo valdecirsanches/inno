@@ -1,0 +1,30 @@
+<table id="tabelaConsultasPaciente"
+       data-toggle="table"
+       data-classes="table table-condensed table-hover table-no-bordered"
+       data-click-to-select="true"
+       data-unique-id="id"
+       data-row-style="rowStyleConsultaPaciente"
+       data-url="/cadastros/paciente/CarregaConsultasPaciente/">
+    <thead>
+        <tr>
+            <th data-radio="true"></th>
+            <th data-field="id_age" data-visible="false"></th>
+            <th data-field="id_med" data-visible="false"></th>
+            <th data-field="dt" data-visible="false"></th>
+            <th data-field="status" data-visible="false"></th>
+            <th data-field="dte">Data</th>
+            <th data-field="hr">Hora</th>
+
+            <th data-field="hr_chegada"
+                data-formatter="FormatoChegada"
+            data-events="EventoStatus"
+                data-width="80px"
+                data-align="center">Chegada
+            </th>
+
+            <th data-field="med">Médico</th>
+            <th data-field="procedimento">Procedimento</th>
+            <th data-field="id_procedimento" data-formatter="FormatoStatus" data-events="EventoStatus" data-align="center">Status</th>
+        </tr>
+    </thead>
+</table>

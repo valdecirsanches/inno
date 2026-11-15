@@ -1,0 +1,62 @@
+<form action="" method="post" role="form"  id="formDadosPaciente" class="classPaciente">
+    <div id="id_id_div" class="form-group col-md-2 col-lg-1">
+        <label for="id_id">ID</label>
+        <input id="id_id" name="id" type="number" readonly class="form-control">
+    </div>
+    <div id="id_data_cad_div" class="form-group col-md-3 col-lg-2">
+        <label for="id_data_cad">Data cadastro</label>
+        <input id="id_data_cad" name="data_cad" type="date" class="form-control" readonly>
+    </div>
+    <div id="id_codigo_div" class="form-group col-md-2 col-lg-1">
+        <label for="id_codigo">Código</label>
+        <input id="id_codigo" name="codigo" type="text" readonly class="form-control">
+    </div>
+    <div id="id_paciente_div" class="form-group col-md-5">
+        <label for="id_paciente">Nome do paciente</label>
+        <input id="id_paciente" name="paciente" type="text" onblur="Homonimos(this.value)" class="form-control">
+    </div>
+    <div id="id_profissao_div" class="form-group col-md-3 col-lg-3">
+        <label for="id_profissao">Profissão</label>
+        <input id="id_profissao" name="profissao" type="text" class="form-control">
+    </div>
+    <div id="id_rg_div" class="form-group col-md-3 col-lg-2 ">
+        <label for="id_rg">RG</label>
+        <input id="id_rg" name="rg" type="text" class="form-control rg">
+    </div>
+    <div id="id_cpf_div" class="form-group col-md-3 col-lg-2">
+        <label for="id_cpf">CPF</label>
+        <input id="id_cpf" name="cpf" type="text" class="form-control cpf">
+    </div>
+    <div id="id_sexo_div" class="form-group col-md-3 col-lg-2">
+        <label for="id_sexo">Sexo</label>
+        <select id="id_sexo" name="sexo" class="form-control" required="required">
+            <option {% if p.sexo == 'M' %}selected{% endif %} value="M">Masculino</option>
+            <option {% if p.sexo == 'F' %}selected{% endif %} value="F">Feminino</option>
+        </select>
+    </div>
+    <div id="id_data_nasc_div" class="form-group col-md-3 col-lg-2">
+        <label for="id_data_nasc">Nascimento</label>
+        <input id="id_data_nasc" name="data_nasc" type="date" class="form-control"
+               required="required" onblur="calculaIdade(this.value, $('.classPaciente #id_idade'))">
+    </div>
+    <div id="id_idade_div" class="form-group col-md-2 col-lg-1">
+        <label for="id_idade">Idade</label>
+        <input id="id_idade" name="idade" type="text" class="form-control" readonly>
+    </div>
+   
+    <div id="id_necesp_div" class="form-group col-md-3 col-lg-3">
+        <label for="id_necesp">Necessidade especial</label>
+        <select id="id_necesp" name="necesp" class="form-control">
+            <option {% if p.necesp == '' %}selected{% endif %} value="">Sem necessidade</option>
+            <option {% if p.necesp == 'CRIANÇA' %}selected{% endif %} value="CRIANÇA">CRIANÇA</option>
+            <option {% if p.necesp == 'IDOSO' %}selected{% endif %} value="IDOSO">IDOSO</option>
+	        <option {% if p.necesp == 'NECESSIDADE ESPECIAL' %}selected{% endif %} value="NECESSIDADE ESPECIAL">PORTADOR DE NECESSIDADE ESPECIAL</option>
+            <option {% if p.necesp == 'RETORNO CIRURGIA' %}selected{% endif %} value="RETORNO CIRURGIA">RETORNO DE CIRURGIA</option>
+            <option {% if p.necesp == 'GESTANTE' %}selected{% endif %} value="GESTANTE">GESTANTE</option>
+            <option {% if p.necesp == 'CADEIRANTE' %}selected{% endif %} value="CADEIRANTE">CADEIRANTE</option>
+            <option {% if p.necesp == 'DEFICIENTE VISUAL' %}selected{% endif %} value="DEFICIENTE VISUAL">DEFICIENTE VISUAL</option>
+            <option {% if p.necesp == 'DEFICIENTE AUDITIVO' %}selected{% endif %} value="DEFICIENTE AUDITIVO">DEFICIENTE AUDITIVO</option>
+        </select>
+    </div>
+
+</form>

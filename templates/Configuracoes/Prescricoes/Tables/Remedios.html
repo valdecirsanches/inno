@@ -1,0 +1,20 @@
+<table id="tabelaPrescricaoRemedios"
+       data-toggle="table"
+       data-classes="table table-no-bordered"
+       data-detail-view="true"
+       data-detail-formatter="detailFormatter"
+       data-unique-id="id"
+       data-url="/configuracoes/prescricoes/CarregarConfPrescricaoRemedios">
+    <thead>
+        <tr>
+            <th data-field="id" data-visible="false"></th>
+            <th data-field="descricao" data-visible="false"></th>
+            <th data-field="fk_prescricao_id" data-visible="false"></th>
+            <th data-field="nome" data-editable-placement="right" data-editable="true">Nome</th>
+            <th data-field="tipo" data-editable-placement="right" data-editable="true">Tipo</th>
+            <th data-field="qtdade" data-editable-placement="right" data-editable="true">Quantidade</th>
+            <th data-field="unidade" data-editable-placement="right" data-editable="true">Unidade</th>
+            <th data-field="remove" data-formatter="excludeFormatter" data-events="excludeRemedioEvents" data-align="center"></th>
+        </tr>
+    </thead>
+</table>

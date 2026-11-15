@@ -1,0 +1,53 @@
+<form action="" method="post" role="form" id="formPrescricao" class="classConfPrescricao">
+    <input id="id_id_prescricao" name="id" type="hidden" value="0">
+    <div class="row">
+        <div id="id_cont_esp_div" class="form-group col-md-3">
+            <label for="id_cont_esp">Controle especial</label>
+            <input id="id_cont_esp" name="cont_esp" type="checkbox" value="on" class="form-control">
+        </div>
+        <div id="id_nome_div" class="form-group col-md-9">
+            <label for="id_nome">Tipo Receita</label>
+            <input id="id_nome" name="nome" class="form-control">
+        </div>
+        <div id="id_prescricao_div" class="form-group col-md-12">
+            <label for="id_prescricao">Prescricao</label>
+            <textarea id="id_prescricao" name="prescricao" class="form-control" rows="3"></textarea>
+        </div>
+    </div>
+</form>
+<form action="" method="post" role="form"  id="formPrescricaoRemedio">
+    <div class="row">
+        <div id="id_nome_div" class="form-group col-md-4">
+            <label for="id_nome">Remedio</label>
+            <input id="id_nome" name="nome" class="form-control">
+        </div>
+        <div id="id_tipo_div" class="form-group col-md-3">
+            <label for="id_tipo">Tipo</label>
+            <input id="id_tipo" name="tipo" class="form-control">
+        </div>
+        <div id="id_telefone_div" class="form-group col-md-2">
+            <label for="id_qtdade">Qtde</label>
+            <input id="id_qtdade" name="qtdade" class="form-control" type="number">
+        </div>
+        <div id="id_ramal_div" class="form-group col-md-2">
+            <label for="id_unidade">Unidade</label>
+            <input id="id_unidade" name="unidade" class="form-control">
+        </div>
+        <div id="id_descricao_div" class="form-group col-md-11">
+            <label for="id_descricao">Descrição</label>
+            <textarea id="id_descricao" name="descricao" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="col-md-1">
+            <button id="SalvarRemedio" class="btn btn-default m-t-lg" onclick="SalvaPrescricao('remedio')"><i class="fa fa-check"></i></button>
+        </div>
+    </div>
+</form>
+{% include 'Configuracoes/Prescricoes/Tables/Remedios.html' %}
+<div class="hr-line-dashed"></div>
+<div class="form-group">
+    <a>Salvo em <strong id="data_prescricao"></strong></a>
+    <div class="pull-right">
+        <a id="NovaPrescricao" class="btn btn-primary" onclick="NovaPrescricao()"><i class="fa fa-plus"></i> Nova</a>
+        <a id="SalvaPrescricao" class="btn btn-primary" onclick="SalvaPrescricao()"><i class="fa fa-pencil"></i> Salvar</a>
+    </div>
+</div>

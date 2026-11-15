@@ -1,0 +1,76 @@
+
+
+<div class="ibox-content">
+    <div class="row m-t">
+        <H1>Exame</H1>
+        <form method="post" role="form" id="formExames" class="classExame">
+            <input id="id_id_exames" name="id" type="hidden" value="0">
+            <input id="id_fk_prontuario" name="fk_prontuario" type="hidden">
+            <input id="id_fk_consulta" name="fk_consulta" type="hidden">
+            <div id="div_exame" class="row m-b-n-lg">
+                <div id="id_fk_medico_div" class="form-group col-md-12 save_exame disabled">
+                    <label for="id_fk_medico">Médico</label>
+                    <select
+                            id="id_fk_medico"
+                            name="fk_medico"
+                            class="form-control save_exame select_medico"
+                            data-format="formatRepoSelectionMedico"
+                            data-change="changeRemoveSelect2"
+                    >
+                    </select>
+                </div>
+
+                <div id="id_descricao_div" class="form-group col-md-12">
+                    <label for="id_descricao_exames">Descrição</label>
+                    <input id="id_descricao_exames" name="descricao" type="text" class="form-control save_exame">
+                </div>
+                
+                <div id="id_pedido_div" class="form-group col-md-6">
+                    <label for="id_pedido_exames">Pedido</label>
+                    <textarea id="id_pedido_exames"
+                              name="pedido"
+                              class="form-control save_exame"
+                              cols="75"
+                              rows="3"></textarea>
+                </div>
+                <div id="id_motivo_div" class="form-group col-md-6">
+                    <label for="id_motivo_exames">Justificativa</label>
+                    <textarea id="id_motivo_exames"
+                              name="motivo"
+                              class="form-control save_exame"
+                              cols="75"
+                              rows="3"></textarea>
+                </div>
+
+                <div id="id_cid10_div" class="form-group col-md-12" onblur="SalvaExame(true)">
+                    <label for="id_cid10_exames">CID 10</label>
+                    <select
+                            id="id_cid10_exames"
+                            name="cid10"
+                            class="form-control select_CID10 js-example-basic-multiple save_exame"
+                            data-format="formatRepoSelectionCID10"
+                            data-change="changeCID10"
+                            multiple="multiple"
+
+                    >
+                    </select>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <a>Salvo em <strong id="exame_data_salvo"></strong></a>
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <a id="SelicionaExame" class="btn btn-success btn-outline" onclick="CarregaExames()"><i class="fa fa-refresh"></i> Atualiza</a>
+                        <a id="SelicionaExame" class="btn btn-success btn-outline" onclick="SelecionaExame()"><i class="fa fa-chain"></i> Padrões</a>
+                        <a id="AdicionaExamePadrao" class="btn btn-success btn-outline" onclick="AdicionaExamePadrao()"><i class="fa fa-plus"></i></a>
+                    </div>
+                    <a id="btnAddExame" class="btn btn-success btn-outline" onclick="AddExame()"><i class="fa fa-plus"></i> Novo</a>
+                    <a id="ImprimirPrescricao" class="btn btn-success btn-outline btn-exame" onclick="ImprimeExame()"><i class="fa fa-print"></i> Imprimir</a>
+                    {# <a id="btnSaveExame" class="btn btn-primary btn-outline btn-exame" onclick="UpdateExame()"><i class="fa fa-save"></i> Salvar dados</a> #}
+                    {#                    <a id="CancelaExame" class="btn btn-warning btn-outline" onclick="CancelaExame()"><i class="fa fa-times"></i> Cancelar edição</a>#}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

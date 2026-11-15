@@ -1,0 +1,24 @@
+<div  class="form-group col-md-12 col-lg-12">
+    <div class="modal-body" id="corpo">
+        <div class="form-group col-md-6 col-lg-6" >
+            <table id="tabelaUsuario"
+                   data-toggle="table"
+                   data-classes="table table-no-bordered"
+                   data-height="560"
+                   data-url="/seguranca/usuario.json/">
+                <thead>
+                <tr>
+                    <th data-field="id">ID</th>
+                    <th data-field="first_name">Nome do Usuário</th>
+                    <th data-field="clinica">Clinica</th>
+                    <th data-field="login">Login</th>
+                    <th data-field="operate" data-formatter="FormatoUsuario" data-events="EventoUsuario"></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div id="id_TelaUsuariox"  class="form-group col-md-6 col-lg-6" style="background-color: #dceaf8">
+        <div class="row"> {% include 'Seguranca/Usuario/form.html' %}</div>
+    </div>
+</div>

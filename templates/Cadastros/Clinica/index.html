@@ -1,0 +1,116 @@
+{% extends "Base/base.html" %}
+
+
+{% block cadastros_auxiliares %}active{% endblock %}
+{% block cadastros_auxiliares_clinica %}active{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    {% include 'datatables.html' %}
+    <link href="/static/css/Cadastros/clinica.css?{{ user.release }}" rel="stylesheet">
+{% endblock %}
+
+{% block cadastro %}
+  <li class=" dropdown active">
+    <a class="collapsed" data-toggle="collapse" data-parent="#collapseNavbarLeft2" rel="popover-sidebar" data-container="body" data-placement="right"
+       data-content="Cadastro de Consultório... Manutenção no cadastro de Clínica..." href="#uidb0490bb1401f28d0a7bed4338a9c96b0">
+      <i class="oc-partial-icon icm icm-clipboard3"></i>
+      <span class="oc-partial-menu-item">
+        Clínicas
+        <b class="caret"></b>
+      </span>
+    </a>
+    <ul class="collapse dropdown-menu in" id="uidb0490bb1401f28d0a7bed4338a9c96b0">
+      <li class="">
+        <a href="" rel="popover-sidebar" data-container="body"
+           data-placement="right" data-content="Retornar a lista de Clínicas">Lista de Clínicas</a>
+      </li>
+    </ul>
+  </li>
+{% endblock %}
+
+
+{% block modal %}
+{#    {% include 'Cadastros/Plano/Modals/planos.html' %}#}
+{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading clinica-cabecalho clinica-page">
+        <div class="col-lg-10">
+            <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Clínicas</h2>
+            <p class="clinica-subtitulo">Dados de cada unidade e a conexão com o WhatsApp usada nos lembretes de consulta.</p>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">
+                    <strong>Clínicas</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block cabecalho_botoes %}
+
+{% endblock %}
+
+
+{% block container_corpo %}
+<div class="row clinica-page">
+    <div class="col-md-4 col-lg-3">
+        <div class="clinica-card clinica-lista">
+            <div class="clinica-card-topo">
+                <h3>Cadastradas</h3>
+                <button type="button" id="botao_novo_plano" class="btn btn-sm btn-clinica-secundario" onclick="AddClinica()">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Nova clínica
+                </button>
+            </div>
+            {% include 'Cadastros/Clinica/table.html' %}
+        </div>
+    </div>
+
+    <div class="col-md-8 col-lg-9">
+        <div class="clinica-card">
+            <div id="id_TelaClinica">
+                {% include 'Cadastros/Clinica/form.html' %}
+            </div>
+            <div class="clinica-vazio" role="status">
+                <i class="fa fa-check-circle-o" aria-hidden="true"></i>
+                <h3>Nenhuma clínica aberta</h3>
+                <p>Escolha uma clínica na lista para editar ou cadastre uma nova.</p>
+                <button type="button" class="btn btn-clinica-primario" onclick="AddClinica()">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Nova clínica
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block js %}
+    <!-- Data Tables -->
+    <script src="/static/js/plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.responsive.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.tableTools.min.js"></script>
+    <script src="/static/js/plugins/jeditable/jquery.jeditable.js"></script>
+    <!-- Page-Level Scripts -->
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+    <!-- Convenio -->
+    <script src="/static/javascripts/Cadastros/Clinica/clinica.js?{{ user.release }}-1" type="application/javascript"></script>
+    <script src="/static/javascripts/datatables.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/WhatsApp/whatsapp.js?{{ user.release }}"></script>
+
+    <!-- QrCode -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lrsjng.jquery-qrcode/0.13.0/jquery.qrcode.min.js"></script>
+{% endblock %}
+
+

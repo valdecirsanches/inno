@@ -1,0 +1,150 @@
+{% extends 'Base/base.html' %}
+
+
+{% block head %}
+
+    <!-- Input Mask -->
+    <link href="/static/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+    <!-- select2 -->
+    <link href="/static/css/plugins/select2/select2.css" rel="stylesheet">
+    <link href="/static/css/plugins/select2/select2-bootstrap.css" rel="stylesheet">
+
+
+{% endblock %}
+
+{% block iniciar %}
+    <li>
+        <a href="#" onclick="FocaPesquisa()"><i class="fa fa-edit"></i> <span class="nav-label">Iniciar</span></a>
+    </li>
+{% endblock %}
+
+{% block modal %}
+    <div class="modal inmodal" id="carregando"></div>
+    {% include 'Cadastros/Pacientes/Modal/Recibo.html' %}
+{% endblock %}
+
+{% block cabecalho_botoes %}
+    <div class="header fixed">
+        <div class="row">
+            <a id="historicoFicha" class="btn btn-primary" href="/atendimento/?paciente="><i class="fa fa-pencil"></i> Histórico</a>
+            <div class="pull-right">
+                <a id="novaFicha" class="btn btn-primary" onclick="NovoProntuario()"><i class="fa fa-pencil"></i> Novo prontuário</a>
+                <a id="reciboConsulta" class="btn btn-primary" onclick="ReciboConsulta()" href="" data-toggle="modal" data-target="#recibo"><i class="fa fa-print"></i> <span>Recibo</span></a>
+                <a id="imprimeFicha" class="btn btn-primary" onclick="ImprimeFicha()"><i class="fa fa-print"></i> <span>Ficha</span></a>
+                <a id="salvaFicha" class="btn btn-primary">
+                    <i class="fa fa-save"></i> <span>Salvar</span></a>
+    
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block container_cabecalho %}
+    <!--div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Prontuário Eletrônico</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li class="active">
+                <strong>Prontuário Eletrônico</strong>
+            </li>
+        </ol>
+    </div>
+</div-->
+{% endblock %}
+
+{% block container_corpo %}
+    <div class="form-group ibox-content">
+{#        style="background-color: #dddddd;">#}
+        <label for="pesquisa_str_iniciar">Pesquisar paciente</label>
+        <select placeholder="Pesquisa paciente por nome ou código ou CPF(ex: 000.000.000-00)" id="pesquisa_str_iniciar" tabindex="0"></select>
+{#    </div>#}
+{#    <div class="row">#}
+        <div class="ibox-title">
+            <h5>Dados do paciente</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="row">
+                {% include 'Cadastros/Pacientes/Forms/DadosPaciente.html' %}
+                {#            </div>#}
+                {#        </div>#}
+                {#    </div>#}
+                <div class="ibox float-e-margins">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#endereco">Endereço</a></li>
+                        <li class=""><a data-toggle="tab" href="#agendamentos">Agendamentos</a></li>
+                        <li class=""><a data-toggle="tab" href="#laudos">Laudos</a></li>
+                        <li class=""><a data-toggle="tab" href="#outros">Outros</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="endereco" class="tab-pane active">
+                            <div class="ibox-content">
+                                <div class="row">
+                                    {% include 'Cadastros/Pacientes/Forms/ComplementosPaciente.html' %}
+                                </div>
+                            </div>
+                        </div>
+                        <div id="agendamentos" class="tab-pane">
+                            <div class="ibox-content">
+                                {% include 'Cadastros/Pacientes/Tables/Consultas.html' %}
+                            </div>
+                        </div>
+                        <div id="laudos" class="tab-pane">
+                            <div class="col-lg-6">
+                                <div class="ibox float-e-margins">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div id="outros" class="tab-pane">
+                            <div class="col-lg-6">
+                                <div class="ibox float-e-margins">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+
+    <!-- Select2 -->
+    <script src="/static/js/plugins/select2/select2.full.js"></script>
+    <script src="/static/js/plugins/select2/i18n/pt-BR.js"></script>
+
+    <!-- Input Mask -->
+    <script src="/static/js/plugins/jquery-mask-plugin/jquery.mask.js"></script>
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.min.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+    <!-- Selectize -->
+    <script src="/static/js/plugins/selectize/standalone/selectize.min.js"></script>
+
+    <!-- Iniciar -->
+    <script src="/static/javascripts/Cadastros/Pacientes/iniciar.js?{{ user.release }}-1" type="application/javascript"></script>
+    <script src="/static/javascripts/Cadastros/Pacientes/recibo.js?{{ user.release }}-2" type="application/javascript"></script>
+
+    <!-- Cep -->
+    <script src="/static/javascripts/Base/cep.js?{{ user.release }}" type="application/javascript"></script>
+
+
+
+{% endblock %}

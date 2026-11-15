@@ -1,0 +1,141 @@
+{% extends "Base/base.html" %}
+
+
+
+{% block cadastros_auxiliares %}active{% endblock %}
+{% block cadastros_auxiliares_medicos %}active{% endblock %}
+
+{% block head %}
+    <!-- Input Mask -->
+    <link href="/static/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+    <!-- select2 -->
+    <link href="/static/css/plugins/select2/select2.css" rel="stylesheet">
+    <link href="/static/css/plugins/select2/select2-bootstrap.css" rel="stylesheet">
+
+    <!-- iCheck -->
+    <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block modal %}
+    {#    {% include 'Cadastros/Medicos/Modals/Pesquisa.html' %}#}
+    {% include 'Cadastros/Medicos/Modals/MedicoHorarios.html' %}
+{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2><i class="fa fa-user-md"></i>  Cadastro de Médico</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">
+                    <strong> Cadastro de Médico</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block cabecalho_botoes %}
+
+{% endblock %}
+
+
+{% block container_corpo %}
+    {#    <div class="ibox float-e-margins">#}
+    {#        <div class="ibox-content">#}
+    <div class="row">
+        <div class="form-group col-lg-12" style="background-color: #dceaf8">
+            <div class="form-group col-md-3 col-lg-3" >
+                {% include 'Cadastros/Medicos/Tables/Pesquisa.html' %}
+            </div>
+
+            <div id="id_TelaConvenio"  class="form-group col-md-9 col-lg-9">
+                {% include 'Cadastros/Medicos/Forms/MedicoDados.html' %}
+
+                {% include 'Cadastros/Medicos/Forms/Pastas.html' %}
+
+                <div class="form-group col-md-12 col-lg-12 text-right">
+                    <div class="hr-line-solid"></div>
+                    <div class="col-md-6 text-left">
+                        <a id="btnNewMedico" class="btn btn-primary" onclick="AddMedico()"><i class="fa fa-pencil"></i> Novo</a>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <a id="btnSaveMedico" class="btn btn-primary" onclick="UpdateMedico()"><i class="fa fa-save"></i> Salvar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js %}
+
+    <script>
+        const MEMED_URL_API_BASE = '{{ settings.MEMED_URL_API_BASE }}'
+    </script>
+
+    <!-- Input Mask -->
+    <script src="/static/js/plugins/jquery-mask-plugin/jquery.mask.js"></script>
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+    <!-- iCheck -->
+    <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                radioClass: 'iradio_square-green'
+            });
+        });
+    </script>
+
+    <!-- JSKnob -->
+    <script src="/static/js/plugins/jsKnob/jquery.knob.js"></script>
+
+    <!-- Selectize -->
+    <script src="/static/js/plugins/selectize/standalone/selectize.min.js"></script>
+
+    <!-- Select2 -->
+    <script src="/static/js/plugins/select2/select2.full.js"></script>
+    <script src="/static/js/plugins/select2/i18n/pt-BR.js"></script>
+
+
+     <!-- Especialidade -->
+    <script src="/static/javascripts/Cadastros/Especialidades/indexEspecialidade.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Cadastros/Especialidades/selectEspecialidade.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Medico -->
+    <script src="/static/javascripts/Cadastros/Medico/indexMedico.js?{{ user.release }}-2" type="application/javascript"></script>
+    <script src="/static/javascripts/Cadastros/Medico/medicos.js?{{ user.release }}" type="application/javascript"></script>
+    {# horarios.js nunca existiu (dava 404); os horários usam Horario/tableHorario.js abaixo #}
+    <script src="/static/javascripts/Cadastros/Medico/tableMedico.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Horario -->
+    <script src="/static/javascripts/Cadastros/Medico/Horario/tableHorario.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Cadastros/Medico/Horario/indexHorario.js?{{ user.release }}" type="application/javascript"></script>
+
+    Cep
+    <script src="/static/javascripts/Base/cep.js?{{ user.release }}" type="application/javascript"></script>
+
+{#    <!-- Mascaras -->#}
+{#    <script src="/static/javascripts/Base/mascaras.js?{{ user.release }}" type="application/javascript"></script>#}
+
+{% endblock %}
+
+

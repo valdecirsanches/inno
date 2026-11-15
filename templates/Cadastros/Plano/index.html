@@ -1,0 +1,86 @@
+{% extends "Base/base.html" %}
+
+
+{% block cadastros_auxiliares %}active{% endblock %}
+{% block cadastros_auxiliares_planos %}active{% endblock %}
+
+{% block head %}
+    {% include 'datatables.html' %}
+{% endblock %}
+
+{% block cadastro %}
+    <li class=" dropdown active">
+        <a class="collapsed" data-toggle="collapse" data-parent="#collapseNavbarLeft2" rel="popover-sidebar" data-container="body" data-placement="right"
+           data-content="Cadastro de planos... Manutenção no cadastro de planos..." href="#uidb0490bb1401f28d0a7bed4338a9c96b0">
+            <i class="oc-partial-icon icm icm-clipboard3"></i>
+            <span class="oc-partial-menu-item">
+        Planos de saúde
+        <b class="caret"></b>
+      </span>
+        </a>
+        <ul class="collapse dropdown-menu in" id="uidb0490bb1401f28d0a7bed4338a9c96b0">
+            <li class="">
+                <a href="" rel="popover-sidebar" data-container="body"
+                   data-placement="right" data-content="Retornar a lista de Planos">Lista de Planos</a>
+            </li>
+        </ul>
+    </li>
+{% endblock %}
+
+
+{% block modal %}
+
+{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2><i class="fa fa-group"></i> Cadastro de Planos de Saúde</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">
+                    <strong>Cadastro de Planos de Saúde</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block cabecalho_botoes %}
+
+{% endblock %}
+
+
+{% block container_corpo %}
+    <div class="row">
+        <div class="col-lg-12" style="background-color: #dceaf8">
+            {% include 'Cadastros/Plano/table.html' %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js %}
+    <!-- Data Tables -->
+    <script src="/static/js/plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.responsive.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.tableTools.min.js"></script>
+    <script src="/static/js/plugins/jeditable/jquery.jeditable.js"></script>
+    <!-- Page-Level Scripts -->
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+    <!-- Convenio -->
+    <script src="/static/javascripts/Cadastros/Plano/planos.js?{{ user.release }}"></script>
+    <script src="/static/javascripts/datatables.js"></script>
+
+{% endblock %}
+
+

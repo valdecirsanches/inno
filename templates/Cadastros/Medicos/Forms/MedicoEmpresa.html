@@ -1,0 +1,54 @@
+<form action="" id="formMedicoEmpresa" method="post" role="form" class="classMedico form-horizontal">
+    <div class="form-group m-b-n-sm m-t-n-sm">
+        <div class="col-md-4 col-lg-5 m-t-xs">
+            <label for="id_empresa_fantasia">Nome fantasia da Empresa</label>
+            <input id="id_empresa_fantasia" name="empresa_fantasia" type="text" maxlength="50" class="form-control ">
+        </div>
+        <div class="col-md-5 col-lg-5 m-t-xs">
+            <label for="id_empresa_razao">Razão Social</label>
+            <input id="id_empresa_razao" name="empresa_razao" type="text" maxlength="50" class="form-control ">
+        </div>
+        <div class="col-md-3 col-lg-2 m-t-xs">
+            <label for="id_empresa_cnpj">CNPJ</label>
+            <input id="id_empresa_cnpj" name="empresa_cnpj" type="text" maxlength="20" class="form-control cnpj">
+        </div>
+        <div class="col-md-4 col-lg-2 m-t-xs">
+            <label for="cep_id">CEP</label>
+            <div class="input-group">
+                <input id="id_empresa_cep" name="empresa_cep" type="text" maxlength="9" class="form-control cep" placeholder="Digite o CEP">
+                <div class="input-group-addon btn" id="btn_busca_id"
+                     onclick="BuscaCep('id_empresa_cep', 'id_empresa_endereco', 'id_empresa_numero', 'id_empresa_bairro', 'id_empresa_cidade', 'id_empresa_uf')">
+                    <span class="glyphicon glyphicon-search"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4 m-t-xs">
+            <label for="id_empresa_endereco">Endereço</label>
+            <input id="id_empresa_endereco" name="empresa_endereco" type="text" maxlength="50" class="form-control">
+        </div>
+        <div class="col-md-2 col-lg-1 m-t-xs">
+            <label for="id_empresa_numero">Número</label>
+            <input id="id_empresa_numero" name="empresa_numero" type="text" maxlength="10" class="form-control">
+        </div>
+        <div class="col-md-4 col-lg-2 m-t-xs">
+            <label for="id_empresa_bairro">Bairro</label>
+            <input id="id_empresa_bairro" name="empresa_bairro" type="text" maxlength="40" class="form-control">
+        </div>
+        <div class="col-md-6 col-lg-2 m-t-xs">
+            <label for="id_empresa_cidade">Cidade</label>
+            <input id="id_empresa_cidade" name="empresa_cidade" type="text" maxlength="40" class="form-control">
+        </div>
+        <div class="col-md-2 col-lg-1 m-t-xs">
+            <label for="id_empresa_uf">UF</label>
+            <input id="id_empresa_uf" name="empresa_uf" type="text" maxlength="2" class="form-control">
+        </div>
+        <div class="col-md-4 col-lg-3 m-t-xs">
+            <label for="id_empresa_telefone">Telefone</label>
+            <input id="id_empresa_telefone" name="empresa_telefone" type="text" class="form-control celular">
+        </div>
+        <div class="col-md-8 m-t-xs">
+            <label for="id_empresa_email">Email</label>
+            <input id="id_empresa_email" name="empresa_email" type="text" class="form-control text-lowercase">
+        </div>
+    </div>
+</form>

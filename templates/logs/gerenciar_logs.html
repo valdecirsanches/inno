@@ -1,0 +1,32 @@
+<form method="get" class="mb-3 row g-2 align-items-end">
+  <div class="col-md-3">
+    <label for="usuario" class="form-label">Usuário:</label>
+    <select name="usuario" id="usuario" class="form-select">
+      <option value="">Todos</option>
+      {% for u in usuarios %}
+        <option value="{{ u.username }}" {% if usuario_selecionado == u.username %}selected{% endif %}>
+          {{ u.username }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <label for="data_inicio" class="form-label">De:</label>
+    <input type="date" name="data_inicio" id="data_inicio" value="{{ data_inicio }}" class="form-control">
+  </div>
+
+  <div class="col-md-2">
+    <label for="data_fim" class="form-label">Até:</label>
+    <input type="date" name="data_fim" id="data_fim" value="{{ data_fim }}" class="form-control">
+  </div>
+
+  <div class="col-md-3">
+    <label for="q" class="form-label">Busca:</label>
+    <input type="text" name="q" id="q" value="{{ busca }}" class="form-control" placeholder="Ação, modelo, ID...">
+  </div>
+
+  <div class="col-md-2 d-grid">
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+  </div>
+</form>

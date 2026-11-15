@@ -1,0 +1,30 @@
+
+<div  class="form-group col-md-12 col-lg-12">
+    <div class="modal-body" id="corpo">
+        <div class="form-group col-md-6 col-lg-6" >
+            <table id="tabelaPlanosSaude"
+                   data-toggle="table"
+                   data-classes="table table-condensed table-hover table-no-bordered"
+                   data-row-style="rowStyle"
+                   data-click-to-select="true"
+                   data-search="true"
+                   data-height="550"
+                   data-unique-id="id"
+                   data-url="/cadastros/planos/CarregaPlanosSaude/">
+                <thead>
+                    <tr>
+                        <th data-field="id"></th>
+                        <th data-field="descricao">Nome do Plano</th>
+                        <th data-field="convenio">Convenio</th>
+                        <th data-field="anotacoes">Anotações</th>
+                        <th data-field="edit" data-width="120px" data-formatter="FormatoPlano" data-events="EventoPlano" data-align="center"></th>
+    {#                    <th data-field="del" data-formatter="FormatoDel" data-events="EventoDel" data-align="center">Excluir</th>#}
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div id="id_TelaPlanox"  class="form-group col-md-6 col-lg-6" style="background-color: #dceaf8">
+        <div class="row"> {% include 'Cadastros/Plano/form.html' %}</div>
+    </div>
+</div>

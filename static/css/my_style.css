@@ -1,0 +1,259 @@
+
+.table > thead > tr > td.abono,
+.table > tbody > tr > td.abono,
+.table > tfoot > tr > td.abono,
+.table > thead > tr > th.abono,
+.table > tbody > tr > th.abono,
+.table > tfoot > tr > th.abono,
+.table > thead > tr.abono > td,
+.table > tbody > tr.abono > td,
+.table > tfoot > tr.abono > td,
+.table > thead > tr.abono > th,
+.table > tbody > tr.abono > th,
+.table > tfoot > tr.abono > th {
+    background-color: darkgrey;
+}
+
+.table-hover > tbody > tr > td.abono:hover,
+.table-hover > tbody > tr > th.abono:hover,
+.table-hover > tbody > tr.abono:hover > td,
+.table-hover > tbody > tr:hover > .abono,
+.table-hover > tbody > tr.abono:hover > th {
+    background-color: grey;
+}
+
+.table > thead > tr > td.selecionado,
+.table > tbody > tr > td.selecionado,
+.table > tfoot > tr > td.selecionado,
+.table > thead > tr > th.selecionado,
+.table > tbody > tr > th.selecionado,
+.table > tfoot > tr > th.selecionado,
+.table > thead > tr.selecionado > td,
+.table > tbody > tr.selecionado > td,
+.table > tfoot > tr.selecionado > td,
+.table > thead > tr.selecionado > th,
+.table > tbody > tr.selecionado > th,
+.table > tfoot > tr.selecionado > th {
+    background-color: #52657A;
+    color: yellow;
+}
+
+.table-hover > tbody > tr > td.selecionado:hover,
+.table-hover > tbody > tr > th.selecionado:hover,
+.table-hover > tbody > tr.selecionado:hover > td,
+.table-hover > tbody > tr:hover > .selecionado,
+.table-hover > tbody > tr.selecionado:hover > th {
+    background-color: #2B6B7A;
+    color: yellow;
+}
+
+.table > thead > tr > td.quitado,
+.table > tbody > tr > td.quitado,
+.table > tfoot > tr > td.quitado,
+.table > thead > tr > th.quitado,
+.table > tbody > tr > th.quitado,
+.table > tfoot > tr > th.quitado,
+.table > thead > tr.quitado > td,
+.table > tbody > tr.quitado > td,
+.table > tfoot > tr.quitado > td,
+.table > thead > tr.quitado > th,
+.table > tbody > tr.quitado > th,
+.table > tfoot > tr.quitado > th {
+    background-color: green;
+    color: yellow;
+}
+
+.table-hover > tbody > tr > td.quitado:hover,
+.table-hover > tbody > tr > th.quitado:hover,
+.table-hover > tbody > tr.quitado:hover > td,
+.table-hover > tbody > tr:hover > .quitado,
+.table-hover > tbody > tr.quitado:hover > th {
+    background-color: darkgreen;
+    color: yellow;
+}
+
+.table > thead > tr > td.vencido,
+.table > tbody > tr > td.vencido,
+.table > tfoot > tr > td.vencido,
+.table > thead > tr > th.vencido,
+.table > tbody > tr > th.vencido,
+.table > tfoot > tr > th.vencido,
+.table > thead > tr.vencido > td,
+.table > tbody > tr.vencido > td,
+.table > tfoot > tr.vencido > td,
+.table > thead > tr.vencido > th,
+.table > tbody > tr.vencido > th,
+.table > tfoot > tr.vencido > th {
+    background-color: red;
+    color: white;
+}
+
+.table-hover > tbody > tr > td.vencido:hover,
+.table-hover > tbody > tr > th.vencido:hover,
+.table-hover > tbody > tr.vencido:hover > td,
+.table-hover > tbody > tr:hover > .vencido,
+.table-hover > tbody > tr.vencido:hover > th {
+    background-color: darkred;
+    color: white;
+}
+
+
+.table > thead > tr > td.autenticado,
+.table > tbody > tr > td.autenticado,
+.table > tfoot > tr > td.autenticado,
+.table > thead > tr > th.autenticado,
+.table > tbody > tr > th.autenticado,
+.table > tfoot > tr > th.autenticado,
+.table > thead > tr.autenticado > td,
+.table > tbody > tr.autenticado > td,
+.table > tfoot > tr.autenticado > td,
+.table > thead > tr.autenticado > th,
+.table > tbody > tr.autenticado > th,
+.table > tfoot > tr.autenticado > th {
+    background-color: lightgreen;
+}
+
+.table-hover > tbody > tr > td.autenticado:hover,
+.table-hover > tbody > tr > th.autenticado:hover,
+.table-hover > tbody > tr.autenticado:hover > td,
+.table-hover > tbody > tr:hover > .autenticado,
+.table-hover > tbody > tr.autenticado:hover > th {
+    background-color: green;
+}
+
+.table > thead > tr > td.avencer,
+.table > tbody > tr > td.avencer,
+.table > tfoot > tr > td.avencer,
+.table > thead > tr > th.avencer,
+.table > tbody > tr > th.avencer,
+.table > tfoot > tr > th.avencer,
+.table > thead > tr.avencer > td,
+.table > tbody > tr.avencer > td,
+.table > tfoot > tr.avencer > td,
+.table > thead > tr.avencer > th,
+.table > tbody > tr.avencer > th,
+.table > tfoot > tr.avencer > th {
+    background-color: lightyellow;
+}
+
+.table-hover > tbody > tr > td.avencer:hover,
+.table-hover > tbody > tr > th.avencer:hover,
+.table-hover > tbody > tr.avencer:hover > td,
+.table-hover > tbody > tr:hover > .avencer,
+.table-hover > tbody > tr.avencer:hover > th {
+    background-color: yellow;
+}
+
+.table > thead > tr > td.livre,
+.table > tbody > tr > td.livre,
+.table > tfoot > tr > td.livre,
+.table > thead > tr > th.livre,
+.table > tbody > tr > th.livre,
+.table > tfoot > tr > th.livre,
+.table > thead > tr.livre > td,
+.table > tbody > tr.livre > td,
+.table > tfoot > tr.livre > td,
+.table > thead > tr.livre > th,
+.table > tbody > tr.livre > th,
+.table > tfoot > tr.livre > th {
+    background-color: yellow;
+}
+
+.table-hover > tbody > tr > td.livre:hover,
+.table-hover > tbody > tr > th.livre:hover,
+.table-hover > tbody > tr.livre:hover > td,
+.table-hover > tbody > tr:hover > .livre,
+.table-hover > tbody > tr.livre:hover > th {
+    background-color: lightyellow;
+}
+
+.table > thead > tr > td.desativado,
+.table > tbody > tr > td.desativado,
+.table > tfoot > tr > td.desativado,
+.table > thead > tr > th.desativado,
+.table > tbody > tr > th.desativado,
+.table > tfoot > tr > th.desativado,
+.table > thead > tr.desativado > td,
+.table > tbody > tr.desativado > td,
+.table > tfoot > tr.desativado > td,
+.table > thead > tr.desativado > th,
+.table > tbody > tr.desativado > th,
+.table > tfoot > tr.desativado > th {
+    background-color: #9b9b9b;
+}
+
+.table-hover > tbody > tr > td.desativado:hover,
+.table-hover > tbody > tr > th.desativado:hover,
+.table-hover > tbody > tr.desativado:hover > td,
+.table-hover > tbody > tr:hover > .desativado,
+.table-hover > tbody > tr.desativado:hover > th {
+    background-color: lightyellow;
+}
+
+.table > thead > tr > td.pgtomenor,
+.table > tbody > tr > td.pgtomenor,
+.table > tfoot > tr > td.pgtomenor,
+.table > thead > tr > th.pgtomenor,
+.table > tbody > tr > th.pgtomenor,
+.table > tfoot > tr > th.pgtomenor,
+.table > thead > tr.pgtomenor > td,
+.table > tbody > tr.pgtomenor > td,
+.table > tfoot > tr.pgtomenor > td,
+.table > thead > tr.pgtomenor > th,
+.table > tbody > tr.pgtomenor > th,
+.table > tfoot > tr.pgtomenor > th {
+    background-color: lightcoral;
+    color: black;
+}
+
+.table-hover > tbody > tr > td.pgtomenor:hover,
+.table-hover > tbody > tr > th.pgtomenor:hover,
+.table-hover > tbody > tr.pgtomenor:hover > td,
+.table-hover > tbody > tr:hover > .pgtomenor,
+.table-hover > tbody > tr.pgtomenor:hover > th {
+    background-color: red;
+    color: black;
+}
+
+.table > thead > tr > td.compareceu,
+.table > tbody > tr > td.compareceu,
+.table > tfoot > tr > td.compareceu,
+.table > thead > tr > th.compareceu,
+.table > tbody > tr > th.compareceu,
+.table > tfoot > tr > th.compareceu,
+.table > thead > tr.compareceu > td,
+.table > tbody > tr.compareceu > td,
+.table > tfoot > tr.compareceu > td,
+.table > thead > tr.compareceu > th,
+.table > tbody > tr.compareceu > th,
+.table > tfoot > tr.compareceu > th {
+    background-color: #7ffd80;
+}
+
+.table-hover > tbody > tr > td.compareceu:hover,
+.table-hover > tbody > tr > th.compareceu:hover,
+.table-hover > tbody > tr.compareceu:hover > td,
+.table-hover > tbody > tr:hover > .compareceu,
+.table-hover > tbody > tr.compareceu:hover > th {
+    background-color: #8cff76;
+}
+
+.swal2-container {
+    z-index: 100000 !important;
+}
+
+.cbtn {
+    margin-bottom: 39px !important;
+}
+
+@media (max-width: 767.9px){
+    .cbtn {
+        margin-bottom: 23px !important;
+    }
+}
+
+.emp-raz {
+    margin-left: 0px !important;
+    font-weight: bold;
+    color: #999c9e;
+}

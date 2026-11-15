@@ -1,0 +1,22 @@
+<div class="modal inmodal" id="modalCadastrar" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content animated fadeInUp">
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <div class="modal-title">
+                    <h4 class="modal-title">Cadastra Novo Paciente</h4>
+                </div>
+            </div>
+            <div class="modal-body">
+                {% include 'Cadastros/Pacientes/Forms/Cadastrar.html' %}
+            </div>
+            <div class="modal-footer">
+                <button id="SalvaProntuario" class="btn btn-primary" onclick="SalvaProntuario()"><i class="fa fa-pencil"></i> Salvar</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>

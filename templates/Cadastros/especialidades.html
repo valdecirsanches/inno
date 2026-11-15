@@ -1,0 +1,138 @@
+{% extends "Base/base.html" %}
+
+
+{% block cadastros_auxiliares %}active{% endblock %}
+{% block cadastros_auxiliares_especialidades %}active{% endblock %}
+
+{% block head %}
+    {% include 'datatables.html' %}
+
+    <!-- Input Mask -->
+    <link href="/static/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block cadastro %}
+              <li class=" dropdown active">
+                <a class="collapsed" data-toggle="collapse" data-parent="#collapseNavbarLeft2" rel="popover-sidebar" data-container="body" data-placement="right"
+                   data-content="Consulta associado... Gera lista permitindo acesso aos dados do paciente..." href="#uidb0490bb1401f28d0a7bed4338a9c96b0">
+                  <i class="oc-partial-icon icm icm-clipboard3"></i>
+                  <span class="oc-partial-menu-item">
+                    Médicos
+                    <b class="caret"></b>
+                  </span>
+                </a>
+                <ul class="collapse dropdown-menu in" id="uidb0490bb1401f28d0a7bed4338a9c96b0">
+                  <li class="">
+                    <a href="" rel="popover-sidebar" data-container="body"
+                       data-placement="right" data-content="Retornar a lista de Pacientes">Lista de Paciente</a>
+                  </li>
+                </ul>
+              </li>
+{% endblock %}
+
+
+{% block modal %}
+    {% include 'Cadastros/Modals/modal_medico.html' %}
+{% endblock %}
+
+
+
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2><i class="fa fa-user-md"></i>  Cadastro de Médico</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">
+                    <strong> Cadastro de Médico</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block cabecalho_botoes %}
+<div class="header fixed">
+    <div class="row">
+        <div class="pull-right">
+            <a id="botao_novo_medico" class="btn btn-primary" onclick="NovoMedico()"><i class="fa fa-pencil"></i> Novo Médico</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block container_corpo %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Lista de todos os médicos</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-wrench"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#">Config option 1</a>
+                        </li>
+                        <li><a href="#">Config option 2</a>
+                        </li>
+                    </ul>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                {% include 'Cadastros/Especialidades/tabela_medicos.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block js %}
+    <!-- Data Tables -->
+    <script src="/static/js/plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.responsive.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.tableTools.min.js"></script>
+    <script src="/static/js/plugins/jeditable/jquery.jeditable.js"></script>
+    <!-- Page-Level Scripts -->
+
+    <!-- Input Mask -->
+    <script src="/static/js/plugins/jquery-mask-plugin/jquery.mask.js"></script>
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+    <!-- Convenio -->
+    <script src="/static/javascripts/medicos.js?{{ user.release }}"></script>
+    <script src="/static/javascripts/datatables.js"></script>
+
+    <!-- Cep -->
+    <script src="/static/javascripts/cep.js?{{ user.release }}"></script>
+
+    <!-- Mascaras -->
+    <script src="/static/javascripts/Base/mascaras.js?{{ user.release }}"></script>
+
+{% endblock %}
+
+

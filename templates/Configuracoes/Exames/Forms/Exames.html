@@ -1,0 +1,34 @@
+<form method="post" role="form" id="formExames"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <input id="id_id_exames" name="id" type="hidden" value="0">
+    <div class="row m-b-n-lg">
+        <div id="id_nome_div" class="form-group col-md-12">
+            <label for="id_nome">Tipo Exame</label>
+            <input id="id_nome" name="nome" type="text" class="form-control">
+        </div>
+        <div id="id_descricao_div" class="form-group col-md-12">
+            <label for="id_descricao">Descrição</label>
+            <input id="id_descricao" name="descricao" type="text" class="form-control">
+        </div>
+        <div id="id_pedido_div" class="form-group col-md-6">
+            <label for="id_pedido_exames">Pedido</label>
+            <textarea id="id_pedido_exames" name="pedido" class="form-control" cols="75" rows="3"></textarea>
+        </div>
+        <div id="id_motivo_div" class="form-group col-md-6">
+            <label for="id_motivo_exames">Justificativa</label>
+            <textarea id="id_motivo_exames" name="motivo" class="form-control" cols="75" rows="3"></textarea>
+        </div>
+        <div id="id_cid10_div" class="form-group col-md-12">
+            <label for="id_cid10_exames">CID 10</label>
+            <input id="id_cid10_exames" name="cid10" class="form-control">
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <a>Salvo em <strong id="data_exames"></strong></a>
+        <div class="pull-right">
+            <a id="NovoExame" class="btn btn-primary" onclick="AddExame()"><i class="fa fa-plus"></i> Novo</a>
+            <a id="SalvaExame" class="btn btn-primary" onclick="UpdateExame()"><i class="fa fa-pencil"></i> Salvar</a>
+        </div>
+    </div>
+</form>
+

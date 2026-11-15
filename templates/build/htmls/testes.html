@@ -1,0 +1,45 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>datepicker demo</title>
+
+  <script type="text/javascript">
+    var polyfilter_scriptpath = "/themes/emerald/polyfills/filters/";
+    window.polyfilter_skip_stylesheets = true
+  </script>
+
+  <link href="/static/stylesheets/application.css" rel="stylesheet" type="text/css" />
+<!--[if lte IE 9]>
+    <link href="/static/stylesheets/application_split2.css" rel="stylesheet" type="text/css" /><link href="/static/stylesheets/application_split3.css" rel="stylesheet" type="text/css" />
+<![endif]-->
+  <script src="/static/javascripts/application.js?{{ user.release }}" type="text/javascript"></script>
+  <script src="/static/javascripts/demo.js?{{ user.release }}" type="text/javascript"></script>
+  <script src="/static/javascripts/init.js?{{ user.release }}" type="text/javascript"></script>
+
+
+
+  <!--link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script-->
+</head>
+<body>
+ 
+<div id="datepicker"></div>
+ 
+<script>
+$( "#datepicker" ).datepicker({
+  onSelect: function(date) {
+    alert(date);
+  },
+  selectWeek: true,
+  inline: true,
+  startDate: '01/01/2000',
+  firstDay: 1
+});
+
+</script>
+ 
+</body>
+</html>

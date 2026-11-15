@@ -1,0 +1,152 @@
+{% extends "Base/base.html" %}
+
+
+{% block head %}
+
+{#    <link href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css" rel="stylesheet">#}
+
+    <!-- Input Mask -->
+    <link href="/static/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+
+    <!-- Date picker -->
+    <link href="/static/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+    <!-- switchery -->
+    <link href="/static/css/plugins/switchery/switchery.min.css" rel="stylesheet">
+
+
+{% endblock %}
+
+{% block modal %}
+    {% include 'Agenda/Consultas/Modals/SMS.html' %}
+    {% include 'Agenda/Consultas/Modals/WhatsApp.html' %}
+    {% include 'Agenda/Consultas/Modals/Agendar.html' %}
+    {% include 'Cadastros/Pacientes/Modal/Cadastrar.html' %}
+
+{% endblock %}
+
+{% block agenda_consultas %}
+    <li class="active">
+        <a href="/agenda/consultas/"> <i class="fa fa-calendar"></i>
+            <span class="nav-label">Agenda</span><span class="fa arrow"></span></a>
+        <ul class="nav nav-second-level">
+            <li>
+                <select id="medico" name="medico" class="form-control{% if user.fk_medico_id %} hidden{% endif %}" class="agenda_buttons"></select>
+            </li>
+            <li>
+                <div id="datepicker_agenda" class="datepicker-full"></div>
+            </li>
+            <li class="text-center">
+                A
+                <input type="checkbox" id="id_A" name="A" checked class="agenda_buttons" />
+                B
+                <input type="checkbox" id="id_B" name="B" class="agenda_buttons" />
+                C
+                <input type="checkbox" id="id_C" name="C" class="agenda_buttons"  />
+            </li>
+            <li class="text-center">
+                <input type="checkbox" id="id_All" name="All" checked/>
+                <input type="checkbox" id="id_Livre" name="Livre" checked/>
+            </li>
+        </ul>
+    </li>
+{% endblock %}
+
+{% block cabecalho_botoes %}
+<div class="header fixed">
+    <div class="row">
+        <div class="pull-right">
+            <a id="btnAbrirAgenda" class="btn btn-primary " onclick="AbrirAgenda()"><i class="fa fa-plus"></i> Abrir/Revisar Agenda</a>
+            <a id="btnNovoReceita" class="btn btn-primary hidden" onclick="NovoReceita()"><i class="fa fa-plus"></i> Receita</a>
+            <a id="btnDesativaAgenda" class="btn btn-danger" onclick="DesativarAgenda()"><i class="fa fa-trash"></i> Desativar agenda atual</a>
+            <a id="btnImrimeAgenda" class="btn btn-primary" onclick="ImprimeAgenda()"><i class="fa fa-print"></i> Imprimir</a>
+        </div>
+        <div>
+            <h3 style="padding: 3px 0 0 15px"><strong id="titData"></strong> - <strong id="titMedico"></strong> *** <strong id="titAgendados"></strong> Total de consultas agendadas</h3>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-md-5 m-t-md" >
+            <span id="id_title1" style="font-size: large; font-style: oblique; padding: 40px">Agenda de Consultas</span>
+            <span id="id_msgAgenda" style="color:mediumvioletred "></span>
+        </div>
+        <div class="col-md-7">
+            <div class="pull-right m-t-sm">
+                <span style="color: #0a6aa1">
+                    Agendados: <span id="id_agendados" style="color: red"> </span> &nbsp;&nbsp;&nbsp;
+                    Encaixes: <span id="id_encaixes" style="color: red"></span> &nbsp;&nbsp;&nbsp;
+                    Balcão: <span id="id_balcao" style="color: red"></span> &nbsp;&nbsp;&nbsp;
+                    Aguardando: <span id="id_aguardando" style="color: red"></span> &nbsp;&nbsp;&nbsp;
+                    Atendidos: <span id="id_atendidos" style="color: red"></span> &nbsp;&nbsp;&nbsp;
+                    Faltou: <span id="id_faltas" style="color: red"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block container_corpo %}
+    <div class="row">
+        <input type="hidden" id="data" value="{{ data }}">
+        <div id="col_agenda" style="margin-bottom: 100px;">
+            <div class="ibox float-e-margins" id="panel_agenda">
+                <div class="ibox-content">
+                    {% include 'Agenda/Consultas/Table/ConsultasDia.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+
+{#    <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>#}
+{#    <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/extensions/auto-refresh/bootstrap-table-auto-refresh.min.js"></script>#}
+
+
+    <!-- Input Mask -->
+    <script src="/static/js/plugins/jquery-mask-plugin/jquery.mask.js"></script>
+
+    <!-- Data picker -->
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.pt-BR.js"></script>
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+    <!-- Switchery -->
+    <script src="/static/js/plugins/switchery/switchery.min.js"></script>
+
+    <!-- Selectize -->
+    <script src="/static/js/plugins/selectize/standalone/selectize.min.js"></script>
+
+    <!-- Agenda Consulta -->
+    <script src="/static/javascripts/Agenda/consultas.js?{{ user.release }}-1" type="application/javascript"></script>
+    <script src="/static/javascripts/Agenda/horario.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Cep -->
+    <script src="/static/javascripts/cep.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!--whatsapp -->
+    <script src="/static/javascripts/Agenda/whatsapp.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/WhatsApp/whatsapp.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Mascaras -->
+    <script src="/static/javascripts/Base/mascaras.js?{{ user.release }}" type="application/javascript"></script>
+
+    {# <script src="/static/javascripts/Cadastros/Especialidades/selectEspecialidade.js?{{ user.release }}" type="application/javascript"></script> #}
+
+{% endblock %}

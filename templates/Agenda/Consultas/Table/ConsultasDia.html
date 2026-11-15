@@ -1,0 +1,119 @@
+<div style="margin-bottom:10px;">
+    <button id="btnAplicarCor" style="display:none;">Aplicar Cor</button>
+</div>
+
+<div class="table-responsive">
+    <table id="tabelaConsultas"
+{#           data-height="600"#}
+{#           data-search="true"#}
+           data-toggle="table"
+           data-classes="table table-condensed table-hover table-no-bordered"
+           data-row-style="rowStyle"
+           data-unique-id="id"
+           data-query-params="Params"
+           data-show-fullscreen="true"
+           data-icons-prefix="icon"
+           data-icons="icons"
+           data-method="GET"
+           >{# sem data-url: a tabela é preenchida por TabelaMedico() (consultas.js); a busca automática era vazia e desperdiçada #}
+        <thead>
+            <tr class="bg-default">
+                <th data-field="check" data-checkbox="true"></th>
+
+                <th data-field="proced"  data-visible="false"></th>
+                <th data-field="id_age" data-visible="false"></th>
+                <th data-field="confirmacao" data-visible="false"></th>
+                <th data-field="confirmacao_dh" data-visible="false"></th>
+                <th data-field="ultimaAlteracao" data-visible="false"></th>
+                <th data-field="periodo" data-visible="false"></th>
+                <th data-field="nome_med" data-visible="false"></th>
+                <th data-field="hr_format"
+                    data-formatter="FormatoHora"
+                    data-events="EventoHora"
+                    data-width="80px"
+                    data-align="center">Hora
+                </th>
+                <th data-field="hr_chegada"
+                    data-formatter="FormatoChegada"
+                    data-events="EventoChegada"
+                    data-width="80px"
+                    data-align="center">Chegada
+                </th>
+
+                <th data-field="hr_opcoes"
+                    data-formatter="FormatoHrOpcoes"
+                    data-events="EventoHrOpcoes"
+                    data-width="10px"
+                >
+                    <a class="btn btn-outline" title="Exclui horários selecionados" onclick="HrsExclui()" data-align="center"><i class="fa fa-trash-o"></i></a>
+                </th>
+{#                <th data-field="cod_pac">Cód.</th>#}
+                <th data-field="prontuario"
+                    data-formatter="FormatoProntuario"
+                    data-width="80px"
+                    data-events="EventoProntuario">Código
+                </th>
+                <th data-field="pac"
+                    data-formatter="FormatoPaciente"
+                    data-width="300px"
+                    data-events="EventoPaciente">Nome do Paciente
+                </th>
+                <th data-field="necesp"
+                    data-formatter="FormatoEspecial"
+                    data-align="center"
+                    data-width="100px">Neces.Espec.
+                </th>
+                <th data-field="conv"
+                    data-formatter="FormatoConvenio"
+                    data-width="200px"
+                    data-events="EventoConvenio">Convênio</th>
+                <th data-field="cel"
+                    data-width="250px"
+                    data-formatter="FormatoFone"
+                >Telefone</th>
+                <th data-field="status" data-align="center" data-cell-style="cellStyle">Status</th>
+                <th data-field="stt" data-formatter="FormatoStatus" data-events="EventoStatus" data-align="left" data-cell-style="cellStyle"></th>
+
+{#                <th data-field="necesp" data-align="center">Especial</th>#}
+{#                <th data-field="sms"#}
+{#                    data-formatter="FormatoSms"#}
+{#                    data-events="EventoSms"#}
+{#                    data-align="center">#}
+{#                    <a class="btn btn-outline" title="Envia SMS a todos os pacientes marcados" onclick="sms_a_todos()"><i class="fa fa-comments"></i></a>#}
+{#                </th>#}
+                <th data-field="whatsapp"
+                    data-formatter="FormatoWhatsApp"
+                    data-events="EventoWhatsApp"
+                    data-align="center"
+                    data-width="130px"
+
+                >
+{#                    <a class="btn btn-outline" title="Envia Whatsapp a todos os pacientes marcados" onclick="whatsapp_a_todos()"><i class="fa fa-phone-square"></i></a>#}
+
+                </th>
+
+                 {# <th data-field="cor"
+                    data-formatter="FormatoBotaoCor"
+                    data-events="EventoBotaoCor"
+                    data-align="center">
+                    🎨 Cor
+                </th>    #}
+                {# <th data-field="cor" data-formatter="FormatoBotaoCor" data-events="EventoBotaoCor" data-align="center">🎨 Cor</th> #}
+            </tr>
+                     
+
+        </thead>
+    </table>
+</div>
+
+
+
+<script>
+function Params(params) {
+    return params
+}
+
+
+
+
+</script>

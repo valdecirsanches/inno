@@ -1,0 +1,58 @@
+
+<form role="form"  id="formUsuario" class="classUsuario">
+    <div class="row">
+        <div id="id_nome_div" class="form-group col-md-8 col-lg-8">
+            <label for="id_nome">Nome </label>
+            <input id="id_id" name="id" type="hidden">
+            <input id="id_nome" name="nome" type="email" class="form-control">
+        </div>
+        <div id="id_fk_user_div" class="form-group col-md-4 col-lg-49">
+            <label for="id_fk_user">Conciliador</label>
+            <select name="fk_user" class="form-control" id="id_fk_user">
+                {% for u in users %}
+                    <option  value={{ u.id }} {% if u.id == user.fk_user_id %}selected{% endif %}>
+                        {{ u.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="id_eh_administrador_div" class="form-group col-md-2 col-lg-2 text-center">
+            <label for="id_eh_administrador">É Administrador</label>
+            <input id="id_eh_administrador" name="eh_administrador" type="checkbox" value="True" class="form-control checkbox">
+        </div>
+
+        <div id="id_acessa_organista_div" class="form-group col-md-2 col-lg-2 text-center">
+            <label for="id_acessa_organista">Organista</label>
+            <input id="id_acessa_organista" name="acessa_organista" type="checkbox" value="True" class="form-control checkbox">
+        </div>
+        <div id="id_acessa_estacionamento_div" class="form-group col-md-2 col-lg-2 text-center ">
+            <label for="id_acessa_estacionamento">Estacionamento</label>
+            <input id="id_acessa_estacionamento" name="acessa_estacionamento" type="checkbox" value="True" class="form-control checkbox">
+        </div>
+        <div id="id_acessa_porta_div" class="form-group col-md-2 col-lg-2 text-center">
+            <label for="id_acessa_porta">Porta</label>
+            <input id="id_acessa_porta" name="acessa_porta" type="checkbox" value="True" class="form-control checkbox">
+        </div>
+        <div id="id_acessa_rfamiliar_div" class="form-group col-md-2 col-lg-2 text-center">
+            <label for="id_acessa_rfamiliar">R.Familiar</label>
+            <input id="id_acessa_rfamiliar" name="acessa_rfamiliar" type="checkbox" value="True" class="form-control checkbo">
+        </div>
+        <div id="id_acessa_lista_telefonica_div" class="form-group col-md-2 col-lg-2 text-center">
+            <label for="id_acessa_lista_telefonica">Fones</label>
+            <input id="id_acessa_lista_telefonica" name="acessa_lista_telefonica" type="checkbox" value="True" class="form-control checkbox">
+        </div>
+        <div id="id_acessa_som_div" class="form-group col-md-2 col-lg-2 text-center">
+            <label for="id_acessa_som">SOM</label>
+            <input id="id_acessa_som" name="acessa_som" type="checkbox" value="True" class="form-control checkbox">
+        </div>
+        <div id="id_acessa_santa_ceia_div" class="form-group col-md-2 col-lg-2 text-center">
+            <label for="id_acessa_santa_ceia">Santa Ceia</label>
+            <input id="id_acessa_santa_ceia" name="acessa_santa_ceia" type="checkbox" value="True" class="form-control checkbox">
+        </div>
+        <div id="id_acessa_coleta_div" class="form-group col-md-2 col-lg-2 text-center">
+            <label for="id_acessa_coleta">Coleta</label>
+            <input id="id_acessa_coleta" name="acessa_coleta" type="checkbox" value="True" class="form-control checkbox">
+        </div>
+    </div>
+</form>
+

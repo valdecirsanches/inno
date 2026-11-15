@@ -1,0 +1,30 @@
+<form method="post" role="form" id="formRelatorio"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <input id="id_id_relatorio" name="id" type="hidden" value="0">
+    <div class="row m-b-n-lg">
+        <div id="id_nome_div" class="form-group col-md-12">
+            <label for="id_nome">Tipo Relatório</label>
+            <input id="id_nome" name="nome" type="text" class="form-control">
+        </div>
+        <div id="id_titulo_div" class="form-group col-md-12">
+            <label for="id_titulo">Titulo</label>
+            <input id="id_titulo" name="titulo" type="text" class="form-control">
+        </div>
+        <div id="id_texto_div" class="form-group col-md-12">
+            <label for="id_texto">Texto</label>
+            <textarea id="id_texto" name="texto" class="form-control" cols="75" rows="6"></textarea>
+        </div>
+        <div id="id_cid10_div" class="form-group col-md-12">
+            <label for="id_cid10_relatorio">CID 10</label>
+            <input id="id_cid10_relatorio" name="cid10" class="form-control">
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <a>Salvo em <strong id="data_exames"></strong></a>
+        <div class="pull-right">
+            <a id="NovoRelatorio" class="btn btn-primary" onclick="NovoRelatorio()"><i class="fa fa-plus"></i> Novo</a>
+            <a id="SalvaRelatorio" class="btn btn-primary" onclick="SalvaRelatorio()"><i class="fa fa-pencil"></i> Salvar</a>
+        </div>
+    </div>
+</form>
+

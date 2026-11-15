@@ -1,0 +1,353 @@
+{% extends "Base/base.html" %}
+
+
+{% block principal_ativa %}active{% endblock %}
+
+{% block container_cabecalho %}
+<div class="col-lg-10">
+    <h2>{{ nmsistema }}</h2>
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Home</a>
+        </li>
+        <li class="active">
+            <strong>Apresentação</strong>
+        </li>
+    </ol>
+</div>
+{% endblock %}
+{% block head %}
+
+{% endblock %}
+{% block container_corpo %}
+<div class="wrapper wrapper-content tooltip-demo">
+     <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Pacientes</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins">{{ t_pacientes }}</h1>
+                        <small>Total de Pacientes</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-info pull-right">Mensal</span>
+                        <h5>Incluidos</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins">{{ t_pacientes_incluidos }}</h1>
+                        <div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>
+                        <small>Novos Pacientes</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary pull-right">Mensal</span>
+                        <h5>Faturamento</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h1 class="no-margins">6.420</h1>
+                                <div class="font-bold text-navy">44% <i class="fa fa-level-up"></i> <small>Adimplentes</small></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h1 class="no-margins">1.200</h1>
+                                <div class="font-bold text-navy">22% <i class="fa fa-level-down"></i> <small>Inadimplentes</small></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Consultas</h5>
+                        <div class="ibox-tools">
+                            <span class="label label-primary">Atualizado 10.2015</span>
+                        </div>
+                    </div>
+                    <div class="ibox-content no-padding">
+                        <div class="flot-chart m-t-lg" style="height: 55px;">
+                            <div class="flot-chart-content" id="flot-chart1"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div>
+                            <span class="pull-right text-right">
+                                <small>Relativo aos pagamentos realizados dos planos no: <strong>Brasil</strong></small>
+                            </span>
+                            <h3 class="font-bold no-margins">
+                                Gráfico dos pagamentos no ano corrente
+                            </h3>
+                            <small>Departamento Financeiro</small>
+                        </div>
+                        <div class="m-t-sm">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div>
+                                        <canvas id="lineChart" height="114"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <ul class="stat-list m-t-lg">
+                                        <li>
+                                            <h2 class="no-margins">6,346</h2>
+                                            <small>Total De Boletos emitidos no periodo</small>
+                                            <div class="progress progress-mini">
+                                                <div class="progress-bar" style="width: 64%;"></div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <h2 class="no-margins ">1,422</h2>
+                                            <small>Mesmo percentual no ano anterior</small>
+                                            <div class="progress progress-mini">
+                                                <div class="progress-bar" style="width: 27%;"></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Comparação de Clinicas </h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">Config option 1</a>
+                                </li>
+                                <li><a href="#">Config option 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Project </th>
+                                        <th>Name </th>
+                                        <th>Phone </th>
+                                        <th>Company </th>
+                                        <th>Completed </th>
+                                        <th>Task</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Project <small>This is example of project</small></td>
+                                        <td>Patrick Smith</td>
+                                        <td>0800 051213</td>
+                                        <td>Inceptos Hymenaeos Ltd</td>
+                                        <td><span class="pie">0.52/1.561</span></td>
+                                        <td>20%</td>
+                                        <td>Jul 14, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Alpha project</td>
+                                        <td>Alice Jackson</td>
+                                        <td>0500 780909</td>
+                                        <td>Nec Euismod In Company</td>
+                                        <td><span class="pie">6,9</span></td>
+                                        <td>40%</td>
+                                        <td>Jul 16, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Betha project</td>
+                                        <td>John Smith</td>
+                                        <td>0800 1111</td>
+                                        <td>Erat Volutpat</td>
+                                        <td><span class="pie">3,1</span></td>
+                                        <td>75%</td>
+                                        <td>Jul 18, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Gamma project</td>
+                                        <td>Anna Jordan</td>
+                                        <td>(016977) 0648</td>
+                                        <td>Tellus Ltd</td>
+                                        <td><span class="pie">4,9</span></td>
+                                        <td>18%</td>
+                                        <td>Jul 22, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Alpha project</td>
+                                        <td>Alice Jackson</td>
+                                        <td>0500 780909</td>
+                                        <td>Nec Euismod In Company</td>
+                                        <td><span class="pie">6,9</span></td>
+                                        <td>40%</td>
+                                        <td>Jul 16, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Project <small>This is example of project</small></td>
+                                        <td>Patrick Smith</td>
+                                        <td>0800 051213</td>
+                                        <td>Inceptos Hymenaeos Ltd</td>
+                                        <td><span class="pie">0.52/1.561</span></td>
+                                        <td>20%</td>
+                                        <td>Jul 14, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Gamma project</td>
+                                        <td>Anna Jordan</td>
+                                        <td>(016977) 0648</td>
+                                        <td>Tellus Ltd</td>
+                                        <td><span class="pie">4,9</span></td>
+                                        <td>18%</td>
+                                        <td>Jul 22, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Project <small>This is example of project</small></td>
+                                        <td>Patrick Smith</td>
+                                        <td>0800 051213</td>
+                                        <td>Inceptos Hymenaeos Ltd</td>
+                                        <td><span class="pie">0.52/1.561</span></td>
+                                        <td>20%</td>
+                                        <td>Jul 14, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Alpha project</td>
+                                        <td>Alice Jackson</td>
+                                        <td>0500 780909</td>
+                                        <td>Nec Euismod In Company</td>
+                                        <td><span class="pie">6,9</span></td>
+                                        <td>40%</td>
+                                        <td>Jul 16, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Betha project</td>
+                                        <td>John Smith</td>
+                                        <td>0800 1111</td>
+                                        <td>Erat Volutpat</td>
+                                        <td><span class="pie">3,1</span></td>
+                                        <td>75%</td>
+                                        <td>Jul 18, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Gamma project</td>
+                                        <td>Anna Jordan</td>
+                                        <td>(016977) 0648</td>
+                                        <td>Tellus Ltd</td>
+                                        <td><span class="pie">4,9</span></td>
+                                        <td>18%</td>
+                                        <td>Jul 22, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Alpha project</td>
+                                        <td>Alice Jackson</td>
+                                        <td>0500 780909</td>
+                                        <td>Nec Euismod In Company</td>
+                                        <td><span class="pie">6,9</span></td>
+                                        <td>40%</td>
+                                        <td>Jul 16, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Project <small>This is example of project</small></td>
+                                        <td>Patrick Smith</td>
+                                        <td>0800 051213</td>
+                                        <td>Inceptos Hymenaeos Ltd</td>
+                                        <td><span class="pie">0.52/1.561</span></td>
+                                        <td>20%</td>
+                                        <td>Jul 14, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Gamma project</td>
+                                        <td>Anna Jordan</td>
+                                        <td>(016977) 0648</td>
+                                        <td>Tellus Ltd</td>
+                                        <td><span class="pie">4,9</span></td>
+                                        <td>18%</td>
+                                        <td>Jul 22, 2013</td>
+                                        <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+    <!-- Flot -->
+    <script src="/static/js/plugins/flot/jquery.flot.js"></script>
+    <script src="/static/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+    <script src="/static/js/plugins/flot/jquery.flot.resize.js"></script>
+
+    <!-- ChartJS-->
+    <script src="/static/js/plugins/chartJs/Chart.min.js"></script>
+
+    <!-- Peity -->
+    <script src="/static/js/plugins/peity/jquery.peity.min.js"></script>
+    <!-- Peity demo -->
+    <script src="/static/js/demo/peity-demo.js"></script>
+
+    <!-- Dashboard -->
+    <script src="/static/javascripts/Home/dashboard.js"></script>
+
+
+{% endblock %}

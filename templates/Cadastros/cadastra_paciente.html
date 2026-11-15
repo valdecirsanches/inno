@@ -1,0 +1,318 @@
+{% extends "Base/base.html" %}
+
+
+{% block cadastro %}
+    <li class=" dropdown active">
+    <a class="collapsed" data-toggle="collapse" data-parent="#collapseNavbarLeft2" rel="popover-sidebar" data-container="body" data-placement="right"
+       data-content="Consulta associado... Gera lista permitindo acesso aos dados do paciente..." href="#uidb0490bb1401f28d0a7bed4338a9c96b0">
+      <i class="oc-partial-icon icm icm-clipboard3"></i>
+      <span class="oc-partial-menu-item">
+        Cadastros
+        <b class="caret"></b>
+      </span>
+    </a>
+    <ul class="collapse dropdown-menu in" id="uidb0490bb1401f28d0a7bed4338a9c96b0">
+      <li class="">
+        <a href="#" rel="popover-sidebar" data-container="body"
+           data-placement="right" data-content="Retornar a lista de Pacientes">Lista de Paciente</a>
+      </li>
+    </ul>
+    </li>
+{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-6">
+          <h3 class="em-page-header v-mid-row thin">
+            <i class="icm icm-user text-gradient-info-dk"></i>
+            <span class="text-gradient-info-dk">
+              Novo Paciente
+            </span>
+          </h3>
+        </div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block container_corpo %}
+    <div class="hpadded">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#dados" data-toggle="tab"><i class="fa fa-user"></i> Ficha de prontuário</a></li>
+        </ul>
+    </div>
+    <form action="#" method="post" role="form"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <div class="tab-content panel-body-white">
+            <div class="tab-pane active fade in" id="dados">
+                <div class="padded">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="form-group col-md-6 has-warning">
+                                <label for="nome_id">Nome</label>
+                                <input name="nome" type="text" value="{% if associado.nome %}{{ associado.nome }}{% endif %}"
+                                       class="form-control" id="nome_id"  required="required" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                            </div>
+                            <div class="form-group col-md-2 has-warning">
+                                <label for="status_id">Status</label>
+                                <select name="status" class="form-control" id="status_id" required="required">
+                                    <option {% if associado.fk_status.codigo == 1 %}selected{% endif %} value="1">ATIVO</option>
+                                    <option {% if associado.fk_status.codigo == 2 %}selected{% endif %} value="2">SUSPENSO</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4 has-warning">
+                                <label for="plano_id">Plano</label>
+                                <select name="plano" class="form-control" id="plano_id" required="required">
+                                    {% for p in planos %}
+                                        <option {% if p.id == associado.fk_plano.id %}selected{% endif %} value="{{ p.id }}">{{ p.descricao }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-4 has-warning">
+                                <label for="empresa_id">Empresa</label>
+                                <input name="associado" type="hidden" value="{{ associado.id }}" class="form-control disabled">
+                                <select name="empresa" class="form-control" id="empresa_id" required="required">
+                                    {% for e in empresas %}
+                                        <option {% if e.id == associado.fk_subempresa.id %}selected{% endif %} value="{{ e.id }}">
+                                            {{ e.nome }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-2 has-warning">
+                                <label for="contrato_id">Registro</label>
+                                <input name="contrato" type="text" value="{% if associado.contrato %}{{ associado.contrato }}{% endif %}"
+                                       class="form-control" id="contrato_id" required="required">
+                            </div>
+                            <div class="form-group col-md-3 has-warning">
+                                <label for="nasc_id">Nascimento</label>
+                                <input name="nascimento" type="date" value="{{ associado.nascimento|date("c") }}"
+                                       class="form-control" id="nasc_id"  required="required">
+                            </div>
+                            <div class="form-group col-md-1">
+                                <label for="idade_id">Idade</label>
+                                <input type="text" value="{{ associado.idade }}" class="form-control" id="idade_id" disabled>
+                            </div>
+                            <div class="form-group col-md-2 has-warning">
+                                <label for="sexo_id">Sexo</label>
+                                <select name="sexo" class="form-control" id="sexo_id"  required="required">
+                                    <option {% if associado.sexo == 'M' %}selected{% endif %} value="M">Masculino</option>
+                                    <option {% if associado.sexo == 'F' %}selected{% endif %} value="F">Feminino</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-2 has-warning">
+                                <label for="civil_id">Estado Civil</label>
+                                <select name="civil" class="form-control" id="civil_id" required="required">
+                                    <option {% if associado.estacivi == 1 %}selected{% endif %} value="1">Solteiro(a)</option>
+                                    <option {% if associado.estacivi == 2 %}selected{% endif %} value="2">Casado(a)</option>
+                                    <option {% if associado.estacivi == 3 %}selected{% endif %} value="3">Viuvo(a)</option>
+                                    <option {% if associado.estacivi == 4 %}selected{% endif %} value="4">Divorciado(a)</option>
+                                    <option {% if associado.estacivi == 5 %}selected{% endif %} value="5">Outros</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="rg_id">RG</label>
+                                <input name="rg" type="text" value="{% if associado.rg %}{{ associado.rg }}{% endif %}"
+                                       class="form-control" id="rg_id" >
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="rgoe_id">Org. Emissor</label>
+                                <input name="rg_orgao_emissor" type="text" value="{% if associado.rg_orgao_emissor %}{{ associado.rg_orgao_emissor }}{% endif %}"
+                                       class="form-control" id="rgoe_id" onkeyup="javascript:this.value=this.value.toUpperCase();" >
+                            </div>
+                            <div class="form-group col-md-3 has-warning">
+                                <label for="cpf_id">CPF</label>
+                                <input name="cic" type="text" maxlength="11" value="{% if associado.cic %}{{ associado.cic }}{% endif %}"
+                                       class="form-control" id="cpf_id"  required="required">
+                            </div>
+                            <div class="form-group col-md-3 has-warning">
+                                <label for="escolaridade">Grau escolaridade</label>
+                                <select name="escolaridade" class="form-control" id="escolaridade"  required="required" >
+                                    <option {% if associado.escolaridade == 'FUNDAMENTAL' %}selected{% endif %} value="FUNDAMENTAL">Fundamental</option>
+                                    <option {% if associado.escolaridade == 'MÉDIO' %}selected{% endif %} value="MEDIO">Médio</option>
+                                    <option {% if associado.escolaridade == 'SUPERIOR' %}selected{% endif %} value="SUPERIOR">Superior</option>
+                                    <option {% if associado.escolaridade == 'CURSANDO SUPERIOR' %}selected{% endif %} value="CURSANDO SUPERIOR">Cursando superior</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-2 ">
+                                <label for="telefone">Telefone Res.</label>
+                                <input name="telefone" id="telefone" maxlength="50" value="{% if associado.foneresi %}{{ associado.foneresi }}{% endif %}"
+                                       class="form-control" placeholder="">
+                            </div>
+                            <div class="form-group col-md-2 ">
+                                <label for="celular">Celular</label>
+                                <input name="celular" id="celular" maxlength="50" value="{% if associado.fonecelular %}{{ associado.fonecelular }}{% endif %}"
+                                       class="form-control" placeholder=""  >
+                            </div>
+                            <div class="form-group col-md-4 ">
+                                <label for="email">Email</label>
+                                <input name="email" type="email" id="email" maxlength="60" value="{% if associado.email %}{{ associado.email }}{% endif %}"
+                                       class="form-control" placeholder="" onkeyup="javascript:this.value=this.value.toLowerCase();">
+                            </div>
+                            <div class="form-group col-md-4 ">
+                                <label for="profissao">Profissão</label>
+                                <input name="profissao" type="text" id="profissao" maxlength="50" value="{% if associado.profissao %}{{ associado.profissao }}{% endif %}"
+                                           class="form-control" placeholder="" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="pai_id">Nome do Pai</label>
+                                <input name="pai" type="text" maxlength="50" value="{% if associado.pai %}{{ associado.pai }}{% endif %}"
+                                       class="form-control" id="pai_id" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                            </div>
+                            <div class="form-group col-md-6 has-warning">
+                                <label for="mae_id">Nome do Mãe</label>
+                                <input name="mae" type="text" maxlength="50" value="{% if associado.mae %}{{ associado.mae }}{% endif %}"
+                                       class="form-control" id="mae_id" required="required" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-heading">Endereço</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="form-group col-md-3 has-warning">
+                                <label for="cep">CEP</label>
+                                <div class="input-group">
+                                    <input name="cep" type="text" maxlength="9" value="{% if associado.cepresi %}{{ associado.cepresi }}{% endif %}"
+                                           class="form-control" id="cep" placeholder="Digite o CEP" required="required">
+                                    <div class="input-group-addon btn" id="btn_busca_id">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6 has-warning">
+                                <label for="rua">Logradouro</label>
+                                <input name="rua" id="rua" maxlength="50" value="{% if associado.enderesi %}{{ associado.enderesi }}{% endif %}"
+                                       class="form-control" placeholder="" required="required" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                            </div>
+                            <div class="form-group col-md-1 has-warning">
+                                <label for="numero">N°</label>
+                                <input name="numero" id="numero" maxlength="50" value="{% if associado.numresi %}{{ associado.numresi }}{% endif %}"
+                                       class="form-control" required="required">
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="complemento">Complemento</label>
+                                <input name="complemento" id="complemento"  maxlength="50" value="{% if associado.complemento %}{{ associado.complemento }}{% endif %}"
+                                       class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-3 has-warning">
+                                <label for="bairro">Bairro</label>
+                                <input name="bairro" id="bairro"  maxlength="50" value="{% if associado.bairresi %}{{ associado.bairresi }}{% endif %}"
+                                       class="form-control" placeholder="" required="required" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                            </div>
+                            <div class="form-group col-md-2 has-warning">
+                                <label for="cidade">Cidade</label>
+                                <input name="cidade" id="cidade" maxlength="50" value="{% if associado.cidaresi %}{{ associado.cidaresi }}{% endif %}"
+                                       class="form-control" placeholder="" required="required" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                            </div>
+                            <div class="form-group col-md-1 has-warning">
+                                <label for="uf">UF</label>
+                                <input name="uf" id="uf" maxlength="2" value="{% if associado.ufresi %}{{ associado.ufresi }}{% endif %}"
+                                       class="form-control" placeholder="" required="required" onkeyup="javascript:this.value=this.value.toUpperCase();">
+                            </div>
+                            <div class="form-group col-md-2 has-warning">
+                                <label for="ibge">Código IBGE</label>
+                                <input name="ibge" id="ibge" maxlength="50" value="{% if associado.cod_cidade %}{{ associado.cod_cidade }}{% endif %}"
+                                       class="form-control" placeholder="" required="required">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <input type="submit" class="btn btn-primary" id="Salva_Associados" value="Salvar Dados">
+                        {% if salva == 1 %}Salvo com Sucesso{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/bootstrap/js/cadastro_paciente.js"></script>
+
+    <script>
+    $(document).ready(function() {
+
+            function limpa_formulário_cep() {
+                // Limpa valores do formulário de cep.
+                $("#rua").val("");
+                $("#bairro").val("");
+                $("#cidade").val("");
+                $("#uf").val("");
+                $("#ibge").val("");
+            }
+
+            //Quando o campo cep perde o foco.
+            $("#cep").blur(function() {
+
+                //Nova variável com valor do campo "cep".
+                var cep = $(this).val();
+
+                //Verifica se campo cep possui valor informado.
+                if (cep != "") {
+
+                    //Expressão regular para validar o CEP.
+                    var validacep = /^[0-9]{5}-?[0-9]{3}$/;
+
+                    //Valida o formato do CEP.
+                    if(validacep.test(cep)) {
+
+                        //Preenche os campos com "..." enquanto consulta webservice.
+                        $("#rua").val("...")
+                        $("#bairro").val("...")
+                        $("#cidade").val("...")
+                        $("#uf").val("...")
+                        $("#ibge").val("...")
+
+                        //Consulta o webservice http://viacep.com.br/
+                        $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
+
+                            if (!("erro" in dados)) {
+                                //Atualiza os campos com os valores da consulta.
+                                $("#rua").val(dados.logradouro);
+                                $("#bairro").val(dados.bairro);
+                                $("#cidade").val(dados.localidade);
+                                $("#uf").val(dados.uf);
+                                $("#ibge").val(dados.ibge);
+                                $("#numero").focusin();
+                            } //end if.
+                            else {
+                                //CEP pesquisado não foi encontrado.
+                                limpa_formulário_cep();
+                                alert("CEP não encontrado.");
+                            }
+                        });
+                    } //end if.
+                    else {
+                        //cep é inválido.
+                        limpa_formulário_cep();
+                        alert("Formato de CEP inválido.");
+                    }
+                } //end if.
+                else {
+                    //cep sem valor, limpa formulário.
+                    limpa_formulário_cep();
+                }
+            });
+        });
+
+    jQuery(function($){
+        //$("#data").mask("99/99/9999");
+        $("#telefone").mask("(099) 09999-9999");
+        $("#celular").mask("(099) 99999-9999");
+        $("#cpf_id").mask("999.999.999-99");
+        //$("#cep").mask("99999-999");
+        //$("#cnpj").mask("99.999.999/9999-99");
+        //$("#placa").mask("aaa - 9999");
+    });
+
+    </script>
+{% endblock %}

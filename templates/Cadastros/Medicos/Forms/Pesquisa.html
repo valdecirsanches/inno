@@ -1,0 +1,19 @@
+<form role="form" id="formPesquisaMedico" onsubmit="PesquisaMedico()"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <div class="row">
+        <div class="form-group col-lg-12 text-center" id="id_tipo">
+            <div class="radio-inline i-checks"><label> <input id="id_tipo_0" type="radio" value="inic" name="tipo"> <i></i> Iniciando </label></div>
+            <div class="radio-inline i-checks"><label> <input id="id_tipo_1" type="radio" checked="" value="cont" name="tipo"> <i></i> Contendo </label></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-lg-12">
+            <label for="id_PNome">Nome</label>
+            <div class="input-group">
+                <input id="pesquisa" type="text" name="pnome" class="form-control" placeholder="Busca por Nome ou número de registro..." tabindex="0" value="">
+                <div class="input-group-addon btn" id="btn_busca_id" onclick="PesquisaMedico()">
+                    <span class="glyphicon glyphicon-search"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

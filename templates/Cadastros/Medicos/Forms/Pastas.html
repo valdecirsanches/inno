@@ -1,0 +1,64 @@
+
+<div class="ibox float-e-margins">
+    <div class="row">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#empresa">Dados da Empresa</a></li>
+            <li class=""><a data-toggle="tab" href="#outros">Outras Informações</a></li>
+            <li class=""><a data-toggle="tab" href="#Horarios">Horários e dias de atendimento</a></li>
+            <li class=""><a data-toggle="tab" href="#memed">Prescrições Memed</a></li>
+            <li class=""><a data-toggle="tab" href="#especialidade">Especialidade</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="empresa" class="tab-pane active">
+                <div class="ibox-content">
+                    {% include 'Cadastros/Medicos/Forms/MedicoEmpresa.html' %}
+                </div>
+            </div>
+            <div id="outros" class="tab-pane">
+                <div class="ibox-content">
+                    {% include 'Cadastros/Medicos/Forms/MedicoOutros.html' %}
+                </div>
+            </div>
+            <div id="Horarios" class="tab-pane">
+                <div class="ibox-content text-center">
+                    <a id="criaHorario" class="btn btn-default" onclick="ConfHorarios()">Cria Horários</a>
+                    <a id="limparHorarios" class="btn btn-default" onclick="LimparHorarios()">Limpar Horários</a>
+                    <div class="row">
+                        <div data-toggle="buttons" class="btn-group">
+                            <label class="btn btn-sm btn-info active"><input type="radio" id="1" value="M" name="periodo" class="periodo" checked> Manhã </label>
+                            <label class="btn btn-sm btn-info"><input type="radio" id="2" value="T" name="periodo" class="periodo"> Tarde </label>
+                        </div>
+                        <div data-toggle="buttons" class="btn-group">
+                            <label class="btn btn-sm btn-white"><input type="radio" id="7" value="7" name="dia_semana" class="dia_semana"> Domingo </label>
+                            <label class="btn btn-sm btn-white active"><input type="radio" id="1" value="1" name="dia_semana" class="dia_semana" checked> Segunda </label>
+                            <label class="btn btn-sm btn-white"><input type="radio" id="2" value="2" name="dia_semana" class="dia_semana"> Terça </label>
+                            <label class="btn btn-sm btn-white"><input type="radio" id="3" value="3" name="dia_semana" class="dia_semana"> Quarta </label>
+                            <label class="btn btn-sm btn-white"><input type="radio" id="4" value="4" name="dia_semana" class="dia_semana"> Quinta </label>
+                            <label class="btn btn-sm btn-white"><input type="radio" id="5" value="5" name="dia_semana" class="dia_semana"> Sexta </label>
+                            <label class="btn btn-sm btn-white"><input type="radio" id="6" value="6" name="dia_semana" class="dia_semana"> Sabado </label>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% include 'Cadastros/Medicos/Tables/tableHorario.html' %}
+                        </div>
+{#                        <div class="col-md-6">#}
+{#                            {% include 'Cadastros/Medicos/Tables/vespertino.html' %}#}
+{#                        </div>#}
+                    </div>
+                </div>
+            </div>
+            <div id="memed" class="tab-pane">
+                <div class="ibox-content">
+                    {% include 'Cadastros/Medicos/Forms/Memed.html' %}
+                </div>
+            </div>
+            <div id="especialidade" class="tab-pane">
+                <div class="ibox-content">
+                    {% include 'Cadastros/Medicos/Forms/MedicoEspecialidade.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

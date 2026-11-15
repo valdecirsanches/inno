@@ -1,0 +1,375 @@
+// ============================================================================
+//  whatsapp_modulo.js  -  Funcoes de leitura de QR Code (WAHA Plus / NOWEB)
+//
+//  CORRECAO PRINCIPAL:
+//  O problema que levava a sessao a FAILED era o polling continuar batendo
+//  no endpoint /auth/qr DEPOIS que o usuario escaneava o QR. No engine NOWEB
+//  (WAHA Plus), pedir o QR enquanto o celular esta pareando derruba a sessao.
+//
+//  Agora, assim que o QR e escaneado (endpoint responde 422 DEPOIS de um QR
+//  ja ter sido exibido), o polling PARA imediatamente e nao martela mais o WAHA.
+//  Isso vale para ReadQRCode (swal) E para ReadQRCode2 (container).
+// ============================================================================
+
+String.prototype.replaceAll || (function() {
+    var regMetaChars = /[-\\^$*+?.()|[\]{}]/g;
+    String.prototype.replaceAll = function(needle, replacement) {
+        return this.replace(new RegExp(needle.replace(regMetaChars, '\\$&'), 'g'), replacement);
+    };
+}());
+
+
+
+function ReadQRCode() {
+    // const whatsappHost = $('#id_whatsapp_url').val() || 'https://whatsapp2.x-star.com.br    ';
+    // const sessionId = $('#id_whatsappClient').val() || 'edssolution';
+
+    let leituraQRCode;
+    let ultimoQR = null;
+    let idadeQR = 0;
+    let intervaloIdade;
+    let qrExibido = false;   // vira true quando um QR chegou a ser mostrado
+    let parado = false;      // trava definitiva do polling (nao martela o WAHA)
+
+    // Para o polling de forma definitiva
+    const pararPolling = () => {
+        parado = true;
+        clearInterval(leituraQRCode);
+        clearInterval(intervaloIdade);
+    };
+
+    swal({
+        title: "Escaneie o QR Code",
+        html: `
+            <div id="div_qrcode" style="display:flex; flex-direction:column; align-items:center; min-height:340px;">
+                
+                <img id="qrcode_img" width="300" height="300"
+                    style="
+                        border:4px solid #10b981;
+                        border-radius:18px;
+                        display:none;
+                        transition: opacity 0.6s ease, transform 0.4s ease;
+                    "/>
+
+                <div id="badge_novo"
+                    style="
+                        margin-top:18px;
+                        padding:16px 40px;
+                        font-size:22px;
+                        font-weight:bold;
+                        border-radius:50px;
+                        background:linear-gradient(45deg,#10b981,#00ff99);
+                        color:white;
+                        letter-spacing:1px;
+                        box-shadow:0 0 35px rgba(16,255,150,0.9);
+                        opacity:0;
+                        transform:scale(0.8);
+                        transition: transform 0.3s ease;
+                    ">
+                    🔥 NOVO
+                </div>
+
+
+                <div id="qr_status" style="margin-top:20px;">
+                    Gerando QR Code...
+                </div>
+
+            </div>`,
+        showCancelButton: true,
+        confirmButtonText: "Fechar",
+
+        onOpen: function () {
+
+            const atualizarQR = async () => {
+                if (parado) return;
+                try {
+                    const response = await api.post('whatsapp/read_qrcode/', {
+                        host: whatsappHost,
+                        sessionId: sessionId
+                    });
+
+                    // Se o backend informar que ja conectou, encerra aqui.
+                    const st = response.data.status;
+                    if (response.data.connected === true || st === "WORKING") {
+                        pararPolling();
+                        const status = document.getElementById("qr_status");
+                        const img = document.getElementById("qrcode_img");
+                        const badge = document.getElementById("badge_novo");
+                        if (img) img.style.display = "none";
+                        if (badge) badge.style.opacity = 0;
+                        if (status) {
+                            status.style.display = "block";
+                            status.innerHTML = "✅ WhatsApp conectado!";
+                            status.style.color = "#10b981";
+                        }
+                        return;
+                    }
+
+                    const qrBase64 = response.data.data || response.data.qrcode;
+
+                    if (qrBase64 && qrBase64 !== ultimoQR) {
+
+                        ultimoQR = qrBase64;
+                        idadeQR = 0;
+                        qrExibido = true;
+
+                        const img = document.getElementById("qrcode_img");
+                        const status = document.getElementById("qr_status");
+                        const badge = document.getElementById("badge_novo");
+
+                        img.style.opacity = 0;
+                        img.style.transform = "scale(0.96)";
+
+                        setTimeout(() => {
+
+                            img.src = qrBase64.includes("base64,")
+                                ? qrBase64
+                                : "data:image/png;base64," + qrBase64;
+
+                            img.style.display = "block";
+                            status.style.display = "none";
+
+                            img.style.opacity = 1;
+                            img.style.transform = "scale(1)";
+
+                            // Mostra badge
+                            badge.style.opacity = 1;
+
+                            clearInterval(intervaloIdade);
+
+                            intervaloIdade = setInterval(() => {
+                                idadeQR++;
+
+                                // Vai apagando lentamente em 10 segundos
+                                badge.style.opacity = Math.max(0, 1 - (idadeQR / 10));
+
+                                if (idadeQR >= 10) {
+                                    clearInterval(intervaloIdade);
+                                }
+                            }, 1000);
+
+                        }, 400);
+                    }
+
+                } catch (e) {
+                    const httpStatus = e?.response?.status;
+
+                    // 422 = a sessao saiu de SCAN_QR_CODE.
+                    //   -> Se ja mostramos um QR, o usuario ESCANEOU: paramos o
+                    //      polling para NAO martelar o WAHA durante o pareamento
+                    //      (era isso que levava a sessao a FAILED no NOWEB).
+                    //   -> Se ainda nao mostramos QR, a sessao esta iniciando.
+                    if (httpStatus === 422) {
+                        if (qrExibido) {
+                            pararPolling();
+                            const status = document.getElementById("qr_status");
+                            const img = document.getElementById("qrcode_img");
+                            const badge = document.getElementById("badge_novo");
+                            if (img) img.style.display = "none";
+                            if (badge) badge.style.opacity = 0;
+                            if (status) {
+                                status.style.display = "block";
+                                status.innerHTML = "QR lido! Conectando ao WhatsApp...";
+                                status.style.color = "#10b981";
+                            }
+                        } else {
+                            const status = document.getElementById("qr_status");
+                            if (status) status.innerHTML = "Iniciando sessão...";
+                        }
+                        return;
+                    }
+
+                    console.error("Erro ao carregar QR:", e);
+                    const status = document.getElementById("qr_status");
+                    if (status) status.innerHTML = "Erro na conexão.";
+                }
+            };
+
+            atualizarQR();
+            leituraQRCode = setInterval(atualizarQR, 6000);
+        },
+
+        onClose: function () {
+            pararPolling();
+        }
+    });
+}
+
+
+function buscaFotoRealtime(seletor, cel) {
+    // 1. Limpeza do número
+    if (!cel) return;
+    let celular = cel.toString().replace(/\D/g, ''); 
+    
+    if (celular.length < 10) {
+        console.log("Número incompleto:", celular);
+        return;
+    }
+
+    // 2. Referência ao elemento da imagem usando o SELETOR dinâmico
+    let $img = $(seletor);
+    
+    // Feedback visual
+    $('#status_realtime').text('Buscando...').css('background', '#f8ac59');
+
+    $.post('/api/whatsapp/info/', { celular: celular }, function(res) {
+        
+        if (res.success && res.url && res.url !== "None") { 
+            $img.attr('referrerpolicy', 'no-referrer');
+            $img.attr('src', res.url);
+            
+            // Troca o texto pelo ícone do WhatsApp
+            $('#status_realtime')
+                .html('<i class="fa fa-whatsapp"></i>') 
+                .css({
+                    'background': '#1ab394',
+                    'color': '#fff',
+                    'display': 'flex',
+                    'align-items': 'center',
+                    'gap': '5px'
+                });
+            // Se houver um ponto de status (como o #ponto-status do modal restaura)
+            $('#ponto-status').css('background', '#1ab394');
+            
+        } else {
+            // FALHA: Usa o seletor para colocar o SVG cinza
+            let svgDefault = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23cccccc'/%3E%3Ctext x='50%25' y='55%25' font-family='sans-serif' font-size='10' fill='%23666666' text-anchor='middle'%3ESem Foto%3C/text%3E%3C/svg%3E";
+            
+            $img.attr('src', svgDefault);
+            $('#status_realtime').text('Sem Foto').css('background', '#888');
+            $('#ponto-status').css('background', '#888');
+        }
+
+    }).fail(function() {
+        $('#status_realtime').text('Erro Conexão').css('background', '#ed5565');
+    });
+}
+
+
+
+
+let _qrPollTimer = null;
+
+function ReadQRCode2(container, host, session) {
+  // Obtém os dados dos campos do formulário quando não forem informados.
+  host = (host || document.querySelector("#id_whatsapp_url")?.value || "").trim().replace(/\/$/, "");
+  session = (session || document.querySelector("#id_whatsappClient")?.value || "").trim();
+
+  if (!host || !session) {
+    alert("Informe a URL do WhatsApp e o ID da sessão antes de autenticar.");
+    console.error("[QR] Parâmetros ausentes:", { host, session });
+    return;
+  }
+
+  // resolve o container (aceita seletor string ou elemento DOM)
+  const box =
+    typeof container === "string"
+      ? document.querySelector(container)
+      : container;
+
+  if (!box) {
+    console.log("[v0] ReadQRCode2: container não encontrado:", container);
+    return;
+  }
+
+  // limpa qualquer polling anterior (evita QR piscando / múltiplos loops)
+  if (_qrPollTimer) {
+    clearInterval(_qrPollTimer);
+    _qrPollTimer = null;
+  }
+
+  // monta a estrutura interna uma única vez
+  box.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px;">
+      <div id="statusQrCode" style="font-size:14px;color:#444;text-align:center;">
+        Gerando QR Code...
+      </div>
+      <img id="imgQrCode" alt="QR Code do WhatsApp"
+           style="width:264px;height:264px;object-fit:contain;display:none;
+                  border:1px solid #eee;border-radius:8px;" />
+      <div id="spinnerQrCode"
+           style="width:40px;height:40px;border:4px solid #eee;
+                  border-top-color:#25D366;border-radius:50%;
+                  animation:qrspin 1s linear infinite;"></div>
+    </div>
+    <style>@keyframes qrspin{to{transform:rotate(360deg)}}</style>
+  `;
+
+  const imgEl = box.querySelector("#imgQrCode");
+  const statusEl = box.querySelector("#statusQrCode");
+  const spinnerEl = box.querySelector("#spinnerQrCode");
+
+  async function tick() {
+    try {
+      // MESMA instancia axios usada em agenda_texto / EnviaWhatsApp.
+      // Rota = @action read_qrcode do WhatsappViewSet: /whatsapp/read_qrcode/
+      const resp = await api.get("/whatsapp/read_qrcode/", {
+        params: {
+          host: host,
+          sessionId: session,
+          _ts: Date.now(), // cache-buster
+        },
+      });
+      const data = resp.data || {};
+      console.log("[v0] read_qrcode ->", data);
+
+      // 1) CONECTADO: somente quando connected === true (status WORKING)
+      if (data.connected === true) {
+        clearInterval(_qrPollTimer);
+        _qrPollTimer = null;
+        if (spinnerEl) spinnerEl.style.display = "none";
+        if (imgEl) imgEl.style.display = "none";
+        if (statusEl) {
+          statusEl.textContent = "WhatsApp conectado com sucesso!";
+          statusEl.style.color = "#25D366";
+        }
+        if (typeof onWhatsappConnected === "function") {
+          onWhatsappConnected(); // callback opcional seu
+        }
+        return;
+      }
+
+      // 2) TEM QR: atualiza a imagem
+      if (data.qr) {
+        if (imgEl) {
+          imgEl.src = data.qr; // já vem como data:image/png;base64,...
+          imgEl.style.display = "block";
+        }
+        if (spinnerEl) spinnerEl.style.display = "none";
+        if (statusEl) {
+          statusEl.textContent = "Escaneie o QR Code com o WhatsApp";
+          statusEl.style.color = "#444";
+        }
+        return;
+      }
+
+      // 3) SEM QR AINDA (aguardando WAHA gerar / reiniciando) -> mantém spinner
+      if (spinnerEl) spinnerEl.style.display = "block";
+      if (statusEl) {
+        statusEl.textContent =
+          data.message || data.error || "Aguardando geração do QR Code...";
+        statusEl.style.color = data.error ? "#c0392b" : "#444";
+      }
+    } catch (e) {
+      console.log("[v0] read_qrcode erro fetch:", e);
+      if (statusEl) {
+        statusEl.textContent = "Erro de conexão. Tentando novamente...";
+        statusEl.style.color = "#c0392b";
+      }
+      // NÃO limpa o timer: continua tentando no próximo ciclo
+    }
+  }
+
+  // primeira chamada imediata + polling a cada 4s (QR expira ~20s)
+  tick();
+  _qrPollTimer = setInterval(tick, 4000);
+}
+
+// para o polling manualmente (ex.: ao fechar o modal)
+function StopReadQRCode2() {
+  if (_qrPollTimer) {
+    clearInterval(_qrPollTimer);
+    _qrPollTimer = null;
+    console.log("[v0] polling do QR parado");
+  }
+}

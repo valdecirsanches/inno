@@ -1,0 +1,181 @@
+
+<DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+        <!-- select2 -->
+        <link rel="stylesheet" href="/static/plugins/sweetalert2/dist/sweetalert2.css">
+        <link href="/static/css/plugins/select2/select2.min.css" rel="stylesheet">
+        <link href="/static/plugins/select2/select2-bootstrap.css" rel="stylesheet">
+
+    </head>
+    <title></title>
+    </head>
+    {#    <div>#}
+    <div class="jumbotron text-center">
+        <h1>Agendamento</h1>
+        {% if ag.id %}
+            <h4 style="color: blue">{{ ag.fk_paciente.paciente }}</h4>
+            <h4 style="color: blue">Em {{ ag.data }} às {{ ag.hora }}</h4>
+            <h5>Com {{ ag.fk_medico.titulo }} {{ ag.fk_medico.medico }}</h5>
+            <br>
+        {% endif %}
+
+        {#        {% if ag.id %}#}
+        {#            <h1>Achei</h1>#}
+        {#        {% else %}#}
+        {#            asdfasfasdfasd#}
+        {#        {% endif %}#}
+    </div>
+    {% if not ag.id %}
+        <div class="text-center">
+            <br><br><br><br>
+            <h1 >Desculpe-nos!</h1>
+            <h3 style="color: red">O registro de agendamento não foi encontrado.</h3>
+        </div>
+    {%  else %}
+        {% if ag.confirmacao == 1 %}
+            <div class="text-center">
+                <h3 style="color: blue">Presença confirmada!</h3>
+                <h5 style="color: blue">Agradecemos sua confirmação.</h5>
+                <br>
+                <br>
+                <h4 style="color: #e30bf3">Aguardamos anciosos por você!</h4>
+            </div>
+        {% endif %}
+
+        {% if ag.confirmacao == 2 %}
+            <div class="text-center">
+                <h3 style="color: red">Presença cancelada</h3>
+                <h5 style="color: blue">Agradecemos o retorno.</h5>
+                <h5 style="color: blue">Caso tenha mudado de idéia, ligue-nos!</h5>
+            </div>
+        {% endif %}
+
+        {% if ag.confirmacao == '0'  or not ag.confirmacao %}
+
+            <div class="container" align="center">
+                <div id="btnMenu" class="classMenuAgenda">
+                    <div class="row">
+                        <button id="btnShowOpcoesConfirmar" class="btn btn-primary" onclick="ShowOpcoesConfirmar()">Quero confirmar presença!</button>
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <button id="btnCancelar" class="btn btn-danger" onclick="CancelarPresenca({{ ag.id }})">Não poderei estar presente!</button>
+                    </div>
+                </div>
+                <br/>
+                <div class="hidden classConfirmarPresenca">
+                    {#                <div class="col-sm-12 col-md-12">#}
+                    {#                    <button class="btn btn-default" onclick="ShowEdtTransportadora()">Houve mudança na transportadora</button>#}
+                    {#                    <div class="col-sm-12 col-md-12 form-group-sm hidden edtTransportadora classMenuOrcamento">#}
+                    {#                        <textarea id="id_edtTransportadora" class="form-control custom-control" rows="3"></textarea>#}
+                    {#                    </div>#}
+                    {#                    <br/> <br>#}
+                    {##}
+                    {#                    <button class="btn btn-default" onclick="ShowEdtCadastro()">Houve mudança no cadastro</button>#}
+                    {#                    <div class="col-sm-12 col-md-12 form-group-sm hidden edtCadastro classMenuOrcamento">#}
+                    {#                        <textarea id="id_edtCadastro" class="form-control custom-control" rows="3"></textarea>#}
+                    {#                    </div>#}
+                    {#                    <br/> <br/>#}
+                    {#                </div>#}
+                    <div class="col-sm-12 col-md-12">
+                        <button id="btnConfirmar" class="btn btn-primary" onclick="ConfirmarPresenca({{ ag.id }})">Confirmo minha presença</button>
+                    </div>
+                    <br/><br/><br/>
+                    <div class="col-sm-12 col-md-12">
+                        <button id="btnVoltar" class="btn btn-info" onclick="ShowMenuAgenda()">Voltar</button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+    </body>
+    </html>
+</DOCTYPE>
+
+<!-- SweetAlert -->
+<script src="/static/plugins/sweetalert2/dist/sweetalert2.all.js"></script>
+
+<!-- axios -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
+
+<!-- Base -->
+<script src="/static/javascripts/Base/baseService.js"></script>
+
+<script>
+
+    function ShowOpcoesConfirmar() {
+        $('.classMenuAgenda').addClass('hidden');
+        $('.classConfirmarPresenca').removeClass('hidden');
+    }
+
+    function ShowMenuAgenda() {
+        $('.classMenuAgenda').removeClass('hidden');
+        $('.classConfirmarPresenca').addClass('hidden');
+    }
+
+    function ConfirmarPresenca(id_consulta){
+        const resp = $.ajax({
+            url: '/confirmar-presenca-efetivo/?id_consulta='+id_consulta+'&paciente={{ ag.fk_paciente_id }}',
+            method: 'POST',
+            success: Ret
+        });
+        function Ret(data) {
+            if (data.success) {
+                swal('Confirmado com sucesso!')
+                location.reload()
+            }
+        }
+    }
+
+    function CancelarPresenca(id_consulta){
+        swal({
+            type: 'question',
+            title: 'Cancelar presença',
+            html: `<h5 style="color: #bd2130" >
+                        Se possível, relate abaixo o motivo, <br/>Agradecemos seu retorno!:
+                        <span class="fa fa-hand-o-down"></span>
+                    </h5>`,
+            input: 'textarea',
+            inputValidator: function(result) {
+                return new Promise(function (resolve, reject) {
+                    if (result) {
+
+                    }
+                    resolve()
+                });
+            },
+
+            showCancelButton: true,
+            confirmButtonColor: "#7b645f",
+            confirmButtonText: "Cancelar presença!",
+
+            cancelButtonText: "Voltar...",
+            cancelButtonColor: "#9fb9e2",
+            closeOnConfirm: false,
+            closeOnCancel: false,
+
+
+            preConfirm: function (result) {
+                return new Promise(async function (resolve, reject) {
+                    const resp = $.ajax({
+                        url: '/cancelar-presenca-efetivo/?id_consulta='+id_consulta+'&paciente={{ ag.fk_paciente_id }}',
+                        method: 'POST',
+                        success: function (data) {
+                            swal('Cancelado com sucesso!')
+                            location.reload()
+                        }
+                    })
+                    resolve()
+                });
+            }
+        });
+    }
+
+</script>

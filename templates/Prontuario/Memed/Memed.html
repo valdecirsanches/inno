@@ -1,0 +1,29 @@
+
+<link href="/static/css/Prontuario/memed.css?{{ user.release }}-3" rel="stylesheet">
+
+{# Aba Memed do atendimento.                                                   #}
+{# Antes o script da Memed era carregado aqui com um token fixo (o mesmo para  #}
+{# todos os médicos). Agora static/javascripts/Prontuario/Memed/acesso.js pede #}
+{# ao servidor o token do médico (ou o reserva da clínica) e abre a receita.   #}
+<div class="memed-atd" id="memedAtd">
+
+    <div class="memed-barra">
+        <div id="memedAtdCarimbo" class="memed-carimbo is-vazio" aria-label="Carimbo do prescritor">
+            <span class="memed-carimbo-nome">Prescritor</span>
+            <span class="memed-carimbo-crm">CRM</span>
+        </div>
+        <div class="memed-barra-texto">
+            <span id="memedAtdChip" class="memed-chip">Verificando acesso</span>
+            <p id="memedAtdExplica">Conferindo com qual acesso a receita será emitida.</p>
+        </div>
+        <button type="button" id="memedAtdAtualiza" class="btn btn-white btn-sm" onclick="MemedAcesso.abrir()">
+            <i class="fa fa-refresh"></i> Atualizar paciente
+        </button>
+    </div>
+
+    <div id="memedAtdAviso" class="memed-aviso hidden" role="status"></div>
+
+    <div id="memedAtdEstado" class="memed-estado hidden" role="status" aria-live="polite"></div>
+
+    <div id="prescricao-memed"></div>
+</div>

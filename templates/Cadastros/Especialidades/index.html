@@ -1,0 +1,112 @@
+{% extends "Base/base.html" %}
+
+
+{% block cadastros_auxiliares %}active{% endblock %}
+{% block cadastros_auxiliares_tipos_consulta %}active{% endblock %}
+
+
+{% block head %}
+    {% include 'datatables.html' %}
+{% endblock %}
+
+{% block cadastro %}
+    <li class=" dropdown active">
+        <a class="collapsed" data-toggle="collapse" data-parent="#collapseNavbarLeft2" rel="popover-sidebar" data-container="body" data-placement="right"
+           data-content="Consulta associado... Gera lista permitindo acesso aos dados do paciente..." href="#uidb0490bb1401f28d0a7bed4338a9c96b0">
+            <i class="oc-partial-icon icm icm-clipboard3"></i>
+            <span class="oc-partial-menu-item">
+            Tipos de consultas
+            <b class="caret"></b>
+          </span>
+        </a>
+        <ul class="collapse dropdown-menu in" id="uidb0490bb1401f28d0a7bed4338a9c96b0">
+            <li class="">
+                <a href="" rel="popover-sidebar" data-container="body"
+                   data-placement="right" data-content="Retornar a lista de Pacientes">Lista de Paciente</a>
+            </li>
+        </ul>
+    </li>
+{% endblock %}
+
+
+{% block modal %}
+    <div class="modal inmodal" id="modal_tipo_consulta" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content animated flipInY">
+                <div class="modal-header ">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <div class="modal-title">
+                        <h4 class="modal-title">Tipo de consulta médica</h4>
+                    </div>
+                    <div class="modal-title">
+                        <h4 class="modal-title" id="titulo_id"></h4>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer">
+                    <a name="medico_id" id="" class="btn btn-primary" onclick="SalvaTipoConsulta()">Salvar dados</a>
+                     <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2><i class="fa fa-stethoscope"></i> Cadastro de especialidades</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">
+                    <strong>Cadastro de especialidades</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block cabecalho_botoes %}
+
+{% endblock %}
+
+
+{% block container_corpo %}
+    <div class="row">
+        <div class="col-lg-12" style="background-color: #dceaf8">
+            {% include 'Cadastros/Especialidades/table.html' %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js %}
+    <!-- Data Tables -->
+    <script src="/static/js/plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.responsive.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.tableTools.min.js"></script>
+    <script src="/static/js/plugins/jeditable/jquery.jeditable.js"></script>
+    <!-- Page-Level Scripts -->
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+    <script src="/static/javascripts/datatables.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Convenio -->
+    <script src="/static/javascripts/Cadastros/Especialidades/especialidades.js?{{ user.release }}" type="application/javascript"></script>
+{% endblock %}
+
+

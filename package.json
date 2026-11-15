@@ -1,0 +1,26 @@
+{
+  "name": "inno",
+  "version": "2.0.17",
+  "private": true,
+  "description": "Inno: AppClinic (EDS Solution / INNO Osasco) em Node.js, com as mesmas telas e o mesmo banco MySQL.",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "converte-templates": "echo 'veja tools/converte_templates.py'"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cookie-session": "^2.1.1",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.3",
+    "knex": "^3.3.0",
+    "mysql2": "^3.24.6",
+    "nunjucks": "^3.2.4"
+  },
+  "devDependencies": {
+    "better-sqlite3": "^11.10.0"
+  }
+}

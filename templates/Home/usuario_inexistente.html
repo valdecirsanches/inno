@@ -1,0 +1,52 @@
+{% extends "Base/base.html" %}
+
+
+{% block principal_ativa %}active{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="col-lg-10">
+        <h2>{{ nmsistema }}</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li class="active">
+                <strong>Usuário inexistente</strong>
+            </li>
+        </ol>
+    </div>
+{% endblock %}
+{% block head %}
+    <!-- Context Menu -->
+    <link href="/static/js/plugins/contextMenu/src/jquery.contextMenu.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/js/plugins/contextMenu/prettify/prettify.sunburst.css" rel="stylesheet" type="text/css"/>
+{% endblock %}
+{% block container_corpo %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="text-center m-t-lg context-menu-one">
+                    <i class="fa fa-warning" style="font-size:48px;color:red"></i>
+                    <!--img src="/static/img/ {{ user.fk_igreja.foto }}"-->
+                </div>
+                <div class="text-center m-t-lg">
+                    <div class="text-center m-t-lg">
+                    </div>
+                    <h1>
+                        Houve um erro!!!
+                    </h1>
+
+                    <h1>Usuário não localizado na lista de conciliação</h1>
+
+                    <h1>Entre em contato com o suporte técnico para corrigir este problema.</h1>
+
+                    <h3>{{ msg }}</h3>
+                </div>
+                <div class="text-center m-t-lg context-menu-one">
+                    <a href="/logout"> <i class="fa fa-sign-out"></i> Tentar novamente </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

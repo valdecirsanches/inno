@@ -1,0 +1,113 @@
+{% extends "Base/base.html" %}
+
+
+{% block head %}
+    <!-- Input Mask -->
+    <link href="/static/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+
+    <!-- Date picker -->
+    <link href="/static/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+{% endblock %}
+
+{% block modal %}
+
+    {% include 'Consultas/Modals/Atendimento.html' %}
+    {% include 'Cadastros/Pacientes/Modal/Cadastrar.html' %}
+    {% include 'Consultas/Atestado/Modal/Atestado.html' %}
+    {% include 'Consultas/HistoricoFamiliar/Modal/HistoricoFamiliar.html' %}
+    {% include 'Consultas/Anamnese/Modal/Anamnese.html' %}
+    {% include 'Consultas/Prescricoes/Modal/Prescricoes.html' %}
+
+{% endblock %}
+
+{% block atendimento %}
+    <li class="active">
+        <a href="/atendimento/"> <i class="fa fa-calendar"></i> <span class="nav-label">Atendimento médico<b class="fa arrow"></b></span></a>
+        <ul class="nav nav-second-level">
+            <li>
+                <select id="agendamento" name="agendamento" class="form-control">
+                    <option value="AGUARDANDO"> Aguardando </option>
+                    <option value="AGENDAMENTOS"> Agendados </option>
+                    <option value="TODOS"> Todos </option>
+                </select>
+            </li>
+        </ul>
+    </li>
+{% endblock %}
+
+{% block cabecalho_botoes %}
+<div class="header fixed">
+    <div class="row">
+        <div class="pull-right">
+            <a id="btnImrimeAgenda" class="btn btn-primary"
+               onclick="ImprimeAgenda()"><i class="fa fa-print"></i> Imprimir</a>
+        </div>
+        <div>
+            <h3 style="padding: 3px 0 0 15px"><strong id="titData"></strong> - <strong id="titAgendamento"></strong></h3>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2>Agenda de Consultas</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">
+                    <strong>Agenda de Consultas</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block container_corpo %}
+    <div class="row">
+        <input type="hidden" id="data" value="{{ data }}">
+        <div class="col-lg-12" id="col_agenda">
+            <div class="ibox float-e-margins" id="panel_agenda">
+                <div class="ibox-content">
+                    {% include 'Consultas/Table/ConsultasDia.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <!-- Input Mask -->
+    <script src="/static/js/plugins/jquery-mask-plugin/jquery.mask.js"></script>
+
+    <!-- Data picker -->
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.pt-BR.js"></script>
+
+    <!-- Toastr script -->
+    <script src="/static/js/plugins/toastr/toastr.js"></script>
+
+    <!-- BootBox script -->
+    <script src="/static/js/plugins/bootbox/bootbox.min.js"></script>
+
+    <!-- Selectize -->
+    <script src="/static/js/plugins/selectize/standalone/selectize.min.js"></script>
+
+    <!-- Agenda Consulta -->
+    <script src="/static/javascripts/Consultas/consultas.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Cep -->
+    <script src="/static/javascripts/cep.js?{{ user.release }}" type="application/javascript"></script>
+
+    <!-- Mascaras -->
+    <script src="/static/javascripts/Base/mascaras.js?{{ user.release }}" type="application/javascript"></script>
+
+{% endblock %}

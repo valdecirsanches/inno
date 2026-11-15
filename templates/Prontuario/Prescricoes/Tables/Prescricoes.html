@@ -1,0 +1,26 @@
+<div class="ibox-content">
+    <table id="tabelaPrescricao"
+           data-toggle="table"
+           data-classes="table table-condensed table-hover table-no-bordered"
+           data-unique-id="id"
+           data-click-to-select="true"
+{#           data-row-style="rowStylePrescricao"#}
+           data-url="/api/prescricao/">
+        <thead>
+            <tr>
+                <th data-radio="true"></th>
+                <th data-field="id" data-visible="false"></th>
+                <th data-field="dataSalvo">Data</th>
+                <th data-field="prescricao">Prescrição</th>
+                <th data-field="medico">Médico</th>
+{#                <th data-field="edit" data-formatter="editFormatter" data-events="editPrescricaoEvents" data-align="center"></th>#}
+                <th data-field="remove"
+                    data-formatter="PrescricaoOptions"
+                    data-events="PrescricaoEvents"
+                    data-align="center"
+                    class="col-md-4"
+                ></th>
+            </tr>
+        </thead>
+    </table>
+</div>

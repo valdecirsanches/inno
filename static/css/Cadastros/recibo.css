@@ -1,0 +1,451 @@
+/* Janela de recibos — estilos restritos a #recibo
+ *
+ * Layout: a janela nunca passa da altura da tela. Cabeçalho e barra de botões
+ * ficam sempre visíveis; em telas largas o formulário e a lista de recibos
+ * emitidos ficam lado a lado, e só a lista rola por dentro se houver muitos
+ * recibos. Em telas estreitas tudo vira uma coluna.
+ */
+
+#recibo {
+    --rc-ink: #2f4050;
+    --rc-text: #4a5866;
+    --rc-muted: #8a96a3;
+    --rc-line: #e7eaec;
+    --rc-paper: #ffffff;
+    --rc-page: #f3f4f6;
+    --rc-primary: #1ab394;
+    --rc-primary-dark: #149c81;
+    --rc-radius: 6px;
+    --rc-margem: 16px;
+}
+
+/* ---------- Estrutura: janela do tamanho da tela ---------- */
+#recibo .modal-dialog {
+    width: min(1180px, calc(100vw - 2 * var(--rc-margem)));
+    margin: var(--rc-margem) auto;
+}
+#recibo .modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 2 * var(--rc-margem));
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--rc-page);
+}
+#recibo .modal-header,
+#recibo .modal-footer {
+    flex: 0 0 auto;
+}
+#recibo .modal-body.recibo-corpo {
+    flex: 1 1 auto;
+    min-height: 0;          /* permite que as colunas encolham e rolem por dentro */
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+    gap: 18px;
+    padding: 16px 20px;
+    background: var(--rc-page);
+}
+#recibo .recibo-coluna-form,
+#recibo .recibo-historico {
+    min-height: 0;
+    overflow-y: auto;       /* só aparece se o conteúdo realmente não couber */
+}
+
+/* ---------- Cabeçalho ---------- */
+#recibo .modal-header {
+    padding: 12px 20px;
+    background: var(--rc-paper);
+    border-bottom: 1px solid var(--rc-line);
+    text-align: left;
+}
+#recibo .modal-header .modal-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--rc-ink);
+}
+#recibo .modal-header .recibo-subtitulo {
+    margin: 1px 0 0;
+    font-size: 12px;
+    color: var(--rc-muted);
+}
+#recibo .modal-header .close {
+    margin-top: 2px;
+    font-size: 24px;
+    opacity: .4;
+}
+#recibo .modal-header .close:hover,
+#recibo .modal-header .close:focus {
+    opacity: .8;
+}
+
+/* ---------- Folha do recibo ---------- */
+#recibo .recibo-folha {
+    padding: 14px 18px 2px;
+    background: var(--rc-paper);
+    border: 1px solid var(--rc-line);
+    border-top: 3px solid var(--rc-primary);
+    border-radius: var(--rc-radius);
+}
+#recibo .recibo-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+#recibo .recibo-titulo {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--rc-ink);
+}
+
+/* nº de controle no canto, como num talão */
+#recibo .classRecibo .recibo-controle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+#recibo .classRecibo .recibo-controle label {
+    margin: 0;
+    font-size: 12px;
+    color: var(--rc-muted);
+    white-space: nowrap;
+}
+#recibo .classRecibo .recibo-controle .form-control {
+    width: 90px;
+    height: 28px;
+    text-align: right;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+#recibo .classRecibo label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--rc-text);
+}
+#recibo .classRecibo label small {
+    font-weight: 400;
+    color: var(--rc-muted);
+}
+#recibo .classRecibo .form-group {
+    margin-bottom: 11px;
+}
+#recibo .classRecibo .form-control {
+    height: 32px;
+    border: 1px solid #dfe3e7;
+    border-radius: var(--rc-radius);
+    box-shadow: none;
+    color: var(--rc-ink);
+    font-size: 13px;
+    transition: border-color .15s, box-shadow .15s;
+}
+#recibo .classRecibo textarea.form-control {
+    height: auto;
+    min-height: 50px;
+    resize: vertical;
+    line-height: 1.4;
+}
+#recibo .classRecibo .form-control:focus {
+    border-color: var(--rc-primary);
+    box-shadow: 0 0 0 3px rgba(26, 179, 148, .15);
+    outline: 0;
+}
+#recibo .classRecibo .form-control[readonly],
+#recibo .classRecibo .form-control[disabled] {
+    background: var(--rc-page);
+    color: var(--rc-text);
+}
+
+/* valor em destaque */
+#recibo .recibo-valor .input-group-addon {
+    border: 1px solid #dfe3e7;
+    border-right: 0;
+    border-radius: var(--rc-radius) 0 0 var(--rc-radius);
+    background: var(--rc-page);
+    color: var(--rc-muted);
+    font-weight: 600;
+}
+#recibo .classRecibo .recibo-valor .form-control {
+    height: 40px;
+    border-radius: 0 var(--rc-radius) var(--rc-radius) 0;
+    font-size: 20px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+/* "Recebemos de" alinhado à altura do valor */
+#recibo .classRecibo .recibo-pagador .form-control {
+    height: 40px;
+    font-weight: 600;
+}
+
+/* picote antes de "Emitido por" (que fica na mesma linha, compacto) */
+#recibo .recibo-picote {
+    margin: 2px -18px 10px;
+    border-top: 2px dashed var(--rc-line);
+}
+#recibo .classRecibo .recibo-emissor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+#recibo .classRecibo .recibo-emissor label {
+    margin: 0;
+    white-space: nowrap;
+    color: var(--rc-muted);
+}
+#recibo .classRecibo .recibo-emissor .form-control {
+    height: 28px;
+}
+
+/* selectize do médico alinhado aos demais campos */
+#recibo .classRecibo .selectize-control.form-control {
+    height: auto;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+}
+#recibo .classRecibo .selectize-input {
+    min-height: 32px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-color: #dfe3e7;
+    border-radius: var(--rc-radius);
+    box-shadow: none;
+}
+#recibo .classRecibo .selectize-input.focus {
+    border-color: var(--rc-primary);
+    box-shadow: 0 0 0 3px rgba(26, 179, 148, .15);
+}
+
+/* ---------- Recibos emitidos ---------- */
+#recibo .recibo-historico {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;       /* a rolagem, se precisar, fica só na lista */
+}
+#recibo .recibo-historico h5 {
+    flex: 0 0 auto;
+    margin: 4px 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--rc-ink);
+}
+#recibo .recibo-historico h5 small {
+    font-weight: 400;
+    color: var(--rc-muted);
+}
+#recibo .recibo-lista {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    background: var(--rc-paper);
+    border: 1px solid var(--rc-line);
+    border-radius: var(--rc-radius);
+}
+#recibo .recibo-lista .bootstrap-table,
+#recibo .recibo-lista .fixed-table-container {
+    border: 0;
+    margin: 0;
+}
+#recibo .recibo-lista .fixed-table-body {
+    height: auto !important;
+    overflow: visible;
+}
+#recibo .recibo-lista .table {
+    margin: 0;
+}
+/* cabeçalho da lista fica parado enquanto ela rola */
+#recibo #tabelaRecibos.table > thead > tr > th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    border-bottom: 1px solid var(--rc-line);
+    background: var(--rc-paper);
+    color: var(--rc-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+#recibo #tabelaRecibos.table > tbody > tr > td {
+    padding: 8px 10px;
+    border-top: 1px solid var(--rc-line);
+    color: var(--rc-ink);
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+#recibo #tabelaRecibos.table-hover > tbody > tr:hover > td {
+    background: #f7f8f9;
+}
+#recibo .recibo-lista th,
+#recibo .recibo-lista td {
+    border-left: 0 !important;
+    border-right: 0 !important;
+}
+#recibo .recibo-lista .no-records-found td {
+    padding: 28px 10px;
+    color: var(--rc-muted);
+    text-align: center;
+    white-space: normal;
+}
+
+/* ---------- Barra de botões (sempre visível) ---------- */
+#recibo .modal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--rc-paper);
+    border-top: 1px solid var(--rc-line);
+}
+#recibo .modal-footer > .btn {
+    margin: 0;
+    border-radius: var(--rc-radius);
+    font-weight: 600;
+}
+#recibo .modal-footer .recibo-espaco {
+    flex: 1 1 auto;
+}
+#recibo #salvarRecibo {
+    background: var(--rc-primary);
+    border-color: var(--rc-primary);
+    color: #fff;
+    padding-left: 18px;
+    padding-right: 18px;
+}
+#recibo #salvarRecibo:hover,
+#recibo #salvarRecibo:focus {
+    background: var(--rc-primary-dark);
+    border-color: var(--rc-primary-dark);
+}
+#recibo #novoRecibo,
+#recibo #imprimirRecibo {
+    background: var(--rc-paper);
+    border: 1px solid #dfe3e7;
+    color: var(--rc-ink);
+}
+#recibo #novoRecibo:hover,
+#recibo #imprimirRecibo:hover {
+    border-color: var(--rc-primary);
+    color: var(--rc-primary);
+}
+#recibo .recibo-fechar {
+    background: transparent;
+    border: 0;
+    color: var(--rc-muted);
+}
+#recibo .recibo-fechar:hover,
+#recibo .recibo-fechar:focus {
+    color: var(--rc-ink);
+}
+
+/* ---------- Telas menores ---------- */
+
+/* tablets e janelas estreitas: uma coluna; a área central rola se precisar,
+   mas cabeçalho e botões continuam sempre visíveis */
+@media (max-width: 991px) {
+    #recibo .modal-body.recibo-corpo {
+        display: block;
+        overflow-y: auto;
+    }
+    #recibo .recibo-coluna-form,
+    #recibo .recibo-historico {
+        overflow: visible;
+    }
+    #recibo .recibo-historico {
+        margin-top: 16px;
+    }
+    #recibo .recibo-lista {
+        overflow: visible;
+    }
+}
+
+/* celular */
+@media (max-width: 767px) {
+    #recibo {
+        --rc-margem: 8px;
+    }
+    #recibo .modal-body.recibo-corpo {
+        padding: 12px;
+    }
+    #recibo .recibo-folha {
+        padding: 12px 12px 2px;
+    }
+    #recibo .recibo-picote {
+        margin-left: -12px;
+        margin-right: -12px;
+    }
+    #recibo .modal-header .recibo-subtitulo {
+        display: none;
+    }
+    #recibo .modal-footer {
+        padding: 10px 12px;
+    }
+    #recibo .modal-footer .recibo-espaco,
+    #recibo .recibo-fechar {
+        display: none;      /* o "×" do topo continua fechando a janela */
+    }
+    #recibo .modal-footer > .btn {
+        flex: 1 1 0;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+    #recibo #tabelaRecibos.table > tbody > tr > td {
+        white-space: normal;
+    }
+}
+
+/* telas baixas (notebook com zoom, por exemplo): compacta os textos longos */
+@media (min-width: 992px) and (max-height: 700px) {
+    #recibo .modal-header .recibo-subtitulo {
+        display: none;
+    }
+    #recibo .classRecibo .form-group {
+        margin-bottom: 8px;
+    }
+    #recibo .classRecibo textarea.form-control {
+        min-height: 44px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #recibo .classRecibo .form-control { transition: none; }
+}
+
+/* ---------- Lista de médicos (aberta no <body>, por cima da janela) ---------- */
+.selectize-dropdown.recibo-medico-lista {
+    z-index: 2100;              /* acima da janela (modal) */
+    border-color: #dfe3e7;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 8px 20px rgba(47, 64, 80, .15);
+}
+/* cada médico é desenhado com colunas flutuantes (col-sm-2/col-sm-10), o que
+   deixava a lista sem altura e sem fundo; aqui vira uma linha flexível */
+.selectize-dropdown.recibo-medico-lista [data-selectable] .media-body {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.selectize-dropdown.recibo-medico-lista [data-selectable] .media-body > [class*="col-"] {
+    float: none;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+.selectize-dropdown.recibo-medico-lista [data-selectable] .media-body > .col-sm-2 {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 48px;
+    color: #8a96a3;
+    font-variant-numeric: tabular-nums;
+}
+.selectize-dropdown.recibo-medico-lista [data-selectable] .media-body > .col-sm-10 {
+    flex: 1 1 auto;
+    width: auto;
+    padding-left: 0;
+}

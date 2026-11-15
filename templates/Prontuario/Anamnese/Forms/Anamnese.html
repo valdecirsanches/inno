@@ -1,0 +1,43 @@
+{#<div class="row m-t">#}
+    <div id="div-anamnese"  class="ibox-content">
+        <H1>Anamnese</H1>
+        <form method="post" role="form" id="formAnamnese" class="classAnamnese">
+            <input id="id_id_anamnese" name="id" type="hidden" value="0">
+            <div class="row m-b-n-lg">
+
+                <div id="id_queixa_principal_div" class="form-group col-md-12">
+                    <label for="id_queixa_principal">Queixa Principal</label>
+                    <input 
+                        id="id_queixa_principal" 
+                        name="queixa_principal" 
+                        type="text" 
+                        class="form-control save_anamnese"
+                    >
+                </div>
+
+                <div id="id_queixa_historia_div" class="form-group col-md-12">
+                    <label for="id_queixa_historia">História da queixa</label>
+                    <textarea id="id_queixa_historia"
+                              name="queixa_historia"
+                              cols="75"
+                              class="form-control save_anamnese"
+                    ></textarea>
+                </div>
+
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <a>Salvo em <strong id="data_anamnese"></strong></a>
+                <div class="pull-right">
+                    {# <a id="btnSaveAnamnese" class="btn btn-primary btn-outline btnAutoSave" onclick="SalvaAnamnese()"><i class="fa fa-save"></i> Salvar</a> #}
+                    <a id="btnAddAnamnese" class="btn btn-primary btn-outline btnAutoSave hidden" onclick="AddAnamnese()"><i class="fa fa-save"></i> Novo</a>
+                </div>
+            </div>
+            <div id="id_ultima_anamnese">
+
+            </div>
+        </form>
+    </div>
+
+
+{#</div>#}

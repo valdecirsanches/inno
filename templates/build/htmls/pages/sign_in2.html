@@ -1,0 +1,160 @@
+
+<!doctype html>
+<html lang="en" class="high">
+<head>
+
+<meta charset="utf-8">
+
+<!-- Always force latest IE rendering engine or request Chrome Frame -->
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+
+<meta name="viewport" content="width=device-width, minimal-ui, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+
+<!-- Apple Touch -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/images/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/static/images/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/static/images/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="/static/images/apple-touch-icon-57-precomposed.png">
+
+<!-- Favicon -->
+<link rel="shortcut icon" href="/static/images/favicon.png">
+
+<!-- Use title if it's in the page YAML frontmatter -->
+<title>WebClinic Atomic - Login</title>
+
+<script type="text/javascript">
+    var polyfilter_scriptpath = "/static/polyfills/filters/";
+    window.polyfilter_skip_stylesheets = true
+</script>
+
+  <link href="/static/stylesheets/application.css" rel="stylesheet" type="text/css" />
+<!--[if lte IE 9]>
+<link href="/static/stylesheets/application_split2.css" rel="stylesheet" type="text/css" /><link href="../../stylesheets/application_split3.css" rel="stylesheet" type="text/css" />
+<![endif]-->
+  <script src="/static/javascripts/application.js?{{ user.release }}" type="text/javascript"></script>
+  <script src="/static/javascripts/demo.js?{{ user.release }}" type="text/javascript"></script>
+  <script src="/static/javascripts/init.js?{{ user.release }}" type="text/javascript"></script>
+
+
+</head>
+
+<body class="high emerald-default htmls htmls_pages htmls_pages_sign_in">
+
+  <div class="em-page-center-parent">
+    <div class="em-page-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4">
+            <div class="actionable" id="actionable-sign-in">
+              <div class="actionable-front component-shadow">
+                <div class="panel">
+                  <div class="panel-body">
+                    <div class="text-center">
+                      <img src="/static/../static/logotipo2.png" />
+                      <h3>
+                        <strong>WebClinic Athomic 2.0</strong> <br><span class="thin">LOGIN</span>
+                      </h3>
+                    </div>
+                    <div class="padded">
+                      <form action="/login/" method="post"  id="form-sign-in-demo"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        <input type="hidden" value="{{ next_url }}" name="next" />
+                        {% if form.errors %}
+                        <div class="text-center">
+                          {% for key, error in form.errors %}
+                            {% if key == 'username' %}{% elif key == 'password' %}{% else %}{{ key }} : {{ error }}{% endif %}
+                          {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="form-group email required">
+                          {% if form.username.errors %}
+                          <div class="text-center">
+                          {% for error in form.username.errors %}
+                            {{ error }}
+                          {% endfor %}
+                          </div>
+                          {% endif %}
+                          <input class="string email required form-control"
+                                 maxlength="255" name="username" placeholder="Usuário"
+                                 rel="jvfloat">
+                        </div>
+                        <div class="form-group password required">
+                          {% if form.password.errors %}
+                          <div class="text-center">
+                            {% for error in form.password.errors %}
+                              {{ error }}
+                            {% endfor %}
+                          </div>
+                          {% endif %}
+                          <input class="password required form-control"
+                                 name="password" placeholder="Senha"
+                                 type="password" rel="jvfloat">
+                        </div>
+                        <div class="form-group actions">
+                          <button class="btn btn-success-lt btn-block actionable-action" name="commit" type="submit">Vamos lá</button>
+                        </div>
+                        <!--div class="form-group">
+                          <div class="row">
+                            <div class="col-xs-6">
+                              <label class="checkbox-inline no-padding">
+                                <input type="checkbox" value="1" rel="icheck" class="checkable-success"> Remember Me
+                              </label>
+                            </div>
+                            <!--div class="col-xs-6 text-right">
+                              <a href="#">Forgot password?</a>
+                            </div>
+                          </div>
+                        </div-->
+                      </form>
+                    </div>
+                    <!--div class="text-center form-group">
+                      Don't have an account?
+                      <a href="sign_up.html">
+                        <strong>Sign Up</strong>
+                      </a>
+                    </div-->
+                  </div>
+                </div>
+              </div>
+              <div class="actionable-back component-shadow bg-white padded">
+                <div class="actionable-contain">
+                  <button type="button" class="close pull-right">&times;</button>
+                  <br><br>
+                  <h1 class="thin text-success text-center actionable-animated-fadeInLeftSmall">
+                    Successo!
+                  </h1>
+                  <br><br>
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-success progress-bar-striped active"
+                         style="width: 100%">
+                    </div>
+                  </div>
+                  <br><br>
+                  <p class="text-center actionable-animated-fadeInRightSmall">
+                    Redirecionando para a página Inicial...
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="text-center">
+              &copy; 2014 EDSSolution Inc. All Rights Reserved
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    $('#actionable-sign-in').on('acted.actionable', function(){
+      var url = $('#form-sign-in-demo').attr('action');
+      function go() { Turbolinks.visit(url); }
+      setTimeout(go, 1000);
+    });
+  </script>
+  <!-- Needed by BSE.Mq.screen() helper in utils.js -->
+  <div id="mq"></div>
+  <!-- Needed by EmVars helper in _emerald.js -->
+  <div id="emvars"></div>
+</body>
+</html>
