@@ -13,6 +13,7 @@ const { json } = require('../util/http');
 const modelo = require('../util/modelo');
 const { pyStr, djJson, exige, escapaLike, idade, dmy, anoDe } = require('../util/python');
 const { extenso, strFloat } = require('../util/extenso');
+const { erroPython } = require('../util/orm');
 
 const a = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 const BASE = '/cadastros/paciente';
@@ -170,7 +171,42 @@ module.exports = function (app) {
     json(res, ret);
   }));
 
-  app.post(`${BASE}/SalvaPaciente/`, a(async (req, res) => {
+  // /cadastros/paciente/salvar/ (Cadastros/views.py SalvaPaciente): versão antiga, que nenhuma
+  // tela chama. Sempre termina em erro 500, como no AppClinic: no GET não devolve resposta;
+  // no POST com id grava as alterações e depois o reverse('iniciar_pac') não existe;
+  // sem id, o TbPacientes(...) recebe campos que o modelo não tem, antes de gravar.
+  app.all(`${BASE}/salvar/`, a(async (req) => {
+    if (req.method !== 'POST') {
+      throw erroPython("The view Cadastros.views.SalvaPaciente didn't return an HttpResponse object. It returned None instead.");
+    }
+    const P = req.POST;
+    const v = (k) => P.get(k);
+    const id = v('id');
+    const up = (k) => { const x = v(k); if (x === null) throw erroPython("'NoneType' object has no attribute 'upper'"); return x.toUpperCase(); };
+    if (id) {
+      if (!/^\s*[-+]?\d+\s*$/.test(id)) throw erroPython(`Field 'id' expected a number but got '${id}'.`);
+      const pac = await obtem('TbPacientes', { id: parseInt(id, 10) });
+      const se = (k, campo, f = (x) => x) => { if (v(k)) pac[campo] = f(v(k)); };
+      const U = (x) => x.toUpperCase();
+      se('nome', 'paciente', U); se('profissao', 'profissao', U); se('rg', 'rg');
+      pac.cpf = v('cpf');
+      se('nascimento', 'data_nasc'); se('sexo', 'sexo'); se('cep', 'cep'); se('rua', 'endereco', U);
+      se('numero', 'endereco_numero'); se('complemento', 'complento', U); se('bairro', 'bairro', U);
+      se('cidade', 'cidade', U); se('uf', 'estado', U); se('ibge', 'cidade_ibge', U); se('telefone', 'telefone');
+      se('celular', 'celular'); se('email', 'email'); se('plano', 'fk_plano_id'); se('convenio', 'fk_convenio_id');
+      se('medico', 'fk_medico_id'); se('detalhe', 'reg_conv'); se('empresa', 'empresa', U); se('ident', 'carteirinha');
+      se('obs', 'obs');
+      await modelo.salva(req, 'TbPacientes', pac);
+      throw erroPython("Reverse for 'iniciar_pac' not found. 'iniciar_pac' is not a valid view function or pattern name.");
+    }
+    // ultimo_codigo() e os .upper() são avaliados antes do TbPacientes(...)
+    const ult = db.linha('TbPacientes', await db.tabela('TbPacientes').orderBy(db.coluna('TbPacientes', 'codigo'), 'desc').first());
+    if (!ult) throw erroPython("'NoneType' object has no attribute 'codigo'");
+    for (const k of ['nome', 'profissao', 'rua', 'complemento', 'bairro', 'cidade', 'uf', 'empresa']) up(k);
+    throw erroPython("TbPacientes() got an unexpected keyword argument 'soment_eletro'");
+  }));
+
+  app.all(`${BASE}/SalvaPaciente/`, a(async (req, res) => {
     const usuario = req.user;
     const formSerializado = exige(req.POST, 'form');
     const pid = req.POST.get('paciente') || '0';
@@ -262,7 +298,7 @@ module.exports = function (app) {
     json(res, { success: { extenso: extenso(String(valor)).toUpperCase() } });
   }));
 
-  app.post(`${BASE}/SalvaRecibo/`, a(async (req, res) => {
+  app.all(`${BASE}/SalvaRecibo/`, a(async (req, res) => {
     const usuario = req.user;
     const formTexto = exige(req.POST, 'form');
     const reciboTxt = exige(req.POST, 'recibo') || '0';

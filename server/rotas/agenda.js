@@ -612,7 +612,7 @@ module.exports = function (app) {
   }));
 
   // ------------------------------------------- confirmação e horários
-  app.post(`${BASE}/RestauraAgendamento/`, a(async (req, res) => {
+  app.all(`${BASE}/RestauraAgendamento/`, a(async (req, res) => {
     const acao = exige(req.POST, 'acao');
     const id = int(exige(req.POST, 'id_consulta'));
     const ag = await obtem(A, { id });
@@ -627,19 +627,19 @@ module.exports = function (app) {
     json(res, { success: p.paciente });
   }));
 
-  app.post(`${BASE}/hr_exclui/`, a(async (req, res) => {
+  app.all(`${BASE}/hr_exclui/`, a(async (req, res) => {
     const id = int(exige(req.POST, 'id'));
     await modelo.exclui(req, A, await obtem(A, { id }));
     json(res, { success: id });
   }));
 
-  app.post(`${BASE}/hrs_exclui/`, a(async (req, res) => {
+  app.all(`${BASE}/hrs_exclui/`, a(async (req, res) => {
     const ids = String(exige(req.POST, 'id__in')).split(',');
     for (const x of db.linhas(A, await db.tabela(A).whereIn(C('id'), ids))) await modelo.exclui(req, A, x);
     json(res, { success: ids });
   }));
 
-  app.post(`${BASE}/hr_clone/`, a(async (req, res) => {
+  app.all(`${BASE}/hr_clone/`, a(async (req, res) => {
     const id = int(exige(req.POST, 'id'));
     const tp = exige(req.POST, 'tp');
     const ag = await obtem(A, { id });
@@ -657,7 +657,7 @@ module.exports = function (app) {
       id_med: idMed, med, id_procedimento: idProc, procedimento: proc, status: ag.status } });
   }));
 
-  app.post(`${BASE}/TransfereDia`, a(async (req, res) => {
+  app.all(`${BASE}/TransfereDia`, a(async (req, res) => {
     const id = exige(req.POST, 'id');
     const dt = exige(req.POST, 'dt');
     if (dt) {

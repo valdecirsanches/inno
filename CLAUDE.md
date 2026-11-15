@@ -47,6 +47,9 @@ O dono do projeto fala português: responda em português.
   `node tools/testes/etapa6-memed.js` (Memed) e `node tools/testes/etapa6-whatsapp.js`
   (WhatsApp e robô), cada um com o serviço externo falso, local.
   Para testes novos, use `tools/testes/base.js` (banco, login e cliente prontos).
+- Cobertura: `python3 tools/testes/rotas_django.py ../appclinic > /tmp/django.txt` e
+  `node tools/testes/cobertura.js /tmp/django.txt` listam endereços do AppClinic que o Inno
+  não responde (os falsos positivos conhecidos estão no topo do cobertura.js).
   Neste ambiente, rode com `NO_PROXY=127.0.0.1` se houver proxy.
 - Impressos (PDF): `tools/impressos/` roda os `reports.py` originais e compara página a página
   (veja `tools/impressos/LEIAME.md`). Rode de novo ao mexer em `server/util/pdf.js`.

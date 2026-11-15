@@ -1000,7 +1000,8 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
   }));
   app.get(`${P}/Extras/downloadFile.json`, download);
 
-  viewset.registra(app, '/api/extras', {
+  // o mesmo ExtrasViewSet está em /api/extras/ e em /api/prontuario/extras/ (Prontuario/urls_api.py)
+  const opcExtras = {
     modelo: EX, serializer: {}, paginar: true, nome404: EX,
     acoes: [
       { nome: 'rastrear', detalhe: false, metodos: ['post'], fn: async (req, res) => {
@@ -1040,7 +1041,9 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
       } },
       { nome: 'downloadFile', detalhe: false, metodos: ['post'], fn: async () => { throw erroPython("request() got an unexpected keyword argument 'file_name'"); } },
     ],
-  });
+  };
+  viewset.registra(app, '/api/extras', opcExtras);
+  viewset.registra(app, '/api/prontuario/extras', opcExtras);
 
   /** upload_to=prontuario_directory_file: extras/<paciente>/<ano>/<mês>/<dia>/<nome> */
   function salvaArquivoExtra(obj, arq) {

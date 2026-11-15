@@ -82,6 +82,7 @@ static/              CSS, JS e imagens do AppClinic
 tools/               scripts da conversão (rodam uma vez, no AppClinic, não no servidor)
                      e tools/impressos/, que confere os PDFs contra os do AppClinic;
                      tools/testes/ tem os testes das rotas (node tools/testes/etapa5.js etc.)
+                     e a conferência de cobertura (cobertura.js: todos os endereços do AppClinic)
 ```
 
 ## Diferenças em relação ao AppClinic
