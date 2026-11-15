@@ -53,6 +53,12 @@ app.use((req, res) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(new Date().toISOString(), req.method, req.originalUrl, err);
+  // cada erro também vai para logs/erros.log, com a explicação completa
+  try {
+    fs.mkdirSync(path.join(config.raiz, 'logs'), { recursive: true });
+    fs.appendFileSync(path.join(config.raiz, 'logs', 'erros.log'),
+      `${new Date().toISOString()} ${req.method} ${req.originalUrl} usuário=${req.user && req.user.login}\n${err.stack || err}\n\n`);
+  } catch (e) { /* sem permissão de escrita: fica só no terminal */ }
   if (res.headersSent) return;
   if (config.debug) return res.status(500).type('text').send(err.stack || String(err));
   res.status(500).type('html').send('\n<!doctype html>\n<html lang="en">\n<head>\n  <title>Server Error (500)</title>\n</head>\n<body>\n  <h1>Server Error (500)</h1><p></p>\n</body>\n</html>\n');

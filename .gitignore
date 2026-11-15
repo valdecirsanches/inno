@@ -3,6 +3,7 @@
 env
 *.sqlite3
 media/
+logs/
 node_modules/
 __pycache__/
 *.pyc
