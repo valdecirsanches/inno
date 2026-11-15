@@ -669,14 +669,6 @@ module.exports = function (app) {
     json(res, { success: 'ok' });
   }));
 
-  // ---------------------------------------------- API: cor do horário
-  app.post('/api/agenda/:id/grava_cor/', a(async (req, res) => {
-    const ag = await db.busca(A, { id: req.params.id });
-    if (!ag) return drf.naoEncontrado(res, A);
-    ag.cor = (req.data && req.data.cor !== undefined) ? req.data.cor : '';
-    await salvaAgenda(req, ag);
-    json(res, { success: 'ok' });
-  }));
 };
 
 module.exports.salvaAgenda = salvaAgenda;

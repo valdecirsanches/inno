@@ -88,6 +88,7 @@ function criaSerializer(nomeModelo, opc = {}) {
       if (!c) continue;   // ReadOnlyField de atributo que o modelo não tem: o DRF pula
       o[n] = representa(req, c, obj[c.atributo]);
     }
+    if (opc.extras) Object.assign(o, await opc.extras(obj, req));   // ManyToMany (vêm depois das FKs)
     return o;
   };
   return { modelo: nomeModelo, nomes, porNome, declarados, serializa, opc };
@@ -225,7 +226,18 @@ async function valida(ser, dados, { instancia = null, parcial = false } = {}) {
   const so = new Set(ser.opc.somenteLeitura || []);
   const erros = {};
   const valores = {};
+  const gravaveis = ser.opc.gravaveis || {};
   for (const n of ser.nomes) {
+    if (gravaveis[n] && !so.has(n)) {
+      // campo declarado que aceita escrita (ex.: SerializerRelatedField)
+      const c = ser.porNome[n];
+      const v = ehHtml(dados) ? (dados.has(n) ? dados.get(n) : VAZIO) : (dados && Object.prototype.hasOwnProperty.call(dados, n) ? dados[n] : VAZIO);
+      if (v === VAZIO) continue;
+      if (ehHtml(dados) && v === '') continue;   // formulário: vazio e não obrigatório = não enviado
+      if (v === null) { erros[n] = [MSG.null]; continue; }
+      try { Object.assign(valores, await gravaveis[n](v, c)); } catch (e) { if (typeof e === 'string') erros[n] = [e]; else throw e; }
+      continue;
+    }
     if (ser.declarados.has(n) || so.has(n)) continue;
     const c = ser.porNome[n];
     if (!c || c.pk || !c.editavel || c.auto_now || c.auto_now_add) continue;

@@ -26,7 +26,7 @@ const MSG = {
   data: 'Informe uma data válida.',
   hora: 'Informe uma hora válida.',
   dataHora: 'Informe uma data/hora válida.',
-  escolha: 'Faça uma escolha válida. Esta opção não é uma das disponíveis.',
+  escolha: 'Faça uma escolha válida. Sua escolha não é uma das disponíveis.',
   escolhaValor: (v) => `Faça uma escolha válida. ${v} não é uma das escolhas disponíveis.`,
   tamanho: (lim, tem) => `Certifique-se de que o valor tenha no máximo ${lim} caracteres (ele possui ${tem}).`,
 };
@@ -92,6 +92,11 @@ function lerDataHora(t) {
 // ------------------------------------------------------- limpeza por tipo
 async function limpaCampo(c, bruto, presente) {
   const tipo = c.tipo;
+  // BooleanField(null=True) usa o NullBooleanField no formulário (select: 'True'/'False'/'2'/'3')
+  if (tipo === 'NullBooleanField' || (tipo === 'BooleanField' && c.nulo)) {
+    const mapa = { True: true, False: false, true: true, false: false, 2: true, 3: false };
+    return { valor: Object.prototype.hasOwnProperty.call(mapa, bruto) ? mapa[bruto] : null };
+  }
   if (tipo === 'BooleanField') {
     if (!presente) return { valor: false };
     return { valor: !(typeof bruto === 'string' && ['false', '0'].includes(bruto.toLowerCase())) && !!bruto };
@@ -219,6 +224,10 @@ function jsonSeguro(nomeModelo, dict, inteiros = new Set()) {
 async function registraLog(req, acao, nomeModelo, pk, antes, depois) {
   const u = req && req.user;
   if (!u || !u.is_authenticated || IGNORAR_NO_LOG.has(nomeModelo)) return;
+  if (temArquivo(nomeModelo)) {
+    console.error(`[LOG ERRO] Falha ao registrar log para ${nomeModelo}: Object of type FieldFile is not JSON serializable`);
+    return;
+  }
   let data = null;
   if (antes !== undefined || depois !== undefined) {
     data = pyJson({ antes: antes || {}, depois: depois || {} });
@@ -336,8 +345,20 @@ function modelToDictAtrib(nomeModelo, obj) {
   return d;
 }
 
+/**
+ * No AppClinic, o log de um modelo com arquivo (FileField, ex.: TbExtra) falha
+ * ("FieldFile is not JSON serializable"). Ao salvar, o registro fica e o log não;
+ * ao excluir, a falha desfaz a exclusão inteira (o Django marca a transação
+ * para desfazer). O Inno faz igual.
+ */
+const temArquivo = (nomeModelo) => db.modelo(nomeModelo).campos.some((c) => c.tipo === 'FileField' || c.tipo === 'ImageField');
+
 async function exclui(req, nomeModelo, obj) {
   const m = db.modelo(nomeModelo);
+  if (temArquivo(nomeModelo) && req && req.user && req.user.is_authenticated) {
+    console.error(`[LOG ERRO] Falha ao registrar exclusão para ${nomeModelo}: Object of type FieldFile is not JSON serializable`);
+    return;
+  }
   await db.tabela(nomeModelo).where(db.coluna(nomeModelo, m.pk), obj[m.pk]).del();
   try {
     await registraLog(req, 'Exclusão de registro', nomeModelo, obj[m.pk], jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, obj)), {});
@@ -346,4 +367,18 @@ async function exclui(req, nomeModelo, obj) {
   }
 }
 
-module.exports = { camposDoForm, modelToDict, inicialEmTexto, validaForm, salva, exclui, lerData, lerHora, lerDataHora, MSG };
+/** queryset.delete(): apaga tudo e registra os logs do maior para o menor id (como o Collector do Django) */
+async function excluiLista(req, nomeModelo, objs) {
+  const m = db.modelo(nomeModelo);
+  const ordenados = objs.slice().sort((x, y) => Number(x[m.pk]) - Number(y[m.pk])).reverse();
+  if (!ordenados.length) return;
+  if (temArquivo(nomeModelo) && req && req.user && req.user.is_authenticated) return;
+  await db.tabela(nomeModelo).whereIn(db.coluna(nomeModelo, m.pk), ordenados.map((o) => o[m.pk])).del();
+  for (const o of ordenados) {
+    try {
+      await registraLog(req, 'Exclusão de registro', nomeModelo, o[m.pk], jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, o)), {});
+    } catch (e) { console.error(`[LOG ERRO] Falha ao registrar exclusão para ${nomeModelo}: ${e.message}`); }
+  }
+}
+
+module.exports = { camposDoForm, modelToDict, inicialEmTexto, validaForm, salva, exclui, excluiLista, lerData, lerHora, lerDataHora, MSG };

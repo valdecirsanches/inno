@@ -28,4 +28,12 @@ module.exports = {
   mediaRoot: env('MEDIA_ROOT', path.join(__dirname, '..', 'media')),
   // mostrado na barra do sistema (user.hostdb / user.database no Django)
   bancoExibido: { host: env('DB_HOST_EXIBIDO', env('DB_HOST', '')), nome: env('DB_NAME', '') },
+  // Memed (as mesmas chaves do settings.py do AppClinic)
+  memed: {
+    apiBase: env('MEMED_URL_API_BASE', 'https://api.memed.com.br/'),
+    scriptBase: env('MEMED_URL_SCRIPT_BASE', 'https://partners.memed.com.br/'),
+    apiKey: env('MEMED_API_KEY', ''),
+    secretKey: env('MEMED_SECRET_KEY', ''),
+    dataToken: env('MEMED_DATA_TOKEN', ''),
+  },
 };

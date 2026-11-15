@@ -8,6 +8,7 @@ const fs = require('fs');
 const express = require('express');
 const config = require('./config');
 const QueryDict = require('./util/querydict');
+const multipart = require('./util/multipart');
 const csrf = require('./seguranca/csrf');
 const { sessao, usuario } = require('./seguranca/sessao');
 const loginObrigatorio = require('./seguranca/login-obrigatorio');
@@ -23,16 +24,19 @@ app.use('/static', express.static(path.join(config.raiz, 'static'), { maxAge: '1
 // e request.data (JSON das chamadas axios / API)
 app.use(express.text({ type: 'application/x-www-form-urlencoded', limit: '20mb' }));
 app.use(express.json({ limit: '20mb' }));
+app.use(multipart);
 app.use((req, res, next) => {
   const i = req.originalUrl.indexOf('?');
   req.GET = new QueryDict(i >= 0 ? req.originalUrl.slice(i + 1) : '');
-  if (typeof req.body === 'string') {
-    req.POST = new QueryDict(req.body);
-    req.data = req.POST.dict();
-  } else {
-    req.POST = new QueryDict('');
-    req.data = req.body && typeof req.body === 'object' ? req.body : {};
-  }
+  // req.corpo: QueryDict(request.body) (usado pelos PUT/DELETE das telas)
+  if (req.multipart) req.corpo = req.multipart.campos;
+  else req.corpo = new QueryDict(typeof req.body === 'string' ? req.body : '');
+  req.FILES = req.multipart ? req.multipart.arquivos : {};
+  // request.POST só existe no POST (como no Django)
+  req.POST = req.method === 'POST' ? req.corpo : new QueryDict('');
+  // request.data do DRF: JSON ou o formulário (QueryDict)
+  if (typeof req.body === 'string' || req.multipart) req.data = req.corpo;
+  else req.data = req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body) ? req.body : {};
   next();
 });
 

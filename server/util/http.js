@@ -21,4 +21,9 @@ function json(res, dados, status = 200) {
   res.status(status).type('application/json').send(pyJson(dados));
 }
 
-module.exports = { pyQuote, redireciona, json };
+/** página 404 do Django (DEBUG desligado) */
+function pagina404(res) {
+  res.status(404).type('html').send('\n<!doctype html>\n<html lang="en">\n<head>\n  <title>Not Found</title>\n</head>\n<body>\n  <h1>Not Found</h1><p>The requested resource was not found on this server.</p>\n</body>\n</html>\n');
+}
+
+module.exports = { pyQuote, redireciona, json, pagina404 };
