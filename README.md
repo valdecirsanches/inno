@@ -104,3 +104,7 @@ O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As 
 - Criar horários com intervalo negativo travava o AppClinic num laço sem fim; o Inno ignora esse intervalo.
 - Ao abrir a agenda, se a lista de médicos chegava antes do calendário ter data, a tela pedia a agenda de "NaN-NaN-NaN" e recebia erro. O Inno espera a data.
 - WhatsApp e Memed: quando o servidor de fora não responde, algumas respostas trazem o texto do erro de rede (`"error": "..."`). O texto é parecido com o do Python (`HTTPConnectionPool(...): Max retries exceeded...`), mas não idêntico, porque vem do Node.
+- Atestado antigo: o CID gravado que não está na tabela de CID (ex.: "G43") não aparecia
+  ao selecionar o atestado, e o salvamento seguinte apagava o CID. O Inno mostra o código.
+- Atestado (e as outras seções do prontuário) gravado sem usuário ou sem médico: salvar e
+  imprimir davam "Este campo não pode ser nulo.". O Inno aceita a chave vazia.

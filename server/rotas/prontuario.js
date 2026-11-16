@@ -173,7 +173,8 @@ function serSecao(M, extra = []) {
       ['dataSalvo', async (o) => (o.data_salvo ? formata(o.data_salvo, 'd/m/Y H:i') : '')],
       ...extra,
     ],
-    gravaveis: { fk_medico: S.relacionadoGravavel('TbMedicos', 'fk_medico_id') },
+    // registros antigos sem médico: aceitar o null quando o modelo deixa a chave vazia
+    gravaveis: { fk_medico: S.relacionadoGravavel('TbMedicos', 'fk_medico_id', { aceitaNulo: !!(db.modelo(M)._porAtributo.fk_medico || {}).nulo }) },
   };
 }
 
@@ -732,7 +733,8 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
         ['dataSalvo', async (o) => (o.data_salvo ? formata(o.data_salvo, 'd/m/Y H:i') : '')],
         ['mycid10', async (o) => (o.cid ? o.cid : '')],
       ],
-      gravaveis: { fk_medico: S.relacionadoGravavel('TbMedicos', 'fk_medico_id'), fk_usuario: S.relacionadoGravavel('TbUsuario', 'fk_usuario_id') },
+      // atestados antigos sem médico/usuário: aceitar o null (no AppClinic a gravação era recusada)
+      gravaveis: { fk_medico: S.relacionadoGravavel('TbMedicos', 'fk_medico_id', { aceitaNulo: true }), fk_usuario: S.relacionadoGravavel('TbUsuario', 'fk_usuario_id', { aceitaNulo: true }) },
     },
     paginar: false,
     consulta: porProntuario('TbAtestado'),

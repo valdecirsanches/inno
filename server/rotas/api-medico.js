@@ -78,7 +78,17 @@ module.exports = function (app) {
       if (cids === null) throw erroPython("'NoneType' object has no attribute 'split'");
       const C = 'CID10';
       const l = db.linhas(C, await db.tabela(C).whereIn(col(C, 'codigo'), cids.split(',')));
-      json(res, l.map((c) => ({ title: `${c.codigo} | ${c.descricao}`, codigo: c.codigo, id: c.codigo, descricao: c.descricao, selected: true })));
+      const res0 = l.map((c) => ({ title: `${c.codigo} | ${c.descricao}`, codigo: c.codigo, id: c.codigo, descricao: c.descricao, selected: true }));
+      // CID gravado que não está na tabela de CID (ex.: "G43" de atestados antigos): no AppClinic
+      // ele sumia do campo e o próximo salvamento apagava o CID. O Inno devolve o próprio código.
+      const achados = new Set(l.map((c) => c.codigo));
+      for (const cod of cids.split(',')) {
+        // a tela pede ?cids=undefined / ?cids=null quando o atestado não tem CID
+        if (cod === '' || cod === 'undefined' || cod === 'null' || achados.has(cod)) continue;
+        achados.add(cod);
+        res0.push({ title: cod, codigo: cod, id: cod, descricao: '', selected: true });
+      }
+      json(res, res0);
     } },
     { nome: 'get_medico', url: 'get-medico', detalhe: false, metodos: ['post'], fn: async (req, res) => {
       let m = null;

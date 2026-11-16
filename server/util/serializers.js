@@ -86,8 +86,8 @@ function relacionadoSerializado(nomeModelo, ser, atributo) {
 }
 
 /** SerializerRelatedField.to_internal_value: int(data) e get(id=data); 0 passa adiante */
-function relacionadoGravavel(nomeModelo, atributo) {
-  return async (v) => {
+function relacionadoGravavel(nomeModelo, atributo, { aceitaNulo = false } = {}) {
+  const fn = async (v) => {
     const s = String(v).trim();
     if (typeof v === 'boolean') return { [atributo]: v ? 1 : 0 };
     if (!/^[-+]?\d+$/.test(s)) throw erroPython(`invalid literal for int() with base 10: '${v}'`);
@@ -96,6 +96,11 @@ function relacionadoGravavel(nomeModelo, atributo) {
     await relacionado(nomeModelo, id);
     return { [atributo]: id };
   };
+  // aceitaNulo: o SerializerRelatedField do AppClinic recusa null ("Este campo não pode ser
+  // nulo."), mas registros antigos têm a chave vazia e a tela reenvia null ao salvar.
+  // Com aceitaNulo (só em chaves que o modelo deixa vazias), o null é gravado como null.
+  if (aceitaNulo) fn.aceitaNulo = atributo;
+  return fn;
 }
 
 module.exports = { especialidade, medico, usuario, relacionadoSerializado, relacionadoGravavel, memedUserInfo, pula };

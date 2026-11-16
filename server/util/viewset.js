@@ -234,7 +234,7 @@ async function valida(ser, dados, { instancia = null, parcial = false } = {}) {
       const v = ehHtml(dados) ? (dados.has(n) ? dados.get(n) : VAZIO) : (dados && Object.prototype.hasOwnProperty.call(dados, n) ? dados[n] : VAZIO);
       if (v === VAZIO) continue;
       if (ehHtml(dados) && v === '') continue;   // formulário: vazio e não obrigatório = não enviado
-      if (v === null) { erros[n] = [MSG.null]; continue; }
+      if (v === null) { if (gravaveis[n].aceitaNulo) valores[gravaveis[n].aceitaNulo] = null; else erros[n] = [MSG.null]; continue; }
       try { Object.assign(valores, await gravaveis[n](v, c)); } catch (e) { if (typeof e === 'string') erros[n] = [e]; else throw e; }
       continue;
     }

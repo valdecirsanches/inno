@@ -48,7 +48,8 @@ sem "next" e as preferências criadas com `ultimo_pac = 0`.
 
 `navegador.js` abre a tela de verdade num Chromium sem janela, nos dois sistemas (MySQL), e
 mostra o que apareceu, os erros de JavaScript e as chamadas que falharam. O roteiro de tela
-diz os cliques (ex.: `tela-atestado.js`: aba Atestado, selecionar, conferir o CID, imprimir).
+diz os cliques (ex.: `tela-atestado.js`: aba Atestado, selecionar, conferir o CID, imprimir;
+`tela-atestado-antigo.js`: atestado antigo com CID fora da tabela e sem usuário).
 
 ```bash
 mkdir ../navegador && cd ../navegador && npm init -y && \

@@ -43,6 +43,8 @@ async function percorre(browser, base) {
   pg.on('pageerror', (e) => log.erros.push('JS: ' + e.message.split('\n')[0]));
   pg.on('console', (m) => { if (m.type() === 'error') log.erros.push('console: ' + m.text().slice(0, 200)); });
   pg.on('response', (r) => { if (r.status() >= 400 && r.url().startsWith(base)) log.falhas.push(`${r.status()} ${r.request().method()} ${r.url().replace(base, '')}`); });
+  pg.on('request', (rq) => { if (/\/api\/atestado\/\d/.test(rq.url()) && rq.method() !== 'GET') log.falhas.push(`(enviado) ${rq.method()} ${rq.url().replace(base, '')} ${(rq.postData() || '').slice(0, 400)}`); });
+  pg.on('response', async (r) => { if (/\/api\/atestado\/\d/.test(r.url()) && r.request().method() !== 'GET') { let t = ''; try { t = (await r.text()).slice(0, 200); } catch (e) { /* */ } log.falhas.push(`(resposta) ${r.status()} ${t}`); } });
   pg.on('requestfailed', (r) => log.falhas.push(`falhou ${r.url().replace(base, '')}`));
   // janelas abertas pela tela (window.open da impressão): a cadeia de respostas de cada uma
   pg.on('popup', async (p2) => {
