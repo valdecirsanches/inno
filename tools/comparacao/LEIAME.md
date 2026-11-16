@@ -43,3 +43,15 @@ cada uma diverge (fora os logs e as preferências do usuário).
 
 Diferenças esperadas (estão no README, "Diferenças em relação ao AppClinic"): o login
 sem "next" e as preferências criadas com `ultimo_pac = 0`.
+
+## Teste da tela no navegador
+
+`navegador.js` abre a tela de verdade num Chromium sem janela, nos dois sistemas (MySQL), e
+mostra o que apareceu, os erros de JavaScript e as chamadas que falharam. O roteiro de tela
+diz os cliques (ex.: `tela-atestado.js`: aba Atestado, selecionar, conferir o CID, imprimir).
+
+```bash
+mkdir ../navegador && cd ../navegador && npm init -y && \
+  npm install @sparticuz/chromium@131 puppeteer-core@23 axios@0.19.0 jquery-mask-plugin@1.14.10 x-editable@1.5.1
+cd ../inno && NAVEGADOR=../navegador node tools/comparacao/navegador.js ../appclinic ~/venv-dj/bin/python tools/comparacao/tela-atestado.js
+```
