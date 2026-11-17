@@ -35,7 +35,8 @@ O dono do projeto fala português: responda em português.
 - `server/util/armazenamento.js`: os arquivos enviados ficam **só na nuvem**: a do dono
   (`~/apps/nuvem`, porta 5190, `NUVEM_TIPO=simples`: POST /upload, GET /download/:id, sem
   chave, lista nem exclusão) ou o cloud-storage. A ligação caminho → id fica na tabela
-  `inno_nuvem` (só do Inno). O Inno não grava arquivo no disco: todo acesso a arquivo de
+  `inno_nuvem`, que o AppClinic também usa (`appClinic/nuvem.py`, fonte única: mudança
+  num lado tem de ir para o outro). O Inno não grava arquivo no disco: todo acesso a arquivo de
   `media/` passa por ele. A pasta `MEDIA_ROOT` (a do AppClinic) só é lida: pela migração
   (`tools/nuvem/migra-media.js`) e quando um arquivo ainda não está na nuvem, que então é
   copiado para lá na hora. Não volte a gravar no disco (decisão do dono).
@@ -52,7 +53,7 @@ O dono do projeto fala português: responda em português.
   Exemplo completo em `tools/impressos/gera_inno.js` (cria as tabelas, faz login e chama as rotas).
 - Rotas: `node tools/testes/etapa5.js` (usuários, painel, logs, presença) e
   `node tools/testes/etapa6-memed.js` (Memed) e `node tools/testes/etapa6-whatsapp.js`
-  (WhatsApp e robô) e `node tools/testes/nuvem.js` (imagens no cloud-storage),
+  (WhatsApp e robô) e `node tools/testes/nuvem.js` (imagens na nuvem),
   cada um com o serviço externo falso, local.
   Para testes novos, use `tools/testes/base.js` (banco, login e cliente prontos).
 - Cobertura: `python3 tools/testes/rotas_django.py ../appclinic > /tmp/django.txt` e
@@ -63,6 +64,7 @@ O dono do projeto fala português: responda em português.
   sobe o Django original e o Inno no mesmo banco de teste e compara respostas e tabelas
   passo a passo (veja `tools/comparacao/LEIAME.md`). Rode os três roteiros depois de
   qualquer mudança; hoje todos dão iguais, fora as diferenças documentadas no README.
+  Mexeu em imagens/anexos: rode também o `roteiro-extras.js` (com uma nuvem e `NUVEM_URL`).
 - Impressos (PDF): `tools/impressos/` roda os `reports.py` originais e compara página a página
   (veja `tools/impressos/LEIAME.md`). Rode de novo ao mexer em `server/util/pdf.js`.
 

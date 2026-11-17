@@ -52,9 +52,12 @@ de sempre (`extras/<paciente>/<ano>/<mês>/<dia>/<arquivo>`); a ligação "camin
 fica na tabela `inno_nuvem`, só do Inno, criada sozinha no primeiro envio (o usuário do MySQL
 precisa de permissão para criar tabela). `/media/...` e o download buscam o arquivo na nuvem.
 
-Um arquivo que ainda não está na nuvem (enviado pelo AppClinic, que grava na pasta `media/`)
-é lido da pasta `MEDIA_ROOT` (só leitura) e copiado para a nuvem na mesma hora; assim as imagens
-do AppClinic aparecem no Inno, e a nuvem vai se completando sozinha.
+O AppClinic usa a **mesma nuvem e a mesma tabela** (`appClinic/nuvem.py` no repositório dele): o que
+um envia, o outro vê. Um arquivo que ainda não está na nuvem (enviado antes dessa mudança, na pasta
+`media/`) é lido da pasta `MEDIA_ROOT` (só leitura) e copiado para a nuvem na mesma hora, nos dois
+sistemas; a nuvem vai se completando sozinha, e `tools/nuvem/migra-media.js` copia tudo de uma vez.
+O roteiro `tools/comparacao/roteiro-extras.js` confere os dois lado a lado (precisa de uma nuvem
+rodando e `NUVEM_URL`).
 
 1. No `.env` do Inno: `NUVEM_URL=http://127.0.0.1:5190` (a nuvem de `~/apps/nuvem`, na mesma máquina).
 2. `node tools/nuvem/testa.js` testa tudo (endereço, tabela, envio e leitura de um arquivo de teste)
@@ -128,7 +131,6 @@ O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As 
 - A primeira vez que um usuário sem preferências salvas abre um paciente (ou a agenda), o Django dava erro. O Inno cria as preferências com os valores padrão.
 - Impressos: o nome do arquivo com acento (resumo de atendimentos) vai no formato MIME (`=?utf-8?b?...?=`), porque o Node não envia latin-1 cru no cabeçalho.
 - Criar horários com intervalo negativo travava o AppClinic num laço sem fim; o Inno ignora esse intervalo.
-- Imagens e anexos ficam só na nuvem (cloud-storage), não na pasta `media/` como no AppClinic; o banco guarda o mesmo caminho.
 - Ao abrir a agenda, se a lista de médicos chegava antes do calendário ter data, a tela pedia a agenda de "NaN-NaN-NaN" e recebia erro. O Inno espera a data.
 - WhatsApp e Memed: quando o servidor de fora não responde, algumas respostas trazem o texto do erro de rede (`"error": "..."`). O texto é parecido com o do Python (`HTTPConnectionPool(...): Max retries exceeded...`), mas não idêntico, porque vem do Node.
 - Atestado antigo: o CID gravado que não está na tabela de CID (ex.: "G43") não aparecia

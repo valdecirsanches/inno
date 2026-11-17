@@ -1051,7 +1051,18 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
       { nome: 'recuperar_imagens', detalhe: false, metodos: ['post'], fn: async (req, res) => {
         const pac = req.POST.get('id_paciente');
         const l = await lista(EX, (q) => filtraFk(q, col(EX, 'fk_prontuario_id'), pac), null);
-        if (await arm.existePasta(`extras/${pac}`)) return drf.responde(res, { success: 'OK', imagens: l.map((o) => o.file) });
+        if (await arm.existePasta(`extras/${pac}`)) {
+          // imgs.append(o.file): o JSON do DRF percorre cada FieldFile como um arquivo aberto,
+          // então a resposta traz o CONTEÚDO de cada arquivo, em linhas, decodificado como UTF-8
+          // (imagem de verdade, binária, dá erro 500 no AppClinic; arquivo sumido também)
+          const imagens = [];
+          for (const o of l) {
+            const dados = await arm.le(String(o.file));
+            if (dados === null) throw erroPython(`[Errno 2] No such file or directory: '${o.file}'`);
+            imagens.push(linhasDeArquivo(dados));
+          }
+          return drf.responde(res, { success: 'OK', imagens });
+        }
         drf.responde(res, { erro: 'Nada feito!' });
       } },
       { nome: 'uploadDoc', detalhe: false, metodos: ['get'], fn: async (req, res) => {
@@ -1079,6 +1090,26 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
   };
   viewset.registra(app, '/api/extras', opcExtras);
   viewset.registra(app, '/api/prontuario/extras', opcExtras);
+
+  /** for linha in File(...) do Django + bytes.decode() do JSON do DRF */
+  function linhasDeArquivo(dados) {
+    const linhas = [];
+    let ini = 0;
+    for (let i = 0; i < dados.length; i++) {
+      if (dados[i] === 0x0a || dados[i] === 0x0d) {
+        const fim = dados[i] === 0x0d && dados[i + 1] === 0x0a ? i + 2 : i + 1;
+        linhas.push(dados.subarray(ini, fim)); ini = fim; i = fim - 1;
+      }
+    }
+    if (ini < dados.length) linhas.push(dados.subarray(ini));
+    const dec = new TextDecoder('utf-8', { fatal: true });
+    return linhas.map((b) => {
+      try { return dec.decode(b); } catch (e) {
+        const pos = b.findIndex((x) => x >= 0x80);
+        throw erroPython(`'utf-8' codec can't decode byte 0x${b[Math.max(pos, 0)].toString(16).padStart(2, '0')} in position ${Math.max(pos, 0)}: invalid start byte`);
+      }
+    });
+  }
 
   /** upload_to=prontuario_directory_file: extras/<paciente>/<ano>/<mês>/<dia>/<nome> */
   async function salvaArquivoExtra(obj, arq) {

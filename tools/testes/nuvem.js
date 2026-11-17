@@ -79,7 +79,7 @@ function nuvemFalsa() {
     });
     await t.confere('mesmo nome de novo ganha sufixo, como o Django', async () => {
       const j = await (await envia('foto teste.png')).json();
-      assert.match(j.success, /\/foto_teste_[a-z0-9]{7}\.png$/);
+      assert.match(j.success, /\/foto_teste_[A-Za-z0-9]{7}\.png$/);
     });
     await t.confere('lista de anexos mostra os da nuvem', async () => {
       const j = await (await t.vai('/prontuario/Extras/CarregaExtras/?prontuario=1')).json();

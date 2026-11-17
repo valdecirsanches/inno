@@ -168,12 +168,16 @@ const nuvem = {
   lista: listaTudo,
 };
 
+/** get_random_string(7) do Django: letras maiúsculas, minúsculas e números */
+const ALFABETO = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const sufixo = () => Array.from(require('crypto').randomBytes(7), (b) => ALFABETO[b % ALFABETO.length]).join('');
+
 /** nome livre na pasta, como o get_available_name do Django (sufixo aleatório de 7) */
 async function nomeLivre(dir, nome) {
   let n = nome;
   while (await nuvem.existe(`${dir}/${n}`)) {
     const ext = path.extname(nome);
-    n = `${path.basename(nome, ext)}_${Math.random().toString(36).slice(2, 9).padEnd(7, '0')}${ext}`;
+    n = `${path.basename(nome, ext)}_${sufixo()}${ext}`;
   }
   return n;
 }

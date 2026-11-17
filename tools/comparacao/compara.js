@@ -37,10 +37,19 @@ const porta = () => new Promise((ok) => { const s = require('net').createServer(
 function cliente(base) {
   const ck = {};
   const cookies = () => Object.entries(ck).map(([k, v]) => `${k}=${v}`).join('; ');
-  return async (metodo, url, { corpo = null, json = false, headers = {} } = {}) => {
+  return async (metodo, url, { corpo = null, json = false, headers = {}, arquivos = null } = {}) => {
     const h = Object.assign({ cookie: cookies(), 'x-csrftoken': ck.csrftoken || '', referer: base + '/', accept: 'text/html,application/json' }, headers);
-    if (corpo !== null) h['content-type'] = json ? 'application/json' : 'application/x-www-form-urlencoded';
-    const r = await fetch(base + url, { method: metodo, headers: h, body: corpo === null ? undefined : (json ? JSON.stringify(corpo) : new URLSearchParams(corpo).toString()), redirect: 'manual' });
+    let body;
+    if (arquivos) {
+      // multipart/form-data (envio de arquivo): campos de corpo + {campo: {nome, dados, tipo}}
+      body = new FormData();
+      for (const [k, v] of Object.entries(corpo || {})) body.append(k, v);
+      for (const [k, a] of Object.entries(arquivos)) body.append(k, new Blob([a.dados], { type: a.tipo || 'application/octet-stream' }), a.nome);
+    } else if (corpo !== null) {
+      h['content-type'] = json ? 'application/json' : 'application/x-www-form-urlencoded';
+      body = json ? JSON.stringify(corpo) : new URLSearchParams(corpo).toString();
+    }
+    const r = await fetch(base + url, { method: metodo, headers: h, body, redirect: 'manual' });
     for (const c of r.headers.getSetCookie()) { const [kv] = c.split(';'); const i = kv.indexOf('='); const v = kv.slice(i + 1); if (v === '""' || v === '') delete ck[kv.slice(0, i)]; else ck[kv.slice(0, i)] = v; }
     const buf = Buffer.from(await r.arrayBuffer());
     return { status: r.status, tipo: (r.headers.get('content-type') || '').split(';')[0], local: r.headers.get('location'), corpo: buf };
@@ -60,6 +69,8 @@ function normaliza(t, portas) {
   s = s.replace(new RegExp(`${iso}[T ]\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?`, 'g'), 'AGORA');
   s = s.replace(new RegExp(`${d2(hoje.getDate())}/${d2(hoje.getMonth() + 1)}/${hoje.getFullYear()} \\d{2}:\\d{2}(:\\d{2})?`, 'g'), 'AGORA');
   s = s.replace(/\d{2}:\d{2}:\d{2}\.\d{6}/g, 'HH:MM:SS.US');
+  // sufixo sorteado de nome de arquivo repetido (get_available_name do Django)
+  s = s.replace(/_[A-Za-z0-9]{7}(\.[A-Za-z0-9]{2,4})\b/g, '_SUFIXO$1');
   return s;
 }
 
@@ -104,7 +115,9 @@ function difere(a, b) {
     tabelas = a.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map((t) => t.name);
   }
   const IGNORA = new Set(['tb_usuarios_log', 'tbWhatsappLog', 'tb_usuarios_opcoes']);
-  const linhasDe = async (db, t) => (await db.linhas(t)).map((l) => normaliza(JSON.stringify(Object.keys(l).map((c) => (typeof l[c] === 'number' ? l[c] : l[c] === null ? null : String(l[c]).replace(/\.0+$/, '')))), []));
+  // colunas que mudam a cada envio (o id que a nuvem dá ao arquivo)
+  const SEM_COLUNAS = { inno_nuvem: ['nuvem_id', 'criado_em'] };
+  const linhasDe = async (db, t) => (await db.linhas(t)).map((l) => normaliza(JSON.stringify(Object.keys(l).filter((c) => !(SEM_COLUNAS[t] || []).includes(c)).map((c) => (typeof l[c] === 'number' ? l[c] : l[c] === null ? null : String(l[c]).replace(/\.0+$/, '')))), []));
 
   const jaDivergiu = new Set();
   const divergencias = [];
