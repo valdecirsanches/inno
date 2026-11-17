@@ -2,6 +2,8 @@
 // Imagens e anexos (só na nuvem), contra um cloud-storage falso
 // (mesmas rotas e respostas de app/api/* do valdecirsanches/cloud-storage).
 //   node tools/testes/nuvem.js
+// Contra um cloud-storage de verdade (ex.: a versão antiga, server/, rodando local):
+//   NUVEM_REAL_URL=http://127.0.0.1:4000 NUVEM_REAL_KEY=<chave> node tools/testes/nuvem.js
 const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
@@ -43,14 +45,23 @@ function nuvemFalsa() {
 }
 
 (async () => {
-  const nv = await nuvemFalsa();
-  const URLN = `http://127.0.0.1:${nv.address().port}`;
+  const real = process.env.NUVEM_REAL_URL;
+  const nv = real ? null : await nuvemFalsa();
+  const URLN = real || `http://127.0.0.1:${nv.address().port}`;
+  const CH = real ? process.env.NUVEM_REAL_KEY : CHAVE;
+  // (o armazenamento lê a configuração: só depois que o base() montar o ambiente de teste)
+  const daNuvem = (n) => require('../../server/util/armazenamento').daNuvem(n);
+  /** caminhos (como no banco) dos arquivos que estão na nuvem */
+  const naNuvem = async () => {
+    const r = await fetch(URLN + '/api/files', { headers: { 'x-api-key': CH } });
+    return ((await r.json()).files || []).map((f) => daNuvem(f.name !== undefined ? f.name : f.originalName));
+  };
   const media = fs.mkdtempSync(path.join(os.tmpdir(), 'media-'));
   // arquivos antigos na pasta local, para a migração
   fs.mkdirSync(path.join(media, 'extras/1/2024/05/10'), { recursive: true });
   fs.writeFileSync(path.join(media, 'extras/1/2024/05/10/antiga.png'), Buffer.from('png antigo'));
   fs.writeFileSync(path.join(media, 'extras/1/2024/05/10/raio_x.jpg'), Buffer.from('jpg antigo'));
-  const env = { NUVEM_URL: URLN, NUVEM_API_KEY: CHAVE, MEDIA_ROOT: media };
+  const env = { NUVEM_URL: URLN, NUVEM_API_KEY: CH, MEDIA_ROOT: media };
   const t = await require('./base')({ env });
   try {
     await t.entra();
@@ -68,7 +79,7 @@ function nuvemFalsa() {
       const j = await r.json();
       assert.match(j.success, /^extras\/1\/\d{4}\/\d{2}\/\d{2}\/foto_teste\.png$/);
       caminho = j.success;
-      assert.ok([...arquivos.values()].some((a) => a.meta.name === caminho), 'nome na nuvem = caminho');
+      assert.ok((await naNuvem()).includes(caminho), 'o caminho volta da nuvem igual');
       assert.ok(!fs.existsSync(path.join(media, caminho)), 'nada gravado na pasta local');
       const linha = t.sq.prepare('select file from tb_extra order by id desc limit 1').get();
       assert.strictEqual(linha.file, caminho);
@@ -100,7 +111,7 @@ function nuvemFalsa() {
       assert.match(await roda('--simular'), /2 a enviar/);
       assert.match(await roda(), /2 enviados/);
       assert.match(await roda(), /0 a enviar/);
-      assert.ok([...arquivos.values()].some((a) => a.meta.name === 'extras/1/2024/05/10/raio_x.jpg'));
+      assert.ok((await naNuvem()).includes('extras/1/2024/05/10/raio_x.jpg'));
     });
     await t.confere('rastrear acha na nuvem as imagens sem registro', async () => {
       require('../../server/util/armazenamento')._zeraIndice();
@@ -118,7 +129,7 @@ function nuvemFalsa() {
       const antes = t.sq.prepare('select count(*) n from tb_extra').get().n;
       assert.strictEqual((await envia('x.png')).status, 500);
       assert.strictEqual(t.sq.prepare('select count(*) n from tb_extra').get().n, antes);
-      require('../../server/config').nuvem.apiKey = CHAVE;
+      require('../../server/config').nuvem.apiKey = CH;
     });
     await t.confere('sem a nuvem configurada: erro, e nada vai para o disco nem para o banco', async () => {
       const cfg = require('../../server/config');
@@ -133,5 +144,5 @@ function nuvemFalsa() {
     });
     await t.fim();
   } catch (e) { await t.fim(e); }
-  nv.close();
+  if (nv) nv.close();
 })();

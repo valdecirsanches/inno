@@ -46,8 +46,10 @@ O `.env` nunca vai para o GitHub.
 
 As imagens e anexos do prontuário ficam **só** no cloud-storage (criptografados lá): o Inno
 não grava arquivo nenhum no disco, e sem `NUVEM_URL`/`NUVEM_API_KEY` o envio dá erro. O banco
-continua com o mesmo caminho de sempre (`extras/<paciente>/<ano>/<mês>/<dia>/<arquivo>`), que
-vira o nome do arquivo na nuvem; `/media/...` e o download buscam o arquivo lá.
+continua com o mesmo caminho de sempre (`extras/<paciente>/<ano>/<mês>/<dia>/<arquivo>`); na nuvem
+o nome do arquivo é esse caminho com `~` no lugar de `/` (`extras~12~2026~11~17~foto.png`), e
+`/media/...` e o download buscam o arquivo lá. Funciona com as duas versões do cloud-storage:
+a atual (Next.js) e a antiga (pasta `server/`, em Express).
 
 1. No servidor do cloud-storage, crie uma chave para o Inno no `config/clients.json`
    (`openssl rand -base64 32`), com o `id` `inno`.

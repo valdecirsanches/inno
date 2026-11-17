@@ -5,9 +5,17 @@
  * arquivo nenhum no disco; sem a nuvem configurada, o envio dá erro.
  *
  * O banco continua guardando o mesmo caminho de sempre (ex.:
- * "extras/12/2026/11/17/foto.png"). Na nuvem, esse caminho é o nome do
- * arquivo; o id que a nuvem dá a cada arquivo é encontrado pela lista dos
- * arquivos do cliente, que fica em memória e é relida quando falta um nome.
+ * "extras/12/2026/11/17/foto.png"). Na nuvem, esse caminho vira o nome do
+ * arquivo com "~" no lugar de "/" ("extras~12~2026~11~17~foto.png"), porque a
+ * versão antiga do cloud-storage (Express + multer) corta o que vem antes da
+ * última "/". O "~" nunca aparece nos nomes que o Inno grava (o nome do arquivo
+ * passa pelo mesmo filtro do Django, que só deixa letras, números, "-", "_" e ".").
+ * O id que a nuvem dá a cada arquivo é achado pela lista dos arquivos do cliente,
+ * que fica em memória e é relida quando falta um nome.
+ *
+ * Funciona com as duas versões do cloud-storage: a atual (Next.js: name, uploadedAt,
+ * id no topo da resposta do envio) e a antiga (server/: originalName, createdAt,
+ * id dentro de "file").
  *
  * A pasta MEDIA_ROOT (a media/ do AppClinic) só é lida, pelo
  * tools/nuvem/migra-media.js, para copiar os arquivos antigos para a nuvem.
@@ -43,6 +51,13 @@ let lidoEm = 0;
 let lendo = null;
 const RELER_MS = 15000;     // no máximo uma releitura da lista a cada 15 s por falta de nome
 
+/** caminho do banco <-> nome na nuvem */
+const paraNuvem = (rel) => {
+  if (String(rel).includes('~')) throw new Error(`caminho com "~" não pode ir para a nuvem: ${rel}`);
+  return String(rel).replace(/\//g, '~');
+};
+const daNuvem = (nome) => String(nome).replace(/~/g, '/');
+
 async function chama(metodo, rota, { corpo, timeout = 60000 } = {}) {
   const { url, chave } = nuvemCfg();
   if (!url || !chave) throw new Error('Armazenamento na nuvem sem NUVEM_URL ou NUVEM_API_KEY no .env');
@@ -60,8 +75,12 @@ async function carregaIndice(forca = false) {
       const j = await r.json();
       const m = new Map();
       // se houver dois com o mesmo nome, vale o mais novo
-      const l = (j.files || []).slice().sort((x, y) => String(x.uploadedAt).localeCompare(String(y.uploadedAt)));
-      for (const f of l) m.set(f.name, f.id);
+      const quando = (f) => String(f.uploadedAt || f.createdAt || '');
+      const l = (j.files || []).slice().sort((x, y) => quando(x).localeCompare(quando(y)));
+      for (const f of l) {
+        const nome = f.name !== undefined ? f.name : f.originalName;
+        if (nome && f.id) m.set(daNuvem(nome), f.id);
+      }
       indice = m;
       lidoEm = Date.now();
       return m;
@@ -94,11 +113,12 @@ const nuvem = {
   },
   async grava(rel, dados, tipoMime) {
     const fd = new FormData();
-    fd.append('file', new Blob([dados], { type: tipoMime || 'application/octet-stream' }), rel);
+    fd.append('file', new Blob([dados], { type: tipoMime || 'application/octet-stream' }), paraNuvem(rel));
     const r = await chama('POST', '/api/upload', { corpo: fd, timeout: 300000 });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok || !j.id) throw new Error(`nuvem recusou ${rel}: ${r.status} ${j.error || ''}`.trim());
-    (await carregaIndice()).set(rel, j.id);
+    const id = j.id || (j.file && j.file.id);
+    if (!r.ok || !id) throw new Error(`nuvem recusou ${rel}: ${r.status} ${j.error || ''}`.trim());
+    (await carregaIndice()).set(rel, id);
   },
   async exclui(rel) {
     const id = await idDe(rel);
@@ -142,7 +162,7 @@ function rotaMedia() {
 }
 
 module.exports = {
-  nomeLivre, rotaMedia, nuvem, origem,
+  nomeLivre, rotaMedia, nuvem, origem, paraNuvem, daNuvem,
   existe: (rel) => nuvem.existe(rel),
   existePasta: (rel) => nuvem.existePasta(rel),
   le: (rel) => nuvem.le(rel),

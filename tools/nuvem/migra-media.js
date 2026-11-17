@@ -27,8 +27,10 @@ const PARALELO = 4;
   console.log(`Nuvem:       ${config.nuvem.url}`);
   const locais = await arm.origem.lista(pasta);
   const naNuvem = new Set(await arm.nuvem.lista(''));
-  const faltam = locais.filter((r) => !naNuvem.has(r));
-  console.log(`${locais.length} arquivos na pasta, ${locais.length - faltam.length} já na nuvem, ${faltam.length} a enviar.`);
+  const comTil = locais.filter((r) => r.includes('~'));
+  for (const r of comTil) console.log(`  pulado (o nome tem "~"): ${r}`);
+  const faltam = locais.filter((r) => !naNuvem.has(r) && !r.includes('~'));
+  console.log(`${locais.length} arquivos na pasta, ${locais.length - faltam.length - comTil.length} já na nuvem, ${faltam.length} a enviar.`);
   if (simular) { for (const r of faltam.slice(0, 50)) console.log('  ' + r); if (faltam.length > 50) console.log(`  ... e mais ${faltam.length - 50}`); return; }
   let ok = 0, erro = 0, bytes = 0, i = 0;
   const t0 = Date.now();
