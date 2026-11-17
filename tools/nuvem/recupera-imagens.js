@@ -16,6 +16,9 @@
  *   tirada das pastas (ano/mês/dia) ou, sem elas, da data do próprio arquivo.
  * - O registro aponta para a última consulta do paciente (e o médico dela), como o
  *   "rastrear" do AppClinic; paciente sem consulta fica sem consulta/médico.
+ * - Arquivo que já tem registro em Imagens e anexos com o mesmo caminho (a pasta é
+ *   uma media/extras do AppClinic: extras/<paciente>/<ano>/<mês>/<dia>/<nome>) não
+ *   ganha registro novo: só é copiado para a nuvem com esse caminho, se ainda não estiver.
  * - Pode rodar de novo: arquivo igual (mesmo conteúdo) já recuperado para o mesmo
  *   paciente é pulado. Nada é apagado nem alterado nas pastas de origem.
  */
@@ -91,7 +94,7 @@ function dataDe(abs, relNoPaciente) {
   };
 
   const P = 'TbPacientes', AG = 'TbAgendaCons', EX = 'TbExtra';
-  const resumo = { arquivos: 0, recuperados: 0, repetidos: 0, semPaciente: 0, foraDePadrao: 0, erros: 0, bytes: 0 };
+  const resumo = { arquivos: 0, recuperados: 0, repetidos: 0, comRegistro: 0, semPaciente: 0, foraDePadrao: 0, erros: 0, bytes: 0 };
   const pacientesSemCadastro = new Set();
   for (const base of pastas) {
     const raiz = path.resolve(base);
@@ -108,6 +111,17 @@ function dataDe(abs, relNoPaciente) {
       try {
         const dados = fs.readFileSync(abs);
         const h = sha(dados);
+        // já registrado com este mesmo caminho (pasta media/extras do AppClinic): só garante a nuvem
+        const original = `extras/${pac}/${resto.join('/')}`;
+        if (await db.tabela(EX).where(col(EX, 'file'), original).first()) {
+          if (!(await arm.naNuvem.existe(original).catch(() => false))) {
+            if (!simular) await arm.naNuvem.grava(original, dados, tipoMime(original));
+            resumo.comRegistro++; resumo.bytes += dados.length;
+          } else resumo.repetidos++;
+          if (!vistosNaRodada.has(pac)) vistosNaRodada.set(pac, new Set());
+          vistosNaRodada.get(pac).add(h);
+          continue;
+        }
         if (await jaEsta(pac, dados, h)) { resumo.repetidos++; continue; }
         const dt = dataDe(abs, resto.join('/'));
         const dir = `extras/${pac}/${dt.a}/${p2(dt.m)}/${p2(dt.d)}`;
@@ -135,7 +149,8 @@ function dataDe(abs, relNoPaciente) {
   }
   console.log(`\n${resumo.arquivos} arquivos lidos`);
   console.log(`  ${resumo.recuperados} ${simular ? 'seriam recuperados' : 'recuperados'} (${(resumo.bytes / 1048576).toFixed(1)} MB)`);
-  console.log(`  ${resumo.repetidos} já estavam no prontuário (mesmo conteúdo): pulados`);
+  if (resumo.comRegistro) console.log(`  ${resumo.comRegistro} já tinham registro no prontuário: ${simular ? 'seriam copiados' : 'copiados'} para a nuvem com o mesmo caminho`);
+  console.log(`  ${resumo.repetidos} já estavam no prontuário e na nuvem: pulados`);
   if (resumo.semPaciente) console.log(`  ${resumo.semPaciente} de pacientes que não existem no cadastro (ids: ${[...pacientesSemCadastro].slice(0, 30).join(', ')}${pacientesSemCadastro.size > 30 ? '...' : ''}): pulados`);
   if (resumo.foraDePadrao) console.log(`  ${resumo.foraDePadrao} fora de uma pasta com o id do paciente: pulados`);
   if (resumo.erros) console.log(`  ${resumo.erros} com erro (rode de novo para tentar outra vez)`);

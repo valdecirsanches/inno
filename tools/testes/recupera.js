@@ -45,19 +45,23 @@ function nuvemFalsa() {
   // pasta 2: cópia do mesmo raio x (não pode duplicar) e uma nova do paciente 2
   escreve('outro/1/copia.png', 'png do paciente 1');
   escreve('outro/2/exame.jpg', 'jpg do paciente 2');
+  // pasta 3: uma media/extras do AppClinic, com arquivo que já tem registro no banco
+  escreve('extras/1/2024/01/02/ja_registrado.png', 'png já registrado');
   const env = { NUVEM_URL: URLN, NUVEM_TIPO: 'simples', MEDIA_ROOT: path.join(raiz, 'media-vazia') };
   const t = await require('./base')({ env });
   const roda = (...a) => new Promise((ok, erro) => execFile(process.execPath, ['tools/nuvem/recupera-imagens.js', ...a],
     { env: Object.assign({}, process.env, env), encoding: 'utf8' }, (e, out, err) => (e && e.code !== 2 ? erro(new Error(out + err)) : ok(out))));
   const extras = (pac) => t.sq.prepare('select file, fk_consulta_id, data_salvo from tb_extra where fk_prontuario_id = ? order by id').all(pac);
-  const pastas = [path.join(raiz, 'extra'), path.join(raiz, 'outro')];
+  const pastas = [path.join(raiz, 'extra'), path.join(raiz, 'outro'), path.join(raiz, 'extras')];
   try {
     await t.entra();
+    t.sq.prepare("insert into tb_extra (fk_prontuario_id, fk_consulta_id, fk_medico_id, file, ativo, data_salvo) values (1, 42, 1, 'extras/1/2024/01/02/ja_registrado.png', 1, '2024-01-02 10:00:00')").run();
     const antes1 = extras(1).length;
     await t.confere('simulação mostra e não grava nada', async () => {
       const out = await roda('--simular', ...pastas);
       assert.match(out, /3 seriam recuperados/);
       assert.match(out, /1 já estavam no prontuário/);
+      assert.match(out, /1 já tinham registro no prontuário: seriam copiados para a nuvem com o mesmo caminho/);
       assert.match(out, /pacientes que não existem no cadastro \(ids: 999\)/);
       assert.match(out, /1 fora de uma pasta com o id do paciente/);
       assert.strictEqual(arquivos.size, 0);
@@ -74,7 +78,9 @@ function nuvemFalsa() {
       const doPac2 = extras(2).map((x) => x.file);
       assert.strictEqual(doPac2.length, 1);
       assert.match(doPac2[0], /^extras\/2\/\d{4}\/\d{2}\/\d{2}\/exame\.jpg$/);
-      assert.strictEqual(arquivos.size, 3);
+      assert.strictEqual(arquivos.size, 4, '3 novos + o já registrado');
+      assert.strictEqual(t.sq.prepare("select count(*) n from tb_extra where file = 'extras/1/2024/01/02/ja_registrado.png'").get().n, 1, 'sem registro duplicado');
+      assert.strictEqual(t.sq.prepare("select count(*) n from inno_nuvem where caminho = 'extras/1/2024/01/02/ja_registrado.png'").get().n, 1, 'na nuvem com o mesmo caminho');
       assert.ok(fs.existsSync(path.join(raiz, 'extra/1/2023/03/05/raio x.png')), 'origem intacta');
     });
     await t.confere('aparece em Imagens e anexos e abre', async () => {
@@ -88,8 +94,8 @@ function nuvemFalsa() {
     await t.confere('rodar de novo não duplica', async () => {
       const out = await roda(...pastas);
       assert.match(out, /0 recuperados/);
-      assert.match(out, /4 já estavam no prontuário/);   // os 3 recuperados + a cópia
-      assert.strictEqual(arquivos.size, 3);
+      assert.match(out, /5 já estavam no prontuário/);   // os 3 recuperados + a cópia + o já registrado
+      assert.strictEqual(arquivos.size, 4);
     });
     await t.fim();
   } catch (e) { await t.fim(e); }
