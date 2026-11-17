@@ -52,6 +52,10 @@ de sempre (`extras/<paciente>/<ano>/<mês>/<dia>/<arquivo>`); a ligação "camin
 fica na tabela `inno_nuvem`, só do Inno, criada sozinha no primeiro envio (o usuário do MySQL
 precisa de permissão para criar tabela). `/media/...` e o download buscam o arquivo na nuvem.
 
+Um arquivo que ainda não está na nuvem (enviado pelo AppClinic, que grava na pasta `media/`)
+é lido da pasta `MEDIA_ROOT` (só leitura) e copiado para a nuvem na mesma hora; assim as imagens
+do AppClinic aparecem no Inno, e a nuvem vai se completando sozinha.
+
 1. No `.env` do Inno: `NUVEM_URL=http://127.0.0.1:5190` (a nuvem de `~/apps/nuvem`, na mesma máquina).
 2. `node tools/nuvem/testa.js` testa tudo (endereço, tabela, envio e leitura de um arquivo de teste)
    e diz onde parou.

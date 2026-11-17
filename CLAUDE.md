@@ -36,8 +36,9 @@ O dono do projeto fala português: responda em português.
   (`~/apps/nuvem`, porta 5190, `NUVEM_TIPO=simples`: POST /upload, GET /download/:id, sem
   chave, lista nem exclusão) ou o cloud-storage. A ligação caminho → id fica na tabela
   `inno_nuvem` (só do Inno). O Inno não grava arquivo no disco: todo acesso a arquivo de
-  `media/` passa por ele, e a pasta `MEDIA_ROOT` só é lida pela migração
-  (`tools/nuvem/migra-media.js`). Não volte a gravar no disco (decisão do dono).
+  `media/` passa por ele. A pasta `MEDIA_ROOT` (a do AppClinic) só é lida: pela migração
+  (`tools/nuvem/migra-media.js`) e quando um arquivo ainda não está na nuvem, que então é
+  copiado para lá na hora. Não volte a gravar no disco (decisão do dono).
 - `server/util/pdf.js`: equivalente do ReportLab (canvas e platypus) para os impressos.
 - `server/db.js`: acesso ao banco, com os tipos de `server/modelos.json`.
   O `modelos.json` tem também três tabelas acrescentadas à mão (o exportador não as gera):

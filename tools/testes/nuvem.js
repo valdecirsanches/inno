@@ -106,6 +106,23 @@ function nuvemFalsa() {
       const migrada = await t.vai('/media/extras/1/2024/05/10/raio_x.jpg');
       assert.strictEqual(Buffer.from(await migrada.arrayBuffer()).toString(), 'jpg antigo');
     });
+    await t.confere('imagem enviada pelo AppClinic (só na pasta) aparece no Inno e vai para a nuvem', async () => {
+      const rel = 'extras/1/2026/11/17/pelo_appclinic.jpg';
+      fs.mkdirSync(path.dirname(path.join(media, rel)), { recursive: true });
+      fs.writeFileSync(path.join(media, rel), Buffer.from('jpg do appclinic'));
+      t.sq.prepare('insert into tb_extra (fk_prontuario_id, fk_consulta_id, fk_medico_id, file, data_salvo) values (1, 42, 1, ?, ?)').run(rel, '2026-11-17 11:00:00');
+      const lista = await (await t.vai('/prontuario/Extras/CarregaExtras/?prontuario=1')).json();
+      const item = lista.success.find((x) => x.nome === 'pelo_appclinic.jpg');
+      assert.ok(item, 'aparece na lista do Inno');
+      assert.ok(!indice().some((x) => x.caminho === rel), 'ainda não está na nuvem');
+      const r = await t.vai(item.url);
+      assert.strictEqual(r.status, 200);
+      assert.strictEqual(Buffer.from(await r.arrayBuffer()).toString(), 'jpg do appclinic');
+      assert.ok(indice().some((x) => x.caminho === rel), 'copiada para a nuvem ao abrir');
+      assert.strictEqual(fs.readFileSync(path.join(media, rel)).toString(), 'jpg do appclinic', 'a pasta não é mexida');
+      const m = await t.vai('/media/' + rel);
+      assert.strictEqual(Buffer.from(await m.arrayBuffer()).toString(), 'jpg do appclinic');
+    });
     await t.confere('rastrear acha na nuvem as imagens sem registro', async () => {
       const antes = t.sq.prepare('select count(*) n from tb_extra').get().n;
       const r = await t.vai('/api/extras/rastrear/', { method: 'POST', body: t.corpo({ id_paciente: 1 }) });
@@ -125,7 +142,7 @@ function nuvemFalsa() {
       assert.strictEqual((await envia('sem nuvem.png')).status, 500);
       assert.strictEqual(t.sq.prepare('select count(*) n from tb_extra').get().n, antes);
       const noDisco = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((i) => (i.isDirectory() ? noDisco(path.join(d, i.name)) : [i.name]));
-      assert.deepStrictEqual(noDisco(media).sort(), ['antiga.png', 'raio_x.jpg'], 'só os arquivos antigos na pasta media');
+      assert.deepStrictEqual(noDisco(media).sort(), ['antiga.png', 'pelo_appclinic.jpg', 'raio_x.jpg'], 'só os arquivos do AppClinic na pasta media');
       cfg.nuvem.url = URLN;
     });
     await t.confere('nuvem fora do ar: erro, e nada vai para o banco', async () => {

@@ -16,8 +16,11 @@
  * "caminho -> id na nuvem" fica numa tabela só do Inno, inno_nuvem, criada
  * sozinha no primeiro uso (o AppClinic não a conhece nem precisa dela).
  *
- * A pasta MEDIA_ROOT (a media/ do AppClinic) só é lida, pelo
- * tools/nuvem/migra-media.js, para copiar os arquivos antigos para a nuvem.
+ * A pasta MEDIA_ROOT (a media/ do AppClinic) nunca é escrita, só lida: pelo
+ * tools/nuvem/migra-media.js e quando o Inno procura um arquivo que ainda não
+ * está na nuvem (enviado pelo AppClinic, por exemplo). Nesse caso o arquivo é
+ * entregue e copiado para a nuvem na mesma hora, então a nuvem vai se completando
+ * sozinha e as imagens do AppClinic aparecem no Inno.
  */
 const fs = require('fs');
 const path = require('path');
@@ -30,6 +33,7 @@ const TABELA = 'inno_nuvem';
 const origem = {
   abs: (rel) => path.join(config.mediaRoot, rel),
   async le(rel) { try { return fs.readFileSync(origem.abs(rel)); } catch (e) { return null; } },
+  existe(rel) { try { return fs.statSync(origem.abs(rel)).isFile(); } catch (e) { return false; } },
   /** caminhos (relativos à raiz) dos arquivos abaixo de "prefixo" */
   async lista(prefixo) {
     const out = [];
@@ -106,9 +110,8 @@ const rotas = () => (cfg().tipo === 'cloud-storage'
 /** nome do arquivo enviado à nuvem: o caminho com "~" no lugar de "/" (fica legível nos metadados de lá) */
 const paraNuvem = (rel) => String(rel).replace(/\//g, '~');
 
-const nuvem = {
+const naNuvem = {
   async existe(rel) { return (await idDe(rel)) !== null; },
-  async existePasta(rel) { return (await caminhos(rel)).length > 0; },
   async le(rel) {
     const id = await idDe(rel);
     if (!id) return null;
@@ -128,6 +131,32 @@ const nuvem = {
     if (!r.ok || !id) throw new Error(`nuvem recusou ${rel}: ${r.status} ${j.error || texto.slice(0, 200)}`.trim());
     await registra(rel, String(id), dados, tipoMime);
   },
+  lista: caminhos,
+};
+
+/** pasta e nuvem juntas, sem repetir, em ordem alfabética */
+async function listaTudo(prefixo) {
+  const s = new Set(await caminhos(prefixo));
+  for (const r of await origem.lista(prefixo)) s.add(r);
+  return [...s].sort();
+}
+
+const nuvem = {
+  /** está na nuvem, ou ainda só na pasta do AppClinic */
+  async existe(rel) { return (await naNuvem.existe(rel)) || origem.existe(rel); },
+  async existePasta(rel) { return (await caminhos(rel)).length > 0 || (await origem.lista(rel)).length > 0; },
+  /** da nuvem; se ainda não estiver lá, da pasta do AppClinic, já copiando para a nuvem */
+  async le(rel) {
+    const daNuvem = await naNuvem.le(rel);
+    if (daNuvem) return daNuvem;
+    const local = await origem.le(rel);
+    if (!local) return null;
+    try { await naNuvem.grava(rel, local, require('./mime').tipo(rel)); } catch (e) {
+      console.error(`[nuvem] não consegui copiar ${rel} para a nuvem agora: ${e.message}`);
+    }
+    return local;
+  },
+  grava: (rel, dados, tipo) => naNuvem.grava(rel, dados, tipo),
   async exclui(rel) {
     const id = await idDe(rel);
     if (!id) return false;
@@ -136,7 +165,7 @@ const nuvem = {
     await db.knex(TABELA).where('caminho', String(rel)).del();
     return true;
   },
-  lista: caminhos,
+  lista: listaTudo,
 };
 
 /** nome livre na pasta, como o get_available_name do Django (sufixo aleatório de 7) */
@@ -167,7 +196,7 @@ function rotaMedia() {
 }
 
 module.exports = {
-  nomeLivre, rotaMedia, nuvem, origem, paraNuvem, TABELA,
+  nomeLivre, rotaMedia, nuvem, naNuvem, origem, paraNuvem, TABELA,
   existe: (rel) => nuvem.existe(rel),
   existePasta: (rel) => nuvem.existePasta(rel),
   le: (rel) => nuvem.le(rel),

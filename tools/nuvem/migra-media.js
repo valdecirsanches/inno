@@ -28,7 +28,7 @@ const PARALELO = 4;
   console.log(`Pasta local: ${config.mediaRoot}${pasta ? '/' + pasta : ''}`);
   console.log(`Nuvem:       ${config.nuvem.url} (${config.nuvem.tipo})`);
   const locais = await arm.origem.lista(pasta);
-  const naNuvem = new Set(await arm.nuvem.lista(''));
+  const naNuvem = new Set(await arm.naNuvem.lista(''));
   const faltam = locais.filter((r) => !naNuvem.has(r));
   console.log(`${locais.length} arquivos na pasta, ${locais.length - faltam.length} já na nuvem, ${faltam.length} a enviar.`);
   if (simular) { for (const r of faltam.slice(0, 50)) console.log('  ' + r); if (faltam.length > 50) console.log(`  ... e mais ${faltam.length - 50}`); await db.knex.destroy(); return; }
@@ -39,7 +39,7 @@ const PARALELO = 4;
       const rel = faltam[i++];
       try {
         const dados = await arm.origem.le(rel);
-        await arm.nuvem.grava(rel, dados, tipo(rel));
+        await arm.naNuvem.grava(rel, dados, tipo(rel));
         ok++; bytes += dados.length;
       } catch (e) { erro++; console.error(`  ERRO ${rel}: ${e.message}`); }
       if ((ok + erro) % 50 === 0) console.log(`  ${ok + erro}/${faltam.length} (${(bytes / 1048576).toFixed(1)} MB)`);
