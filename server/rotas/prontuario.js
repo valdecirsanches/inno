@@ -951,34 +951,36 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
 
   // ================================================================= EXTRAS
   const EX = 'TbExtra';
-  const existe = (rel) => { try { return fs.existsSync(path.join(config.mediaRoot, rel)); } catch (e) { return false; } };
+  const arm = require('../util/armazenamento');
+  const existe = async (rel) => { try { return await arm.existe(rel); } catch (e) { return false; } };
   app.get(`${P}/Extras/CarregaExtras/`, a(async (req, res) => {
     const l = await lista(EX, (q) => filtraFk(q, col(EX, 'fk_prontuario_id'), exige(req.GET, 'prontuario')), null);
     const ret = [];
     for (const e of l) {
-      if (existe(String(e.file))) {
+      if (await existe(String(e.file))) {
         ret.push({ id: e.id, nome: String(e.file).split('/').pop(), data: dataSalvo(e), url: `/prontuario/Extras/downloadFile.json?extra=${e.id}` });
       }
     }
     json(res, { success: ret });
   }));
 
-  function baixa(res, nome) {
-    const arq = path.join(config.mediaRoot, nome);
-    if (!fs.existsSync(arq)) return res.status(404).type('text/html; charset=utf-8').send('The requested pdf was not found in our server.');
+  async function baixa(res, nome) {
+    const dados = await arm.le(nome);
+    if (!dados) return res.status(404).type('text/html; charset=utf-8').send('The requested pdf was not found in our server.');
     const tipo = require('../util/mime').tipo(nome);
     res.status(200);
     if (tipo) res.type(tipo); else res.set('Content-Type', 'text/html; charset=utf-8');
     res.set('Content-Disposition', `filename="${nome.split('/').pop()}"`);
-    res.send(fs.readFileSync(arq));
+    res.send(dados);
   }
+
   const download = a(async (req, res) => {
     const id = req.GET.get('extra');
     // get_object_or_404(TbExtra, id=None): o filtro vira "id IS NULL" e dá 404
     if (id === null) return require('../util/http').pagina404(res);
     const l = await db.tabela(EX).where(col(EX, 'id'), numero(id)).first();
     if (!l) return require('../util/http').pagina404(res);
-    baixa(res, String(db.linha(EX, l).file));
+    await baixa(res, String(db.linha(EX, l).file));
   });
   app.get(`${P}/Extras/downloadFile.json`, download);
 
@@ -1002,7 +1004,7 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
       throw erroPython("'ErrorDict' object has no attribute 'get_json_errors'");
     }
     const obj = Object.assign({}, f.valores);
-    obj.file = salvaArquivoExtra(obj, arq);
+    obj.file = await salvaArquivoExtra(obj, arq);
     await modelo.salva(req, EX, obj);
     const pr = await relacionado('TbPacientes', obj.fk_prontuario_id);
     if (!pr) throw erroPython("'NoneType' object has no attribute 'id'");
@@ -1023,20 +1025,24 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
     acoes: [
       { nome: 'rastrear', detalhe: false, metodos: ['post'], fn: async (req, res) => {
         const pac = parseIntPy(req.POST.get('id_paciente'));
-        const pasta = path.join(config.mediaRoot, 'extras', String(pac));
+        // percorre extras/<pac>/<ano>/<mês>/<dia>/<arquivo> (na pasta local ou na nuvem);
+        // como no AppClinic, imgs fica com os arquivos do último dia percorrido
         let imgs = null;
-        if (fs.existsSync(pasta)) {
-          for (const ano of fs.readdirSync(pasta)) for (const mes of fs.readdirSync(path.join(pasta, ano))) {
-            for (const dia of fs.readdirSync(path.join(pasta, ano, mes))) {
-              imgs = fs.readdirSync(path.join(pasta, ano, mes, dia));
-              for (const img of imgs) {
-                const fname = `extras/${pac}/${ano}/${mes}/${dia}/${img}`;
-                const ja = await db.tabela(EX).where(col(EX, 'file'), fname).first();
-                if (!ja) {
-                  const ag = db.linha('TbAgendaCons', await db.tabela('TbAgendaCons').where(col('TbAgendaCons', 'fk_paciente_id'), pac).orderBy('id', 'desc').first());
-                  if (ag) await modelo.salva(req, EX, { fk_prontuario_id: pac, fk_consulta_id: ag.id, fk_medico_id: ag.fk_medico_id, file: fname });
-                }
-              }
+        const porDia = new Map();
+        for (const rel of await arm.lista(`extras/${pac}`)) {
+          const partes = rel.split('/');
+          if (partes.length !== 6) continue;
+          const dia = partes.slice(0, 5).join('/');
+          if (!porDia.has(dia)) porDia.set(dia, []);
+          porDia.get(dia).push(rel);
+        }
+        for (const arquivos of porDia.values()) {
+          imgs = arquivos;
+          for (const fname of arquivos) {
+            const ja = await db.tabela(EX).where(col(EX, 'file'), fname).first();
+            if (!ja) {
+              const ag = db.linha('TbAgendaCons', await db.tabela('TbAgendaCons').where(col('TbAgendaCons', 'fk_paciente_id'), pac).orderBy('id', 'desc').first());
+              if (ag) await modelo.salva(req, EX, { fk_prontuario_id: pac, fk_consulta_id: ag.id, fk_medico_id: ag.fk_medico_id, file: fname });
             }
           }
         }
@@ -1045,7 +1051,7 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
       { nome: 'recuperar_imagens', detalhe: false, metodos: ['post'], fn: async (req, res) => {
         const pac = req.POST.get('id_paciente');
         const l = await lista(EX, (q) => filtraFk(q, col(EX, 'fk_prontuario_id'), pac), null);
-        if (fs.existsSync(path.join(config.mediaRoot, 'extras', String(pac)))) return drf.responde(res, { success: 'OK', imagens: l.map((o) => o.file) });
+        if (await arm.existePasta(`extras/${pac}`)) return drf.responde(res, { success: 'OK', imagens: l.map((o) => o.file) });
         drf.responde(res, { erro: 'Nada feito!' });
       } },
       { nome: 'uploadDoc', detalhe: false, metodos: ['get'], fn: async (req, res) => {
@@ -1058,23 +1064,13 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
         exige(req.GET, 'paciente');
         const requests = require('../util/requests');
         const raiz = path.join(config.mediaRoot, 'extras');
-        if (!fs.existsSync(raiz)) throw erroPython(`[Errno 2] No such file or directory: '${raiz}'`);
-        const walk = function* (dir) {
-          const itens = fs.readdirSync(dir, { withFileTypes: true });
-          yield [dir, itens.filter((i) => i.isFile()).map((i) => i.name)];
-          for (const i of itens) if (i.isDirectory()) yield* walk(path.join(dir, i.name));
-        };
-        for (const pac of fs.readdirSync(raiz)) {
-          const base = path.join(raiz, pac);
-          if (!fs.statSync(base).isDirectory()) continue;
-          for (const [pasta, arquivos] of walk(base)) {
-            for (const nome of arquivos) {
-              await requests.post('http://docs.edssolution.com.br/upload', {
-                files: { file: { nome, dados: fs.readFileSync(path.join(pasta, nome)) } },
-                params: { sistema: 'appclinic', id_paciente: req.data, path: pasta },
-              });
-            }
-          }
+        if (!(await arm.existePasta('extras'))) throw erroPython(`[Errno 2] No such file or directory: '${raiz}'`);
+        for (const rel of await arm.lista('extras')) {
+          if (rel.split('/').length < 3) continue;   // só o que está dentro da pasta de um paciente
+          await requests.post('http://docs.edssolution.com.br/upload', {
+            files: { file: { nome: rel.split('/').pop(), dados: await arm.le(rel) } },
+            params: { sistema: 'appclinic', id_paciente: req.data, path: path.join(config.mediaRoot, path.dirname(rel)) },
+          });
         }
         json(res, { success: 'Sucesso!' });
       } },
@@ -1085,19 +1081,13 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
   viewset.registra(app, '/api/prontuario/extras', opcExtras);
 
   /** upload_to=prontuario_directory_file: extras/<paciente>/<ano>/<mês>/<dia>/<nome> */
-  function salvaArquivoExtra(obj, arq) {
+  async function salvaArquivoExtra(obj, arq) {
     const h = new Date();
     const p2 = (n) => String(n).padStart(2, '0');
     const dir = `extras/${obj.fk_prontuario_id}/${h.getFullYear()}/${p2(h.getMonth() + 1)}/${p2(h.getDate())}`;
     const limpo = String(arq.nome).trim().replace(/ /g, '_').replace(/[^-\w.]/g, '');
-    let nome = limpo;
-    const abs = path.join(config.mediaRoot, dir);
-    fs.mkdirSync(abs, { recursive: true });
-    while (fs.existsSync(path.join(abs, nome))) {
-      const ext = path.extname(limpo);
-      nome = `${path.basename(limpo, ext)}_${Math.random().toString(36).slice(2, 9)}${ext}`;
-    }
-    fs.writeFileSync(path.join(abs, nome), arq.dados);
+    const nome = await arm.nomeLivre(dir, limpo);
+    await arm.grava(`${dir}/${nome}`, arq.dados, arq.tipo || require('../util/mime').tipo(nome));
     return `${dir}/${nome}`;
   }
 };

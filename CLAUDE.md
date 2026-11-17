@@ -32,6 +32,8 @@ O dono do projeto fala português: responda em português.
   para as rotas `/api/` (veja `server/rotas/api-medico.js` como exemplo).
 - `server/util/requests.js`: a biblioteca requests do Python (status_code, ok, json(), Timeout,
   ConnectionError...); `server/util/whatsapp.js`: o WhatsAppService (servidor WAHA).
+- `server/util/armazenamento.js`: onde ficam os arquivos enviados (pasta local ou o
+  cloud-storage, `ARMAZENAMENTO=nuvem`). Todo acesso a arquivo de `media/` passa por ele.
 - `server/util/pdf.js`: equivalente do ReportLab (canvas e platypus) para os impressos.
 - `server/db.js`: acesso ao banco, com os tipos de `server/modelos.json`.
   O `modelos.json` tem também três tabelas acrescentadas à mão (o exportador não as gera):
@@ -45,7 +47,8 @@ O dono do projeto fala português: responda em português.
   Exemplo completo em `tools/impressos/gera_inno.js` (cria as tabelas, faz login e chama as rotas).
 - Rotas: `node tools/testes/etapa5.js` (usuários, painel, logs, presença) e
   `node tools/testes/etapa6-memed.js` (Memed) e `node tools/testes/etapa6-whatsapp.js`
-  (WhatsApp e robô), cada um com o serviço externo falso, local.
+  (WhatsApp e robô) e `node tools/testes/nuvem.js` (imagens no cloud-storage),
+  cada um com o serviço externo falso, local.
   Para testes novos, use `tools/testes/base.js` (banco, login e cliente prontos).
 - Cobertura: `python3 tools/testes/rotas_django.py ../appclinic > /tmp/django.txt` e
   `node tools/testes/cobertura.js /tmp/django.txt` listam endereços do AppClinic que o Inno

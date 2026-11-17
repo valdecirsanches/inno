@@ -36,10 +36,27 @@ pm2 save
 | `SECRET_KEY` | chave das sessões. Gere com `node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"` |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | o MySQL do AppClinic |
 | `MEDIA_ROOT` | a pasta `media/` do AppClinic (documentos dos pacientes) |
+| `ARMAZENAMENTO` | onde ficam as imagens e anexos enviados: `local` (padrão, na `MEDIA_ROOT`) ou `nuvem` |
+| `NUVEM_URL`, `NUVEM_API_KEY` | o servidor [cloud-storage](https://github.com/valdecirsanches/cloud-storage) e a chave do Inno no `config/clients.json` dele |
 | `DEBUG` | `1` mostra o erro completo na tela; só para desenvolvimento |
 | `MEMED_API_KEY`, `MEMED_SECRET_KEY`, `MEMED_DATA_TOKEN` | as chaves da Memed (as do `settings.py` do AppClinic) |
 
 O `.env` nunca vai para o GitHub.
+
+### Imagens e anexos na nuvem
+
+Com `ARMAZENAMENTO=nuvem`, os arquivos de "Imagens e anexos" do prontuário vão para o
+cloud-storage (criptografados lá) em vez da pasta `media/`. O banco continua com o mesmo
+caminho de sempre (`extras/<paciente>/<ano>/<mês>/<dia>/<arquivo>`), que vira o nome do
+arquivo na nuvem; `/media/...` e o download buscam o arquivo lá.
+
+1. No servidor do cloud-storage, crie uma chave para o Inno no `config/clients.json`
+   (`openssl rand -base64 32`), com o `id` `inno`.
+2. No `.env` do Inno: `ARMAZENAMENTO=nuvem`, `NUVEM_URL=https://cloud.x-star.com.br` e `NUVEM_API_KEY=<a chave>`.
+3. Copie os arquivos que já existem: `node tools/nuvem/migra-media.js --simular` mostra o que
+   vai ser enviado; sem `--simular`, envia. Pode rodar de novo: o que já está lá é pulado,
+   e nada é apagado da pasta local.
+4. Reinicie o Inno.
 
 ## O que já está convertido
 

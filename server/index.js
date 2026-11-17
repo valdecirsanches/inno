@@ -49,7 +49,7 @@ app.use(csrf.middleware((req) => require('./rotas').isentoCsrf(req)));
 app.use(loginObrigatorio);
 
 // documentos dos pacientes (a mesma pasta media/ do AppClinic), só com login
-app.use('/media', express.static(config.mediaRoot));
+app.use('/media', require('./util/armazenamento').rotaMedia());
 
 require('./rotas').registra(app);
 // método HTTP que o Inno não registrou para o endereço: como o Django faria
