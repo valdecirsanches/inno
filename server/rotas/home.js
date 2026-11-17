@@ -35,6 +35,11 @@ module.exports = function (app) {
     });
   }));
 
+  // Novidades: o que mudou em cada versão (Home/views.py VersoesView)
+  app.get('/versoes/', a(async (req, res) => {
+    await render(res, 'Home/versoes.html', { versoes: require('../util/versoes').carrega() });
+  }));
+
   app.get('/login/', a(async (req, res) => {
     if (req.user.is_authenticated) return redireciona(res, '/');
     await telaLogin(res, { form: { errors: null }, next_url: req.GET.get('next') });

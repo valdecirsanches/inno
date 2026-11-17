@@ -1,0 +1,108 @@
+{
+  "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
+  "versoes": [
+    {
+      "versao": "2.4.0",
+      "data": "17/11/2026",
+      "titulo": "Controle de versões e WhatsApp com a logo no topo",
+      "itens": [
+        {
+          "tipo": "novo",
+          "texto": "Tela Novidades (clique em Release no menu): o que mudou em cada atualização."
+        },
+        {
+          "tipo": "novo",
+          "texto": "Depois de uma atualização, o sistema avisa uma vez que há novidades."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "WhatsApp: a logo da clínica vai no topo da mensagem, com o texto junto, numa mensagem só (confirmação de consulta e respostas ao paciente)."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "WhatsApp: a logo vai dentro do envio, sem o servidor do WhatsApp precisar buscá-la; se a imagem for recusada, o texto sai sozinho."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "A cada versão nova o navegador carrega as telas atualizadas sozinho, sem precisar de Ctrl+F5."
+        }
+      ]
+    },
+    {
+      "versao": "2.3.0",
+      "data": "17/11/2026",
+      "titulo": "Cadastros auxiliares com visual novo",
+      "itens": [
+        {
+          "tipo": "melhoria",
+          "texto": "Clínicas, Médicos, Convênios, Especialidades, Planos de saúde e Usuários com visual novo: lista com busca e contador, formulário em seções, selo Novo cadastro / Editando."
+        },
+        {
+          "tipo": "novo",
+          "texto": "Ctrl+S salva o cadastro aberto."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Usuários: o botão Novo não funcionava e salvar um usuário novo dava erro."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Especialidades: o botão Novo deixava os dados do registro anterior no formulário."
+        }
+      ]
+    },
+    {
+      "versao": "2.2.0",
+      "data": "17/11/2026",
+      "titulo": "Imagens e anexos num lugar só",
+      "itens": [
+        {
+          "tipo": "novo",
+          "texto": "Imagens e anexos do prontuário ficam na nuvem da clínica, a mesma para o AppClinic e o Inno: o que é enviado num aparece no outro."
+        },
+        {
+          "tipo": "novo",
+          "texto": "Recuperação das imagens de pastas antigas para o prontuário de cada paciente."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Envio de imagens em Imagens e anexos dava erro 500."
+        }
+      ]
+    },
+    {
+      "versao": "2.1.0",
+      "data": "15/11/2026",
+      "titulo": "Inno: o AppClinic em Node.js",
+      "itens": [
+        {
+          "tipo": "novo",
+          "texto": "Inno: nova versão do sistema em Node.js, com as mesmas telas, os mesmos endereços e o mesmo banco."
+        },
+        {
+          "tipo": "novo",
+          "texto": "Todos os impressos em PDF (ficha, recibo, agenda, atestado, exames, receitas, relatórios)."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Atestado antigo: o CID aparece e salvar e imprimir funcionam."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Inno: a agenda não pede mais a agenda de uma data inválida ao abrir."
+        }
+      ]
+    },
+    {
+      "versao": "2.0.17",
+      "data": "31/10/2026",
+      "titulo": "Retorno ao paciente pelo WhatsApp",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "WhatsApp: a resposta ao paciente que confirma ou cancela a consulta sai sempre, pela sessão ativa."
+        }
+      ]
+    }
+  ]
+}

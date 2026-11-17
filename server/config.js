@@ -13,7 +13,8 @@ module.exports = {
   porta: parseInt(env('PORTA', '8001'), 10),
   debug: env('DEBUG', '0') === '1',
   segredo: env('SECRET_KEY', ''),
-  release: env('RELEASE', '2.0.17'),
+  // versão atual: a primeira de versoes.json (o RELEASE do .env não é mais usado)
+  release: require('./util/versoes').atual(),
   nomeSistema: env('NOME_SISTEMA', 'GERENCIADOR DE CLÍNICAS'),
   banco: {
     cliente: env('DB_CLIENT', 'mysql2'),          // mysql2 (produção) ou better-sqlite3 (testes)

@@ -121,7 +121,7 @@ function resumoResposta(r) {
   return { http: r.status_code === undefined ? null : r.status_code, resposta: ok ? corpo : Array.from(pyStrValor(corpo)).slice(0, 300).join('') };
 }
 
-/** retorno ao paciente: o texto sempre e primeiro, depois a logo (opcional) */
+/** retorno ao paciente: a logo no topo com o texto junto (enviar_texto_com_logo) */
 async function enviaMensagem(req, ag, sessaoId, telefone, mensagem) {
   const detalhes = { tipo: 'retorno', consulta: ag.id, sessao: sessaoId, telefone };
   try {
@@ -132,17 +132,11 @@ async function enviaMensagem(req, ag, sessaoId, telefone, mensagem) {
     let texto = mensagem;
     if (ehDict(mensagem)) texto = mensagem.success || mensagem.processado || pyStrValor(mensagem);
     const numero = limparNumero(telefone);
-    const r = await s.enviar_texto(numero, texto);
+    const [r, modo] = await s.enviar_texto_com_logo(numero, texto, LOGO);
+    detalhes.modo = modo;
     detalhes.texto = resumoResposta(r);
     const ok = [200, 201].includes(r.status_code || 0);
     if (!ok) console.error(`Retorno ao paciente NÃO enviado (consulta ${ag.id})`);
-    if (ok && fs.existsSync(LOGO)) {
-      try {
-        const host = req.get('host');
-        const protocolo = !/^[\d.:]+$/.test(host) ? 'https' : (req.socket && req.socket.encrypted ? 'https' : 'http');
-        detalhes.imagem = resumoResposta(await s.enviar_imagem(numero, `${protocolo}://${host}/static/img/neuro100.png`, ''));
-      } catch (e) { detalhes.imagem = { erro: Array.from(e.message).slice(0, 200).join('') }; }
-    }
     return [ok, detalhes];
   } catch (e) {
     console.error(`Falha no envio de retorno WA: ${e.message}`);

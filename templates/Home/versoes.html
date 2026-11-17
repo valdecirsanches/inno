@@ -1,0 +1,55 @@
+{% extends "Base/base.html" %}
+
+{% block head %}
+    {{ super() }}
+    <link href="/static/css/Cadastros/cadastros.css?{{ user.release }}" rel="stylesheet">
+    <link href="/static/css/Home/versoes.css?{{ user.release }}" rel="stylesheet">
+{% endblock %}
+
+{% block container_cabecalho %}
+    <div class="row wrapper border-bottom white-bg page-heading cad-heroi">
+        <div class="cad-heroi-icone"><i class="fa fa-rocket" aria-hidden="true"></i></div>
+        <div class="cad-heroi-texto">
+            <h2>Novidades</h2>
+            <p class="cad-heroi-sub">O que mudou em cada atualização do sistema. Você está na versão {{ user.release }}.</p>
+            <ol class="breadcrumb">
+                <li><a href="/">Home</a></li>
+                <li class="active"><strong>Novidades</strong></li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
+{% block cabecalho_botoes %}
+{% endblock %}
+
+{% block container_corpo %}
+    <div class="row cad-page versoes-page">
+        <div class="col-lg-9">
+            <div class="versoes-linha">
+                {% for v in versoes %}
+                <div class="versao-item{% if v.versao == user.release %} versao-atual{% endif %}">
+                    <div class="versao-ponto"></div>
+                    <div class="cad-card">
+                        <div class="cad-card-topo">
+                            <h3>
+                                <span class="versao-numero">{{ v.versao }}</span>
+                                <span class="cad-titulo-texto">{{ v.titulo }}</span>
+                            </h3>
+                            <span class="versao-data"><i class="fa fa-calendar-o"></i> {{ v.data }}{% if v.versao == user.release %} <span class="versao-selo">atual</span>{% endif %}</span>
+                        </div>
+                        <ul class="versao-itens">
+                            {% for i in v.itens %}
+                            <li class="versao-{{ i.tipo }}">
+                                <span class="versao-tipo">{% if i.tipo == 'novo' %}Novo{% elif i.tipo == 'correcao' %}Correção{% else %}Melhoria{% endif %}</span>
+                                <span>{{ i.texto }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

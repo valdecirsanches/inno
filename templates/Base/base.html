@@ -35,7 +35,7 @@
                     <li class="nav-header">
                         <span class="bi bi-whatsapp" style="color: #00aa88" >WhatsApp</span>
                         <iconify-icon icon="bi:whatsapp" style="color:#46b446"></iconify-icon>
-                        <h3 style="color: #dbdcec"> Release: {{ user.release }}</h3>
+                        <h3 style="color: #dbdcec"> <a href="/versoes/" title="Novidades de cada versão" style="color: inherit">Release: {{ user.release }}</a></h3>
                         <h5>{{ user.hostdb }}/{{ user.database }}</h5>
 
                         <div class="dropdown profile-element">
@@ -350,6 +350,26 @@
 
     <script src="https://code.iconify.design/iconify-icon/1.0.2/iconify-icon.min.js"></script>
 
+
+    <!-- Novidades: aviso de versão nova (uma vez por navegador) -->
+    <link href="/static/css/Home/versoes.css?{{ user.release }}" rel="stylesheet">
+    <script>
+        (function () {
+            var atual = '{{ user.release }}', chave = 'appclinic_versao_vista';
+            try {
+                if (location.pathname === '/versoes/') { localStorage.setItem(chave, atual); return; }
+                if (localStorage.getItem(chave) === atual) { return; }
+            } catch (e) { return; }
+            function visto() { try { localStorage.setItem(chave, atual); } catch (e) { /* sem armazenamento */ } }
+            var d = document.createElement('div');
+            d.className = 'versao-aviso';
+            d.innerHTML = '<i class="fa fa-rocket"></i><div><strong>Sistema atualizado: versão ' + atual + '</strong>' +
+                '<a href="/versoes/">Ver o que há de novo</a></div><span class="versao-fecha" title="Fechar">&times;</span>';
+            d.querySelector('.versao-fecha').onclick = function () { visto(); d.parentNode.removeChild(d); };
+            d.querySelector('a').onclick = visto;
+            document.body.appendChild(d);
+        })();
+    </script>
 
     {% block js %}
 

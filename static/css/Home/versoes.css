@@ -1,0 +1,55 @@
+/* Tela Novidades (/versoes/): linha do tempo das versões */
+.versoes-page .versoes-linha { position: relative; padding-left: 34px; }
+.versoes-page .versoes-linha::before {
+    content: ""; position: absolute; left: 11px; top: 8px; bottom: 30px;
+    width: 2px; background: #e3e8ee; border-radius: 2px;
+}
+.versoes-page .versao-item { position: relative; }
+.versoes-page .versao-ponto {
+    position: absolute; left: -30px; top: 20px; width: 16px; height: 16px;
+    border-radius: 50%; background: #fff; border: 3px solid #c9d2dc;
+}
+.versoes-page .versao-atual .versao-ponto {
+    border-color: #1ab394; box-shadow: 0 0 0 5px rgba(26, 179, 148, .15);
+}
+.versoes-page .versao-numero {
+    display: inline-flex; align-items: center; height: 24px; padding: 0 10px;
+    border-radius: 12px; font-size: 12.5px; font-weight: 700; letter-spacing: .3px;
+    color: #46566a; background: #f1f4f7; margin-right: 4px; flex: 0 0 auto;
+}
+.versoes-page .versao-atual .versao-numero { color: #fff; background: linear-gradient(135deg, #22c7a5, #128a72); }
+.versoes-page .versao-data { font-size: 12px; color: #8693a3; white-space: nowrap; }
+.versoes-page .versao-selo {
+    margin-left: 6px; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700;
+    color: #128a72; background: #e8f7f3;
+}
+.versoes-page .versao-itens { list-style: none; margin: 0; padding: 8px 20px 14px; }
+.versoes-page .versao-itens li {
+    display: flex; align-items: flex-start; gap: 12px; padding: 9px 0;
+    border-top: 1px solid #f0f3f6; font-size: 13.5px; line-height: 1.5; color: #46566a;
+}
+.versoes-page .versao-itens li:first-child { border-top: 0; }
+.versoes-page .versao-tipo {
+    flex: 0 0 84px; text-align: center; padding: 2px 0; border-radius: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase;
+}
+.versoes-page .versao-novo .versao-tipo { color: #1d6fd6; background: #e8f1fd; }
+.versoes-page .versao-melhoria .versao-tipo { color: #128a72; background: #e8f7f3; }
+.versoes-page .versao-correcao .versao-tipo { color: #b7791f; background: #fff8eb; }
+
+/* aviso de versão nova (Base/base.html) */
+.versao-aviso {
+    position: fixed; right: 24px; bottom: 60px; z-index: 2000; max-width: 360px;
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    background: #fff; border: 1px solid #e3e8ee; border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(16, 24, 40, .16); font-size: 13px; color: #46566a;
+    animation: versaoEntra .35s ease-out;
+}
+.versao-aviso .fa-rocket {
+    width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    color: #fff; background: linear-gradient(135deg, #22c7a5, #128a72); flex: 0 0 auto;
+}
+.versao-aviso strong { display: block; color: #1f2d3a; }
+.versao-aviso a { font-weight: 600; color: #128a72; }
+.versao-aviso .versao-fecha { margin-left: auto; color: #aab4bf; cursor: pointer; font-size: 18px; line-height: 1; }
+@keyframes versaoEntra { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }

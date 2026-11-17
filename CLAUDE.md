@@ -12,6 +12,9 @@ O dono do projeto fala português: responda em português.
    em `server/rotas-nomeadas.json`.
 3. Converta um módulo por vez, teste, atualize a tabela do README e faça commit na `main`
    (é o fluxo combinado com o dono). Uma etapa por commit, mensagem em português.
+4. **Toda atualização que o usuário vê ganha uma versão nova** com o que foi feito:
+   `node tools/versao/nova.js <versão> "<título>" novo:"..." melhoria:"..." correcao:"..."`
+   (grava `versoes.json` no Inno e no AppClinic; commit nos dois). Aparece na tela Novidades.
 
 ## Regras da conversão
 
@@ -54,7 +57,8 @@ O dono do projeto fala português: responda em português.
 - Rotas: `node tools/testes/etapa5.js` (usuários, painel, logs, presença) e
   `node tools/testes/etapa6-memed.js` (Memed) e `node tools/testes/etapa6-whatsapp.js`
   (WhatsApp e robô) e `node tools/testes/nuvem.js` (imagens na nuvem) e
-  `node tools/testes/recupera.js` (recuperação de imagens de pastas antigas),
+  `node tools/testes/recupera.js` (recuperação de imagens de pastas antigas) e
+  `node tools/testes/whatsapp-logo.js` (WhatsApp com a logo no topo),
   cada um com o serviço externo falso, local.
   Para testes novos, use `tools/testes/base.js` (banco, login e cliente prontos).
 - Cobertura: `python3 tools/testes/rotas_django.py ../appclinic > /tmp/django.txt` e

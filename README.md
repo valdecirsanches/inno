@@ -134,6 +134,32 @@ passo: 274 leituras (todos os endereços), 126 gravações (paciente, recibo, ag
 prontuário, cadastros, configurações, usuários) e 837 combinações de endereço e método HTTP.
 Fora as diferenças abaixo, as respostas e o banco ficam iguais.
 
+## Versões e novidades
+
+A versão (o "Release" do menu) e o histórico do que mudou em cada atualização ficam em
+`versoes.json`, o mesmo arquivo no Inno e no AppClinic (`appClinic/versoes.py` lê lá; o
+`RELEASE` do `.env` não é mais usado). A tela **Novidades** (`/versoes/`, clicando em Release)
+mostra o histórico, e depois de cada atualização aparece uma vez, em cada navegador, o aviso
+"Sistema atualizado". O número da versão também vai no endereço do CSS e do JS, então o navegador
+baixa tudo de novo sem Ctrl+F5.
+
+Para registrar uma versão (grava nos dois sistemas):
+
+```
+node tools/versao/nova.js 2.4.1 "Título" novo:"o que entrou" melhoria:"o que melhorou" correcao:"o que foi corrigido"
+node tools/versao/nova.js --lista      # versões registradas
+node tools/versao/nova.js --confere    # Inno e AppClinic com o mesmo versoes.json?
+```
+
+## WhatsApp: logo no topo da mensagem
+
+A confirmação de consulta e as respostas ao paciente (confirmado / cancelado) saem numa
+mensagem só: a logo da clínica (`static/img/neuro100.png`) no topo e o texto como legenda
+(`enviar_texto_com_logo`, igual no Inno e no AppClinic). A imagem vai embutida no envio, sem o
+WAHA precisar baixá-la do servidor; se o WAHA recusar a imagem, o texto sai sozinho; texto com
+mais de 1000 caracteres sai logo abaixo da imagem, em outra mensagem. Teste:
+`node tools/testes/whatsapp-logo.js`.
+
 ## Visual dos cadastros auxiliares
 
 Clínicas, Médicos, Convênios, Especialidades, Planos de saúde e Usuários têm um visual

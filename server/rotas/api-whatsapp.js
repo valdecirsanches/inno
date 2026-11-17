@@ -321,13 +321,8 @@ async function enviaWhatsApp(req) {
     await modelo.salva(req, A, ag);
     if (Array.from(celular).length <= 11) celular = '55' + celular;
     const msg = await msgWhatsapp(ag);
-    const resApi = await service.enviar_texto(celular, msg);
-    // a logo, como complemento opcional
-    try {
-      if (fs.existsSync(LOGO) && fs.statSync(LOGO).isFile()) {
-        await service.enviar_imagem(celular, `${esquema(req)}://${hostDe(req)}/static/img/neuro100.png`, '');
-      }
-    } catch (e) { console.log(`[WhatsApp] Falha no envio da imagem (ignorada): ${e.message}`); }
+    // a logo da clínica no topo, com o texto junto
+    const [resApi] = await service.enviar_texto_com_logo(celular, msg, LOGO);
     const statusHttp = resApi.status_code || 0;
     let r;
     try { r = pyJsonLoads(resApi.content.toString('utf8')); } catch (e) { r = {}; }

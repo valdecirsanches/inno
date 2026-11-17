@@ -22,7 +22,7 @@ const waha = http.createServer((req, res) => {
       return envia(200, JSON.stringify(tel === '5511999990000' ? { numberExists: true, chatId: '5511999990000@c.us' } : tel.startsWith('5511988887777') ? { numberExists: true } : { numberExists: false }));
     }
     if (p === '/api/sendText') return envia(201, '{"id": {"id": "MSG1", "remote": "5511999990000@c.us"}}');
-    if (p === '/api/sendImage') return envia(201, '{}');
+    if (p === '/api/sendImage') return envia(201, '{"id": {"id": "MSG1", "remote": "5511999990000@c.us"}}');
     if (p === '/api/contacts/profile-picture') return envia(200, '{"profilePictureURL": "https://foto/x.jpg"}');
     if (p === '/api/default/lids/123%40lid' || p === '/api/default/lids/123@lid') return envia(200, '{"lid": "123@lid", "pn": "5511988887777@c.us"}');
     envia(404, '{"error": "nao"}');
@@ -68,12 +68,15 @@ waha.listen(0, async () => {
     await confere('agenda_texto com id inválido: 400', () => { assert.equal(r.status, 400); assert.equal(x, '{"success": false, "error": "Field \'id\' expected a number but got \'abc\'."}'); });
 
     r = await vai('/api/whatsapp/EnviaWhatsApp/', { method: 'POST', body: corpo({ id_consulta: '1', celular: '(11) 99999-0000' }) }); x = await r.text();
-    await confere('EnviaWhatsApp envia texto e logo e grava o envio', () => {
+    await confere('EnviaWhatsApp envia a logo no topo com o texto junto e grava o envio', () => {
       assert.equal(x, '{"success": true, "message": "WhatsApp enviado com sucesso!"}');
-      const txt = pedidos.find((p) => p.caminho === '/api/sendText');
-      assert.equal(txt.corpo.chatId, '5511999990000@c.us'); assert.equal(txt.corpo.session, 'default'); assert.equal(txt.corpo.linkPreview, true);
-      assert.equal(txt.headers['x-api-key'], 'eds.2013');
-      assert.ok(pedidos.some((p) => p.caminho === '/api/sendImage'));
+      const img = pedidos.filter((p) => p.caminho === '/api/sendImage');
+      assert.equal(img.length, 1);
+      assert.equal(img[0].corpo.chatId, '5511999990000@c.us'); assert.equal(img[0].corpo.session, 'default');
+      assert.equal(img[0].headers['x-api-key'], 'eds.2013');
+      assert.ok(img[0].corpo.caption.length > 20, 'o texto vai como legenda');
+      assert.equal(img[0].corpo.file.mimetype, 'image/png'); assert.ok(img[0].corpo.file.data.length > 100); assert.equal(img[0].corpo.file.url, undefined);
+      assert.ok(!pedidos.some((p) => p.caminho === '/api/sendText'), 'uma mensagem só');
       const w = sq.prepare('SELECT * FROM tb_whatsapp').all();
       assert.equal(w.length, 1);
       assert.deepEqual([w[0].id, w[0].id_whatsapp, w[0].origem, w[0].destino, w[0].status, w[0].sistema, w[0].session_id], [1, 'MSG1', '5511999990000@c.us', '5511999990000', 'pendente', 'APPCLINIC', 'default']);
@@ -94,8 +97,8 @@ waha.listen(0, async () => {
       assert.equal(x.retorno.texto.http, 201);
       assert.equal(sq.prepare('SELECT confirmacao FROM tb_agendas WHERE id = 1').get().confirmacao, 1);
       assert.equal(sq.prepare('SELECT status FROM tb_whatsapp WHERE id = 1').get().status, 'fechado');
-      const ult = pedidos.filter((p) => p.caminho === '/api/sendText').at(-1);
-      assert.equal(ult.corpo.text, 'Olá Ana Paula de Souza,\nSua consulta em 02 de janeiro às 09:10 \nConfirmado.');
+      const ult = pedidos.filter((p) => p.caminho === '/api/sendImage').at(-1);
+      assert.equal(ult.corpo.caption, 'Olá Ana Paula de Souza,\nSua consulta em 02 de janeiro às 09:10 \nConfirmado.');
       assert.equal(sq.prepare('SELECT COUNT(*) n FROM tbWhatsappLog').get().n, n0 + 2);   // evento recebido + detalhes do retorno
       assert.equal(sq.prepare('SELECT COUNT(*) n FROM WhatsApp_mensagemprocessada').get().n, 1);
     });
