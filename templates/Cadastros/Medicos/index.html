@@ -6,6 +6,7 @@
 {% block cadastros_auxiliares_medicos %}active{% endblock %}
 
 {% block head %}
+    {{ super() }}
     <!-- Input Mask -->
     <link href="/static/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
 
@@ -21,7 +22,7 @@
 
     <!-- iCheck -->
     <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
-
+    <link href="/static/css/Cadastros/cadastros.css?{{ user.release }}" rel="stylesheet">
 {% endblock %}
 
 {% block modal %}
@@ -30,16 +31,15 @@
 {% endblock %}
 
 {% block container_cabecalho %}
-    <div class="row wrapper border-bottom white-bg page-heading">
-        <div class="col-lg-10">
-            <h2><i class="fa fa-user-md"></i>  Cadastro de Médico</h2>
+    <div class="row wrapper border-bottom white-bg page-heading cad-heroi">
+        <div class="cad-heroi-icone"><i class="fa fa-user-md" aria-hidden="true"></i></div>
+        <div class="cad-heroi-texto">
+            <h2>Médicos</h2>
+            <p class="cad-heroi-sub">Profissionais da clínica: registro, empresa, horários de atendimento e prescrição Memed.</p>
             <ol class="breadcrumb">
-                <li>
-                    <a href="/">Home</a>
-                </li>
-                <li class="active">
-                    <strong> Cadastro de Médico</strong>
-                </li>
+                <li><a href="/">Home</a></li>
+                <li>Cadastros auxiliares</li>
+                <li class="active"><strong>Médicos</strong></li>
             </ol>
         </div>
     </div>
@@ -51,27 +51,30 @@
 
 
 {% block container_corpo %}
-    {#    <div class="ibox float-e-margins">#}
-    {#        <div class="ibox-content">#}
-    <div class="row">
-        <div class="form-group col-lg-12" style="background-color: #dceaf8">
-            <div class="form-group col-md-3 col-lg-3" >
+    <div class="row cad-page">
+        <div class="col-md-4 col-lg-3">
+            <div class="cad-card cad-lista">
+                <div class="cad-card-topo">
+                    <h3><i class="fa fa-list-ul" aria-hidden="true"></i> Médicos <span class="cad-contador" data-cad-contador>0</span></h3>
+                </div>
                 {% include 'Cadastros/Medicos/Tables/Pesquisa.html' %}
             </div>
+        </div>
 
-            <div id="id_TelaConvenio"  class="form-group col-md-9 col-lg-9">
-                {% include 'Cadastros/Medicos/Forms/MedicoDados.html' %}
+        <div id="id_TelaConvenio" class="col-md-8 col-lg-9">
+            <div class="cad-card">
+                <div class="cad-card-topo">
+                    <h3><i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="cad-titulo-texto" data-cad-titulo="Novo médico">Novo médico</span></h3>
+                    <span class="cad-estado" data-cad-estado>Novo cadastro</span>
+                </div>
+                <div class="cad-form-corpo">
+                    {% include 'Cadastros/Medicos/Forms/MedicoDados.html' %}
 
-                {% include 'Cadastros/Medicos/Forms/Pastas.html' %}
-
-                <div class="form-group col-md-12 col-lg-12 text-right">
-                    <div class="hr-line-solid"></div>
-                    <div class="col-md-6 text-left">
-                        <a id="btnNewMedico" class="btn btn-primary" onclick="AddMedico()"><i class="fa fa-pencil"></i> Novo</a>
-                    </div>
-                    <div class="col-md-6 text-right">
-                        <a id="btnSaveMedico" class="btn btn-primary" onclick="UpdateMedico()"><i class="fa fa-save"></i> Salvar</a>
-                    </div>
+                    {% include 'Cadastros/Medicos/Forms/Pastas.html' %}
+                </div>
+                <div class="cad-card-rodape">
+                    <a id="btnNewMedico" class="cad-btn cad-btn-secundario" data-cad-novo onclick="AddMedico()"><i class="fa fa-plus"></i> <span class="cad-btn-rotulo">Novo</span></a>
+                    <a id="btnSaveMedico" class="cad-btn cad-btn-primario" data-cad-salvar onclick="UpdateMedico()" title="Salvar (Ctrl+S)"><i class="fa fa-check"></i> <span class="cad-btn-rotulo">Salvar</span> <kbd>Ctrl S</kbd></a>
                 </div>
             </div>
         </div>
@@ -130,12 +133,13 @@
     <script src="/static/javascripts/Cadastros/Medico/Horario/tableHorario.js?{{ user.release }}" type="application/javascript"></script>
     <script src="/static/javascripts/Cadastros/Medico/Horario/indexHorario.js?{{ user.release }}" type="application/javascript"></script>
 
-    Cep
+    <!-- Cep -->
     <script src="/static/javascripts/Base/cep.js?{{ user.release }}" type="application/javascript"></script>
 
 {#    <!-- Mascaras -->#}
 {#    <script src="/static/javascripts/Base/mascaras.js?{{ user.release }}" type="application/javascript"></script>#}
 
+    <script src="/static/javascripts/Cadastros/cadastros-ui.js?{{ user.release }}" type="application/javascript"></script>
 {% endblock %}
 
 

@@ -1,12 +1,12 @@
 
-<div class="ibox float-e-margins">
-    <div class="row">
+<div class="cad-secao cad-pastas">
+    <div>
         <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#empresa">Dados da Empresa</a></li>
-            <li class=""><a data-toggle="tab" href="#outros">Outras Informações</a></li>
-            <li class=""><a data-toggle="tab" href="#Horarios">Horários e dias de atendimento</a></li>
-            <li class=""><a data-toggle="tab" href="#memed">Prescrições Memed</a></li>
-            <li class=""><a data-toggle="tab" href="#especialidade">Especialidade</a></li>
+            <li class="active"><a data-toggle="tab" href="#empresa"><i class="fa fa-building-o"></i> Dados da empresa</a></li>
+            <li class=""><a data-toggle="tab" href="#outros"><i class="fa fa-info-circle"></i> Outras informações</a></li>
+            <li class=""><a data-toggle="tab" href="#Horarios"><i class="fa fa-clock-o"></i> Horários de atendimento</a></li>
+            <li class=""><a data-toggle="tab" href="#memed"><i class="fa fa-medkit"></i> Prescrições Memed</a></li>
+            <li class=""><a data-toggle="tab" href="#especialidade"><i class="fa fa-stethoscope"></i> Especialidades</a></li>
         </ul>
         <div class="tab-content">
             <div id="empresa" class="tab-pane active">
@@ -21,8 +21,8 @@
             </div>
             <div id="Horarios" class="tab-pane">
                 <div class="ibox-content text-center">
-                    <a id="criaHorario" class="btn btn-default" onclick="ConfHorarios()">Cria Horários</a>
-                    <a id="limparHorarios" class="btn btn-default" onclick="LimparHorarios()">Limpar Horários</a>
+                    <a id="criaHorario" class="cad-btn cad-btn-secundario" onclick="ConfHorarios()">Cria Horários</a>
+                    <a id="limparHorarios" class="cad-btn cad-btn-secundario" onclick="LimparHorarios()">Limpar Horários</a>
                     <div class="row">
                         <div data-toggle="buttons" class="btn-group">
                             <label class="btn btn-sm btn-info active"><input type="radio" id="1" value="M" name="periodo" class="periodo" checked> Manhã </label>

@@ -6,7 +6,9 @@
 
 
 {% block head %}
+    {{ super() }}
     {% include 'datatables.html' %}
+    <link href="/static/css/Cadastros/cadastros.css?{{ user.release }}" rel="stylesheet">
 {% endblock %}
 
 {% block cadastro %}
@@ -60,16 +62,15 @@
 
 
 {% block container_cabecalho %}
-    <div class="row wrapper border-bottom white-bg page-heading">
-        <div class="col-lg-10">
-            <h2><i class="fa fa-stethoscope"></i> Cadastro de especialidades</h2>
+    <div class="row wrapper border-bottom white-bg page-heading cad-heroi">
+        <div class="cad-heroi-icone"><i class="fa fa-stethoscope" aria-hidden="true"></i></div>
+        <div class="cad-heroi-texto">
+            <h2>Especialidades</h2>
+            <p class="cad-heroi-sub">As especialidades médicas atendidas, organizadas por grupo.</p>
             <ol class="breadcrumb">
-                <li>
-                    <a href="/">Home</a>
-                </li>
-                <li class="active">
-                    <strong>Cadastro de especialidades</strong>
-                </li>
+                <li><a href="/">Home</a></li>
+                <li>Cadastros auxiliares</li>
+                <li class="active"><strong>Especialidades</strong></li>
             </ol>
         </div>
     </div>
@@ -81,10 +82,8 @@
 
 
 {% block container_corpo %}
-    <div class="row">
-        <div class="col-lg-12" style="background-color: #dceaf8">
-            {% include 'Cadastros/Especialidades/table.html' %}
-        </div>
+    <div class="row cad-page">
+        {% include 'Cadastros/Especialidades/table.html' %}
     </div>
 {% endblock %}
 
@@ -107,6 +106,7 @@
 
     <!-- Convenio -->
     <script src="/static/javascripts/Cadastros/Especialidades/especialidades.js?{{ user.release }}" type="application/javascript"></script>
+    <script src="/static/javascripts/Cadastros/cadastros-ui.js?{{ user.release }}" type="application/javascript"></script>
 {% endblock %}
 
 

@@ -1,0 +1,657 @@
+/* =====================================================================
+   Cadastros auxiliares — visual comum (Clínicas, Médicos, Convênios,
+   Especialidades, Planos de saúde e Usuários).
+   Tudo restrito a .cad-page / .cad-heroi: o resto do sistema não muda.
+   Os ids e campos que o JavaScript de cada tela usa continuam os mesmos.
+   ===================================================================== */
+
+.cad-page,
+.cad-heroi {
+    --cad-ink: #1f2d3a;
+    --cad-text: #46566a;
+    --cad-muted: #8693a3;
+    --cad-line: #e9edf1;
+    --cad-line-strong: #dbe1e7;
+    --cad-surface: #ffffff;
+    --cad-soft: #f6f8fa;
+    --cad-primary: #1ab394;
+    --cad-primary-dark: #128a72;
+    --cad-primary-soft: #e8f7f3;
+    --cad-danger: #e5484d;
+    --cad-danger-soft: #fdecec;
+    --cad-radius: 12px;
+    --cad-radius-sm: 8px;
+    --cad-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 6px 20px rgba(16, 24, 40, .05);
+    --cad-ring: 0 0 0 3px rgba(26, 179, 148, .18);
+    color: var(--cad-text);
+}
+
+/* ---------------------------------------------------------- cabeçalho */
+.cad-heroi.page-heading {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 22px 28px 20px;
+    margin: 0;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+}
+.cad-heroi .cad-heroi-icone {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #fff;
+    background: linear-gradient(135deg, #22c7a5 0%, #128a72 100%);
+    box-shadow: 0 8px 18px rgba(18, 138, 114, .28);
+}
+.cad-heroi .cad-heroi-texto {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.cad-heroi h2 {
+    margin: 0;
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: -.2px;
+    color: var(--cad-ink);
+}
+.cad-heroi .cad-heroi-sub {
+    margin: 3px 0 6px;
+    font-size: 13px;
+    color: var(--cad-muted);
+}
+.cad-heroi .breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+}
+.cad-heroi .breadcrumb > li,
+.cad-heroi .breadcrumb > li a,
+.cad-heroi .breadcrumb > .active strong {
+    color: var(--cad-muted);
+    font-weight: 500;
+}
+.cad-heroi .breadcrumb > .active strong {
+    color: var(--cad-text);
+}
+.cad-heroi .cad-heroi-acoes {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 10px;
+}
+
+/* ------------------------------------------------------------- botões */
+.cad-page .cad-btn,
+.cad-heroi .cad-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: var(--cad-radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color .15s, border-color .15s, box-shadow .15s, transform .05s;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.cad-page .cad-btn:active,
+.cad-heroi .cad-btn:active { transform: translateY(1px); }
+.cad-page .cad-btn:focus-visible,
+.cad-heroi .cad-btn:focus-visible { outline: 0; box-shadow: var(--cad-ring); }
+.cad-page .cad-btn-primario,
+.cad-heroi .cad-btn-primario {
+    color: #fff;
+    background: var(--cad-primary);
+    box-shadow: 0 1px 2px rgba(18, 138, 114, .25);
+}
+.cad-page .cad-btn-primario:hover,
+.cad-heroi .cad-btn-primario:hover { background: var(--cad-primary-dark); color: #fff; }
+.cad-page .cad-btn-secundario,
+.cad-heroi .cad-btn-secundario {
+    color: var(--cad-ink);
+    background: var(--cad-surface);
+    border-color: var(--cad-line-strong);
+}
+.cad-page .cad-btn-secundario:hover,
+.cad-heroi .cad-btn-secundario:hover { border-color: var(--cad-primary); color: var(--cad-primary-dark); }
+.cad-page .cad-btn kbd {
+    padding: 1px 5px;
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, .9);
+    background: rgba(255, 255, 255, .18);
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+/* -------------------------------------------------------------- página */
+.row.cad-page {
+    padding: 22px 12px 60px;
+}
+/* os fundos azuis antigos das telas */
+.cad-page [style*="dceaf8"] {
+    background: transparent !important;
+}
+
+/* ------------------------------------------------------------- cartões */
+.cad-page .cad-card {
+    background: var(--cad-surface);
+    border: 1px solid var(--cad-line);
+    border-radius: var(--cad-radius);
+    box-shadow: var(--cad-shadow);
+    margin-bottom: 22px;
+    overflow: hidden;
+}
+.cad-page .cad-card-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--cad-line);
+    background: var(--cad-surface);
+}
+.cad-page .cad-card-topo h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--cad-ink);
+    min-width: 0;
+}
+.cad-page .cad-card-topo h3 .cad-titulo-texto {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.cad-page .cad-card-acoes {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+.cad-page .cad-contador {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 11px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--cad-primary-dark);
+    background: var(--cad-primary-soft);
+}
+.cad-page .cad-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 22px;
+    padding: 0 9px;
+    border-radius: 11px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--cad-muted);
+    background: var(--cad-soft);
+    border: 1px solid var(--cad-line);
+}
+.cad-page .cad-estado::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.cad-page .cad-estado.cad-estado-editando {
+    color: #b7791f;
+    background: #fff8eb;
+    border-color: #f7e2b8;
+}
+
+/* ------------------------------------------------------------- lista */
+.cad-page .cad-lista .modal-body,
+.cad-page .cad-lista > .form-group,
+.cad-page .cad-lista .form-group {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    float: none;
+}
+.cad-page .cad-lista .bootstrap-table .fixed-table-container {
+    border: 0;
+    border-radius: 0;
+}
+.cad-page .cad-lista .bootstrap-table .table {
+    margin: 0;
+    border: 0;
+}
+.cad-page .cad-lista .fixed-table-toolbar {
+    padding: 12px 16px 4px;
+    margin: 0;
+}
+.cad-page .cad-lista .fixed-table-toolbar .search {
+    float: none !important;
+    width: 100%;
+    margin: 0;
+    position: relative;
+}
+.cad-page .cad-lista .fixed-table-toolbar .search::before {
+    content: "\f002";
+    font-family: FontAwesome;
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--cad-muted);
+    font-size: 13px;
+    pointer-events: none;
+}
+.cad-page .cad-lista .fixed-table-toolbar .search input {
+    height: 38px;
+    padding-left: 34px;
+    border-radius: var(--cad-radius-sm);
+    border: 1px solid var(--cad-line-strong);
+    background: var(--cad-soft);
+    box-shadow: none;
+}
+.cad-page .cad-lista .fixed-table-toolbar .search input:focus {
+    background: #fff;
+    border-color: var(--cad-primary);
+    box-shadow: var(--cad-ring);
+}
+.cad-page .cad-lista table thead th {
+    border: 0 !important;
+    background: var(--cad-surface);
+}
+.cad-page .cad-lista table thead th .th-inner {
+    padding: 10px 16px !important;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--cad-muted);
+}
+.cad-page .cad-lista .fixed-table-header {
+    border-bottom: 1px solid var(--cad-line);
+}
+/* rowStyle() das telas marca as linhas como .ATENDIDO, que o tema pinta de azul */
+.cad-page .cad-lista .table > tbody > tr,
+.cad-page .cad-lista .table > tbody > tr.ATENDIDO > td,
+.cad-page .cad-lista .table > tbody > tr > td {
+    background-color: transparent !important;
+}
+.cad-page .cad-lista .table > tbody > tr > td {
+    padding: 11px 16px;
+    border-top: 1px solid var(--cad-line) !important;
+    vertical-align: middle;
+    color: var(--cad-text);
+    font-size: 13px;
+}
+.cad-page .cad-lista .table > tbody > tr {
+    cursor: pointer;
+    transition: background-color .12s;
+}
+.cad-page .cad-lista .table > tbody > tr:hover > td {
+    background-color: var(--cad-soft) !important;
+}
+.cad-page .cad-lista .table > tbody > tr.cad-selecionado > td {
+    background-color: var(--cad-primary-soft) !important;
+}
+.cad-page .cad-lista .table > tbody > tr.cad-selecionado > td:first-child {
+    box-shadow: inset 3px 0 0 var(--cad-primary);
+}
+.cad-page .cad-lista td.cad-nome {
+    color: var(--cad-ink);
+    font-weight: 600;
+}
+.cad-page .cad-lista td.cad-nome .cad-avatar + span {
+    display: inline-block;
+    max-width: calc(100% - 44px);
+    vertical-align: middle;
+    line-height: 1.35;
+}
+.cad-page .cad-lista td.cad-discreto {
+    color: var(--cad-muted);
+    font-size: 12px;
+}
+.cad-page .cad-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+    border-radius: 50%;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    color: #fff;
+    vertical-align: middle;
+    flex: 0 0 auto;
+}
+/* botões editar/excluir gerados pelo JavaScript de cada tela */
+.cad-page .cad-lista .edit,
+.cad-page .cad-lista .del {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    margin: 0 0 0 4px !important;
+    border-radius: var(--cad-radius-sm);
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--cad-muted) !important;
+    font-size: 13px;
+    opacity: .55;
+    transition: opacity .12s, color .12s, background-color .12s;
+}
+.cad-page .cad-lista tr:hover .edit,
+.cad-page .cad-lista tr:hover .del,
+.cad-page .cad-lista tr.cad-selecionado .edit,
+.cad-page .cad-lista tr.cad-selecionado .del { opacity: 1; }
+.cad-page .cad-lista .edit:hover {
+    color: var(--cad-primary-dark) !important;
+    background: var(--cad-primary-soft) !important;
+}
+.cad-page .cad-lista .del:hover {
+    color: var(--cad-danger) !important;
+    background: var(--cad-danger-soft) !important;
+}
+.cad-page .cad-lista .no-records-found td {
+    padding: 36px 16px !important;
+    text-align: center;
+    color: var(--cad-muted) !important;
+    font-weight: 400 !important;
+    cursor: default;
+}
+.cad-page .cad-lista .fixed-table-loading {
+    color: var(--cad-muted);
+    background: rgba(255, 255, 255, .85);
+}
+
+/* -------------------------------------------------------- formulário */
+.cad-page .cad-form-corpo {
+    padding: 0 0 6px;
+}
+.cad-page .cad-form-corpo .modal-body {
+    padding: 0;
+}
+.cad-page .cad-secao {
+    padding: 18px 5px 4px;
+    border-top: 1px solid var(--cad-line);
+}
+.cad-page .cad-secao:first-of-type {
+    border-top: 0;
+}
+.cad-page .cad-secao-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 15px 14px;
+}
+.cad-page .cad-secao-titulo .fa {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--cad-primary-dark);
+    background: var(--cad-primary-soft);
+}
+.cad-page .cad-secao-titulo h4 {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--cad-ink);
+}
+.cad-page .cad-secao-titulo small {
+    display: block;
+    margin-top: 1px;
+    font-size: 12px;
+    color: var(--cad-muted);
+    font-weight: 400;
+}
+.cad-page .cad-form-corpo .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+.cad-page .cad-form-corpo .form-group {
+    margin-bottom: 14px;
+}
+.cad-page .cad-form-corpo label,
+.cad-page .tab-content label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #5b6b7c;
+}
+.cad-page .form-control {
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 13.5px;
+    color: var(--cad-ink);
+    background: #fff;
+    border: 1px solid var(--cad-line-strong) !important;
+    border-radius: var(--cad-radius-sm) !important;
+    box-shadow: none !important;
+    transition: border-color .15s, box-shadow .15s;
+}
+.cad-page textarea.form-control {
+    height: auto;
+    min-height: 84px;
+    resize: vertical;
+    line-height: 1.5;
+}
+.cad-page select.form-control {
+    padding-right: 30px;
+}
+.cad-page .form-control:hover {
+    border-color: #c6ced7 !important;
+}
+.cad-page .form-control:focus {
+    border-color: var(--cad-primary) !important;
+    box-shadow: var(--cad-ring) !important;
+}
+.cad-page .form-control::placeholder {
+    color: #aab4bf;
+}
+.cad-page .form-control[readonly],
+.cad-page .form-control[disabled] {
+    background: var(--cad-soft);
+    color: var(--cad-muted);
+}
+/* bordas laranja do .has-warning do tema: neutras */
+.cad-page .has-warning .form-control { border-color: var(--cad-line-strong) !important; }
+.cad-page .has-warning label { color: #5b6b7c; }
+.cad-page .has-error .form-control { border-color: var(--cad-danger) !important; box-shadow: 0 0 0 3px rgba(229, 72, 77, .14) !important; }
+.cad-page .has-error label { color: var(--cad-danger); }
+/* campo com botão (CEP) */
+.cad-page .input-group .form-control:first-child {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+.cad-page .input-group-addon,
+.cad-page .input-group-btn .btn {
+    height: 40px;
+    border: 1px solid var(--cad-line-strong);
+    border-left: 0;
+    border-radius: 0 var(--cad-radius-sm) var(--cad-radius-sm) 0 !important;
+    background: var(--cad-soft);
+    color: var(--cad-text);
+}
+.cad-page .input-group-addon.btn:hover {
+    color: var(--cad-primary-dark);
+    background: var(--cad-primary-soft);
+}
+/* as barras de botões antigas dos formulários (o cartão já tem Novo/Salvar no topo) */
+.cad-page .cad-form-corpo .hr-line-solid { display: none; }
+
+/* --------------------------------------------- abas (tela de Médicos) */
+.cad-page .nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px;
+    margin: 6px 8px 0;
+    border: 0;
+    border-radius: 10px;
+    background: var(--cad-soft);
+}
+.cad-page .nav-tabs > li {
+    float: none;
+    margin: 0;
+}
+.cad-page .nav-tabs > li > a {
+    margin: 0;
+    padding: 8px 14px;
+    border: 0 !important;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--cad-muted);
+    background: transparent;
+}
+.cad-page .nav-tabs > li > a:hover {
+    color: var(--cad-ink);
+    background: rgba(255, 255, 255, .7);
+}
+.cad-page .nav-tabs > li.active > a,
+.cad-page .nav-tabs > li.active > a:hover,
+.cad-page .nav-tabs > li.active > a:focus {
+    color: var(--cad-primary-dark);
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, .1);
+}
+.cad-page .tab-content > .tab-pane {
+    padding: 16px 8px 4px;
+    border: 0;
+    background: transparent;
+}
+.cad-page .tabs-container .panel-body {
+    border: 0;
+    background: transparent;
+    padding: 16px 0 4px;
+}
+
+/* ------------------------------------------------------ estado vazio */
+.cad-page .cad-dica {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 20px 18px;
+    padding: 10px 14px;
+    border-radius: var(--cad-radius-sm);
+    font-size: 12.5px;
+    color: var(--cad-muted);
+    background: var(--cad-soft);
+}
+.cad-page .cad-dica .fa { color: var(--cad-primary); }
+
+/* ----------------------------------------------------------- telas pequenas */
+@media (max-width: 991px) {
+    .cad-heroi.page-heading { flex-wrap: wrap; padding: 18px; }
+    .cad-heroi .cad-heroi-acoes { width: 100%; }
+    .cad-page .cad-card-topo { flex-wrap: wrap; }
+}
+@media (max-width: 600px) {
+    .cad-page .cad-btn .cad-btn-rotulo { display: none; }
+    .cad-heroi .cad-heroi-icone { width: 44px; height: 44px; font-size: 19px; }
+}
+
+/* ajustes da lista: botões lado a lado e sem divisórias verticais */
+.cad-page .cad-lista td > div:has(> .edit),
+.cad-page .cad-lista td > div:has(> .del) {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+.cad-page .cad-lista td,
+.cad-page .cad-lista th {
+    border-left: 0 !important;
+    border-right: 0 !important;
+}
+.cad-page .cad-lista .fixed-table-body {
+    overflow-x: hidden;
+}
+
+/* rodapé do formulário: Novo à esquerda, Salvar à direita (Ctrl+S salva de qualquer ponto) */
+.cad-page .cad-card-rodape {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--cad-line);
+    background: var(--cad-soft);
+}
+
+/* ---------------------------------------------- tela de Médicos: pastas */
+.cad-page .cad-pastas .nav-tabs { margin: 0 15px; }
+.cad-page .cad-pastas .nav-tabs > li > a .fa { margin-right: 5px; opacity: .8; }
+.cad-page .cad-pastas .tab-content > .tab-pane { padding: 16px 15px 4px; }
+.cad-page .cad-pastas .ibox-content {
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+.cad-page .cad-pastas .ibox-content.text-center > .cad-btn { margin: 0 4px 12px; }
+.cad-page .cad-pastas .form-horizontal .form-group { margin-left: -15px; margin-right: -15px; }
+.cad-page .cad-pastas .form-horizontal [class*="col-"] { margin-bottom: 10px; }
+.cad-page .cad-pastas .btn-group { margin: 0 6px 12px; }
+.cad-page .cad-pastas .btn-group > .btn {
+    height: 34px;
+    padding: 0 14px;
+    line-height: 32px;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--cad-text);
+    background: #fff;
+    border: 1px solid var(--cad-line-strong);
+    box-shadow: none;
+}
+.cad-page .cad-pastas .btn-group > .btn.active {
+    color: #fff;
+    background: var(--cad-primary);
+    border-color: var(--cad-primary);
+}
+.cad-page .cad-pastas .btn-group > .btn:first-child { border-radius: var(--cad-radius-sm) 0 0 var(--cad-radius-sm); }
+.cad-page .cad-pastas .btn-group > .btn:last-child { border-radius: 0 var(--cad-radius-sm) var(--cad-radius-sm) 0; }
+.cad-page .cad-pastas .btn-group > .btn input[type=radio] { display: none; }
+.cad-page .cad-pastas table { font-size: 13px; }
+/* selectize no padrão dos campos */
+.cad-page .selectize-control .selectize-input {
+    min-height: 40px;
+    padding: 9px 12px;
+    border: 1px solid var(--cad-line-strong);
+    border-radius: var(--cad-radius-sm);
+    box-shadow: none;
+}
+.cad-page .selectize-control .selectize-input.focus {
+    border-color: var(--cad-primary);
+    box-shadow: var(--cad-ring);
+}
+
+/* Clínicas (tela que já tinha visual próprio): mesmos cantos e respiro das demais */
+.row.clinica-page:not(.page-heading) { padding-top: 22px; }
+.clinica-page .clinica-card {
+    border-radius: 12px;
+    border-color: #e9edf1;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 6px 20px rgba(16, 24, 40, .05);
+}

@@ -1,28 +1,28 @@
-
-<div  class="form-group col-md-12 col-lg-12">
-    <div class="modal-body" id="corpo">
-        <div class="form-group col-md-6 col-lg-6" >
-            <table id="tabelaEspecialidade"
-                   data-toggle="table"
-                   data-classes="table table-condensed table-hover table-no-bordered"
-                   data-row-style="rowStyle"
-                   data-click-to-select="true"
-                   data-height="450"
-                   data-unique-id="id"
-                   data-search="true"
-                   data-url="/cadastros/especialidades/CarregaEspecialidades/">
-                <thead>
-                <tr>
-                    <th data-field="id" data-visible="false"></th>
-                    <th data-field="grupo" class="text">Grupo</th>
-                    <th data-field="nome">Nome</th>
-                    <th data-field="espcialidade" data-formatter="FormatoEspecialidade" data-events="EventoEspecialidade" data-align="center"></th>
-                </tr>
-                </thead>
-            </table>
+<div class="col-md-7 col-lg-7">
+    <div class="cad-card cad-lista">
+        <div class="cad-card-topo">
+            <h3><i class="fa fa-list-ul" aria-hidden="true"></i> Especialidades cadastradas <span class="cad-contador" data-cad-contador>0</span></h3>
         </div>
+        <table id="tabelaEspecialidade"
+               data-toggle="table"
+               data-classes="table table-hover table-no-bordered"
+               data-row-style="rowStyle"
+               data-click-to-select="true"
+               data-height="520"
+               data-unique-id="id"
+               data-search="true"
+               data-url="/cadastros/especialidades/CarregaEspecialidades/">
+            <thead>
+            <tr>
+                <th data-field="id" data-visible="false"></th>
+                <th data-field="nome" class="cad-nome">Especialidade</th>
+                <th data-field="grupo" class="cad-discreto">Grupo</th>
+                <th data-field="espcialidade" data-formatter="FormatoEspecialidade" data-events="EventoEspecialidade" data-align="right" data-width="90"></th>
+            </tr>
+            </thead>
+        </table>
     </div>
-    <div id="id_TelaEspecialidadex"  class="form-group col-md-6 col-lg-6" style="background-color: #dceaf8">
-        <div class="row"> {% include 'Cadastros/Especialidades/form.html' %}</div>
-    </div>
+</div>
+<div id="id_TelaEspecialidadex" class="col-md-5 col-lg-5">
+    {% include 'Cadastros/Especialidades/form.html' %}
 </div>

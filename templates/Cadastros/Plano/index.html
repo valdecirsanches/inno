@@ -5,7 +5,9 @@
 {% block cadastros_auxiliares_planos %}active{% endblock %}
 
 {% block head %}
+    {{ super() }}
     {% include 'datatables.html' %}
+    <link href="/static/css/Cadastros/cadastros.css?{{ user.release }}" rel="stylesheet">
 {% endblock %}
 
 {% block cadastro %}
@@ -33,16 +35,15 @@
 {% endblock %}
 
 {% block container_cabecalho %}
-    <div class="row wrapper border-bottom white-bg page-heading">
-        <div class="col-lg-10">
-            <h2><i class="fa fa-group"></i> Cadastro de Planos de Saúde</h2>
+    <div class="row wrapper border-bottom white-bg page-heading cad-heroi">
+        <div class="cad-heroi-icone"><i class="fa fa-heartbeat" aria-hidden="true"></i></div>
+        <div class="cad-heroi-texto">
+            <h2>Planos de saúde</h2>
+            <p class="cad-heroi-sub">Os planos oferecidos por cada convênio atendido.</p>
             <ol class="breadcrumb">
-                <li>
-                    <a href="/">Home</a>
-                </li>
-                <li class="active">
-                    <strong>Cadastro de Planos de Saúde</strong>
-                </li>
+                <li><a href="/">Home</a></li>
+                <li>Cadastros auxiliares</li>
+                <li class="active"><strong>Planos de saúde</strong></li>
             </ol>
         </div>
     </div>
@@ -54,10 +55,8 @@
 
 
 {% block container_corpo %}
-    <div class="row">
-        <div class="col-lg-12" style="background-color: #dceaf8">
-            {% include 'Cadastros/Plano/table.html' %}
-        </div>
+    <div class="row cad-page">
+        {% include 'Cadastros/Plano/table.html' %}
     </div>
 {% endblock %}
 
@@ -81,6 +80,7 @@
     <script src="/static/javascripts/Cadastros/Plano/planos.js?{{ user.release }}"></script>
     <script src="/static/javascripts/datatables.js"></script>
 
+    <script src="/static/javascripts/Cadastros/cadastros-ui.js?{{ user.release }}" type="application/javascript"></script>
 {% endblock %}
 
 

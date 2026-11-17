@@ -5,7 +5,9 @@
 {% block cadastros_auxiliares_convenios %}active{% endblock %}
 
 {% block head %}
+    {{ super() }}
     {% include 'datatables.html' %}
+    <link href="/static/css/Cadastros/cadastros.css?{{ user.release }}" rel="stylesheet">
 {% endblock %}
 
 {% block cadastro %}
@@ -28,16 +30,15 @@
 {% endblock %}
 
 {% block container_cabecalho %}
-    <div class="row wrapper border-bottom white-bg page-heading">
-        <div class="col-lg-10">
-            <h2><i class="fa fa-cc-visa"></i> Cadastro de Convênios</h2>
+    <div class="row wrapper border-bottom white-bg page-heading cad-heroi">
+        <div class="cad-heroi-icone"><i class="fa fa-briefcase" aria-hidden="true"></i></div>
+        <div class="cad-heroi-texto">
+            <h2>Convênios</h2>
+            <p class="cad-heroi-sub">Operadoras e convênios aceitos, com dados de contato e faturamento.</p>
             <ol class="breadcrumb">
-                <li>
-                    <a href="/">Home</a>
-                </li>
-                <li class="active">
-                    <strong>Cadastro de Convênios</strong>
-                </li>
+                <li><a href="/">Home</a></li>
+                <li>Cadastros auxiliares</li>
+                <li class="active"><strong>Convênios</strong></li>
             </ol>
         </div>
     </div>
@@ -56,15 +57,17 @@
 
 
 {% block container_corpo %}
-    <div class="row">
-        <div class="col-lg-12" style="background-color: #dceaf8">
-            <div class="form-group col-md-3 col-lg-3" >
+    <div class="row cad-page">
+        <div class="col-md-4 col-lg-4">
+            <div class="cad-card cad-lista">
+                <div class="cad-card-topo">
+                    <h3><i class="fa fa-list-ul" aria-hidden="true"></i> Convênios <span class="cad-contador" data-cad-contador>0</span></h3>
+                </div>
                 {% include 'Cadastros/Convenio/table.html' %}
             </div>
-            <div id="id_TelaConvenio"  class="form-group col-md-9 col-lg-9">
-                <div class="row"> {% include 'Cadastros/Convenio/form.html' %}</div>
-            </div>
-
+        </div>
+        <div id="id_TelaConvenio" class="col-md-8 col-lg-8">
+            {% include 'Cadastros/Convenio/form.html' %}
         </div>
     </div>
 {% endblock %}
@@ -94,6 +97,7 @@
     <!-- Cep -->
     <script src="/static/js/"></script>
 
+    <script src="/static/javascripts/Cadastros/cadastros-ui.js?{{ user.release }}" type="application/javascript"></script>
 {% endblock %}
 
 

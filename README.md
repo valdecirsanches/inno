@@ -134,6 +134,21 @@ passo: 274 leituras (todos os endereços), 126 gravações (paciente, recibo, ag
 prontuário, cadastros, configurações, usuários) e 837 combinações de endereço e método HTTP.
 Fora as diferenças abaixo, as respostas e o banco ficam iguais.
 
+## Visual dos cadastros auxiliares
+
+Clínicas, Médicos, Convênios, Especialidades, Planos de saúde e Usuários têm um visual
+novo (pedido do dono), igual no Inno e no AppClinic: cabeçalho com ícone, lista com busca,
+iniciais coloridas e contador, formulário em seções com o selo "Novo cadastro" / "Editando",
+botões Novo e Salvar no rodapé do formulário e Ctrl+S para salvar.
+O estilo fica em `static/css/Cadastros/cadastros.css` (tudo dentro de `.cad-page` / `.cad-heroi`)
+e o acabamento em `static/javascripts/Cadastros/cadastros-ui.js`; os ids, campos e funções
+que o JavaScript de cada tela usa continuam os mesmos. Os templates dessas telas são os mesmos
+nos dois sistemas (no AppClinic com `{% static %}` / `{% url %}`): mudou num, mude no outro.
+De quebra, duas falhas antigas foram corrigidas nos dois:
+- Usuários: o botão Novo chamava uma função que não existe (`addUsuario`) e, com o campo id
+  vazio, salvar um usuário novo dava erro 500; agora Novo limpa o formulário e o id começa em 0.
+- Especialidades: Novo deixava no formulário o grupo e o nome do registro aberto; agora limpa.
+
 ## Diferenças em relação ao AppClinic
 
 O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As exceções, todas a favor do usuário:

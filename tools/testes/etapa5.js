@@ -89,7 +89,7 @@ const srv = app.listen(0, async () => {
 
     // ------------------------------------------------------------ usuários
     r = await vai('/seguranca/', { headers: { 'x-requested-with': '', accept: 'text/html' } }); t = await r.text();
-    confere('tela de usuários', () => { assert.equal(r.status, 200); assert.match(t, /Cadastro de Usuários/); assert.match(t, /João da Silva/); });
+    confere('tela de usuários', () => { assert.equal(r.status, 200); assert.match(t, /<h2>Usuários<\/h2>/); assert.match(t, /João da Silva/); });
     r = await vai('/seguranca/usuario.json/'); t = await r.text();
     confere('usuario.json lista', () => assert.equal(t, '[{"id": 1, "clinica": "Clinica", "fk_clinica": 1, "fk_medico": 1, "email": "", "login": "u", "username": "u", "first_name": "Maria", "last_name": ""}]'));
 

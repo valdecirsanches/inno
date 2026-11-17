@@ -1,60 +1,69 @@
-<form action="" method="post" role="form"  id="formUsuarioDados" class="classUsuario">
-    <div class="modal-body" id="corpo">
-        <input id="id_id" name="id" type="number" class="form-control hidden" readonly>
-
-        <div id="id_login_div" class="form-group col-md-4 col-lg-4">
-            <label for="id_login">Login</label>
-            <input id="id_login" name="login" type="text" class="form-control">
-        </div>
-        <div id="id_cpf_div" class="form-group col-md-4  col-lg-4">
-            <label for="id_cpf">CPF</label>
-            <input id="id_cpf" name="cpf" type="text" class="form-control cpf">
-        </div>
-        <div id="id_administrador_div" class="form-group col-md-4 col-lg-4">
-            <label for="id_administrador">Administrador</label>
-            <select id="id_administrador" name="administrador" class="form-control" required="required">
-                <option value="True">Sim</option>
-                <option value="False">Não</option>
-            </select>
-        </div>
-        <div id="id_first_name_div" class="form-group col-md-12 col-lg-12">
-            <label for="id_first_name">Nome completo</label>
-            <input id="id_first_name" name="first_name" type="text" class="form-control">
-        </div>
-
-
-        <div id="id_email_div" class="form-group col-md-12 col-lg-12">
-            <label for="id_email">Email</label>
-            <input id="id_email" name="email" type="text" class="form-control email">
-        </div>
-        <div id="id_fk_medico_div" class="form-group col-md-12">
-            <label for="id_fk_medico">Médico</label>
-            <select id="id_fk_medico" name="fk_medico" class="form-control">
-                {% for m in medicos %}
-                    <option {% if m.id == user.fk_medico.id %}selected{% endif %} value="{{ m.id }}">{{ m.medico }}</option>
-                {% endfor %}
-
-            </select>
-        </div>
-
-        <div id="id_fk_clinica_div" class="form-group col-md-12 col-lg-12">
-            <label for="id_fk_clinica">Clinica</label>
-            <select id="id_fk_clinica" name="fk_clinica" class="form-control" required="required">
-                <option value="1">OSASCO</option>
-                <option value="2">SÃO PAULO</option>
-            </select>
-
-        </div>
-
+<div class="cad-card">
+    <div class="cad-card-topo">
+        <h3><i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="cad-titulo-texto" data-cad-titulo="Novo usuário">Novo usuário</span></h3>
+        <span class="cad-estado" data-cad-estado>Novo cadastro</span>
     </div>
-</form>
-
-<div class="form-group col-md-12 col-lg-12 text-right">
-    <div class="hr-line-solid"></div>
-    <div class="col-md-6 text-left">
-        <a id="botao_novo_plano" class="btn btn-primary" onclick="addUsuario()"><i class="fa fa-pencil"></i> Novo</a>
-    </div>
-    <div class="col-md-6 text-right">
-        <a id="btnSalvaPlano" class="btn btn-primary" onclick="SalvaUsuario()"><i class="fa fa-save"></i> Salvar</a>
+    <form action="" method="post" role="form" id="formUsuarioDados" class="classUsuario">
+        <div class="cad-form-corpo" id="corpo">
+            <input id="id_id" name="id" type="number" class="form-control hidden" value="0" readonly>
+            <div class="cad-secao">
+                <div class="cad-secao-titulo">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                    <h4>Pessoa<small>Identificação de quem vai usar o sistema.</small></h4>
+                </div>
+                <div class="row">
+                    <div id="id_first_name_div" class="form-group col-sm-12">
+                        <label for="id_first_name">Nome completo</label>
+                        <input id="id_first_name" name="first_name" type="text" class="form-control" placeholder="Nome e sobrenome">
+                    </div>
+                    <div id="id_cpf_div" class="form-group col-sm-5">
+                        <label for="id_cpf">CPF</label>
+                        <input id="id_cpf" name="cpf" type="text" class="form-control cpf" placeholder="000.000.000-00">
+                    </div>
+                    <div id="id_email_div" class="form-group col-sm-7">
+                        <label for="id_email">E-mail</label>
+                        <input id="id_email" name="email" type="text" class="form-control email" placeholder="nome@clinica.com.br">
+                    </div>
+                </div>
+            </div>
+            <div class="cad-secao">
+                <div class="cad-secao-titulo">
+                    <i class="fa fa-key" aria-hidden="true"></i>
+                    <h4>Acesso<small>Login, perfil e onde a pessoa trabalha.</small></h4>
+                </div>
+                <div class="row">
+                    <div id="id_login_div" class="form-group col-sm-7">
+                        <label for="id_login">Login</label>
+                        <input id="id_login" name="login" type="text" class="form-control" placeholder="Usuário para entrar">
+                    </div>
+                    <div id="id_administrador_div" class="form-group col-sm-5">
+                        <label for="id_administrador">Administrador</label>
+                        <select id="id_administrador" name="administrador" class="form-control" required="required">
+                            <option value="True">Sim</option>
+                            <option value="False">Não</option>
+                        </select>
+                    </div>
+                    <div id="id_fk_clinica_div" class="form-group col-sm-12">
+                        <label for="id_fk_clinica">Clínica</label>
+                        <select id="id_fk_clinica" name="fk_clinica" class="form-control" required="required">
+                            <option value="1">OSASCO</option>
+                            <option value="2">SÃO PAULO</option>
+                        </select>
+                    </div>
+                    <div id="id_fk_medico_div" class="form-group col-sm-12">
+                        <label for="id_fk_medico">Médico vinculado</label>
+                        <select id="id_fk_medico" name="fk_medico" class="form-control">
+                            {% for m in medicos %}
+                                <option {% if m.id == user.fk_medico.id %}selected{% endif %} value="{{ m.id }}">{{ m.medico }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="cad-card-rodape">
+        <a id="botao_novo_plano" class="cad-btn cad-btn-secundario" data-cad-novo onclick="AddUsuario(); $('.classUsuario #id_id').val(0);"><i class="fa fa-plus"></i> <span class="cad-btn-rotulo">Novo</span></a>
+        <a id="btnSalvaPlano" class="cad-btn cad-btn-primario" data-cad-salvar onclick="SalvaUsuario()" title="Salvar (Ctrl+S)"><i class="fa fa-check"></i> <span class="cad-btn-rotulo">Salvar</span> <kbd>Ctrl S</kbd></a>
     </div>
 </div>

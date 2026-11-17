@@ -1,31 +1,48 @@
-<form action="" id="formDadosPlanoSaude" method="post" role="form" class="classPlanoSaude">
-    <div class="modal-body" id="corpo">
-        <input id="id_id" name="id" hidden>
-        <div class="form-group col-md-12 has-warning">
-            <label for="id_descricao">Nome do plano</label>
-            <input id="id_descricao" name="descricao" type="text" value=""
-                   class="form-control text-uppercase" required="required">
-        </div>
-        <div class="form-group col-md-12 has-warning">
-            <label for="id_fk_convenio">Convênio</label>
-            <select id="id_fk_convenio" name="fk_convenio" class="form-control input-sm" >
-                {% for c in lista_convenios %}
-                    <option {% if c.id == plano.fk_convenio.id %}selected{% endif %} value="{{ c.id }}">{{ c.convenio }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group col-md-12 has-warning">
-            <label for="id_anotacoes">Anotações</label>
-            <textarea id="id_anotacoes" name="anotacoes" rows="3" class="form-control"></textarea>
-        </div>
+<div class="cad-card">
+    <div class="cad-card-topo">
+        <h3><i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="cad-titulo-texto" data-cad-titulo="Novo plano">Novo plano</span></h3>
+        <span class="cad-estado" data-cad-estado>Novo cadastro</span>
     </div>
-</form>
-<div class="form-group col-md-12 col-lg-12 text-right">
-    <div class="hr-line-solid"></div>
-    <div class="col-md-6 text-left">
-        <a id="botao_novo_plano" class="btn btn-primary" onclick="addPlano()"><i class="fa fa-pencil"></i> Novo</a>
-    </div>
-    <div class="col-md-6 text-right">
-        <a id="btnSalvaPlano" class="btn btn-primary" onclick="SavePlano()"><i class="fa fa-save"></i> Salvar</a>
+    <form action="" id="formDadosPlanoSaude" method="post" role="form" class="classPlanoSaude">
+        <div class="cad-form-corpo" id="corpo">
+            <input id="id_id" name="id" hidden>
+            <div class="cad-secao">
+                <div class="cad-secao-titulo">
+                    <i class="fa fa-heartbeat" aria-hidden="true"></i>
+                    <h4>Plano<small>Nome do plano e o convênio a que pertence.</small></h4>
+                </div>
+                <div class="row">
+                    <div class="form-group col-sm-12">
+                        <label for="id_descricao">Nome do plano</label>
+                        <input id="id_descricao" name="descricao" type="text" value="" placeholder="Ex.: APARTAMENTO"
+                               class="form-control text-uppercase" required="required">
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <label for="id_fk_convenio">Convênio</label>
+                        <select id="id_fk_convenio" name="fk_convenio" class="form-control">
+                            {% for c in lista_convenios %}
+                                <option {% if c.id == plano.fk_convenio.id %}selected{% endif %} value="{{ c.id }}">{{ c.convenio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="cad-secao">
+                <div class="cad-secao-titulo">
+                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                    <h4>Anotações<small>Carências, coberturas, observações para a recepção.</small></h4>
+                </div>
+                <div class="row">
+                    <div class="form-group col-sm-12">
+                        <label for="id_anotacoes" class="sr-only">Anotações</label>
+                        <textarea id="id_anotacoes" name="anotacoes" rows="3" class="form-control" placeholder="Escreva aqui…"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="cad-card-rodape">
+        <a id="botao_novo_plano" class="cad-btn cad-btn-secundario" data-cad-novo onclick="addPlano()"><i class="fa fa-plus"></i> <span class="cad-btn-rotulo">Novo</span></a>
+        <a id="btnSalvaPlano" class="cad-btn cad-btn-primario" data-cad-salvar onclick="SavePlano()" title="Salvar (Ctrl+S)"><i class="fa fa-check"></i> <span class="cad-btn-rotulo">Salvar</span> <kbd>Ctrl S</kbd></a>
     </div>
 </div>

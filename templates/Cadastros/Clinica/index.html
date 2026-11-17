@@ -8,6 +8,7 @@
     {{ super() }}
     {% include 'datatables.html' %}
     <link href="/static/css/Cadastros/clinica.css?{{ user.release }}" rel="stylesheet">
+    <link href="/static/css/Cadastros/cadastros.css?{{ user.release }}" rel="stylesheet">
 {% endblock %}
 
 {% block cadastro %}
@@ -35,17 +36,15 @@
 {% endblock %}
 
 {% block container_cabecalho %}
-    <div class="row wrapper border-bottom white-bg page-heading clinica-cabecalho clinica-page">
-        <div class="col-lg-10">
-            <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Clínicas</h2>
-            <p class="clinica-subtitulo">Dados de cada unidade e a conexão com o WhatsApp usada nos lembretes de consulta.</p>
+    <div class="row wrapper border-bottom white-bg page-heading cad-heroi">
+        <div class="cad-heroi-icone"><i class="fa fa-hospital-o" aria-hidden="true"></i></div>
+        <div class="cad-heroi-texto">
+            <h2>Clínicas</h2>
+            <p class="cad-heroi-sub">Dados de cada unidade e a conexão com o WhatsApp usada nos lembretes de consulta.</p>
             <ol class="breadcrumb">
-                <li>
-                    <a href="/">Home</a>
-                </li>
-                <li class="active">
-                    <strong>Clínicas</strong>
-                </li>
+                <li><a href="/">Home</a></li>
+                <li>Cadastros auxiliares</li>
+                <li class="active"><strong>Clínicas</strong></li>
             </ol>
         </div>
     </div>

@@ -1,41 +1,44 @@
-<form action="" id="formMedicoDados" method="post" role="form" class="classMedico form-horizontal">
-
-    <div class="row">
-        <div class="form-group">
-            <div class="col-md-7 col-sm-7">
-                <input type="text" id="id_id" name="id">
+<form action="" id="formMedicoDados" method="post" role="form" class="classMedico">
+    <div class="cad-secao">
+        <div class="cad-secao-titulo">
+            <i class="fa fa-user-md" aria-hidden="true"></i>
+            <h4>Dados do médico<small>Nome e registro profissional usados na agenda, nas receitas e nos atestados.</small></h4>
+        </div>
+        <div class="row">
+            <input type="text" id="id_id" name="id" class="hidden">
+            <div class="form-group col-md-6 col-sm-12">
                 <label for="id_medico">Nome</label>
-                <input id="id_medico" name="medico" type="text"
+                <input id="id_medico" name="medico" type="text" placeholder="Nome completo"
                        class="form-control" required="required">
             </div>
-            <div class="col-md-2">
+            <div class="form-group col-md-2 col-sm-4">
                 <label for="id_codigo">Código</label>
                 <input id="id_codigo" name="codigo" type="text"
                        class="form-control text-uppercase" required="required">
             </div>
-            <div class="col-md-2 col-sm-3">
+            <div class="form-group col-md-2 col-sm-5">
                 <label for="id_crm">CRM</label>
                 <input id="id_crm" name="crm" type="text" class="form-control">
             </div>
-            <div class="col-md-1 col-sm-2">
+            <div class="form-group col-md-2 col-sm-3">
                 <label for="id_crm_uf">UF</label>
-                <input id="id_crm_uf" name="crm_uf" type="text" class="form-control">
+                <input id="id_crm_uf" name="crm_uf" type="text" class="form-control text-uppercase" maxlength="2">
             </div>
-            <div class="col-md-3 col-sm-4">
+            <div class="form-group col-md-3 col-sm-6">
                 <label for="id_telefone">Telefone</label>
-                <input id="id_telefone" name="telefone" type="text" class="form-control celular">
+                <input id="id_telefone" name="telefone" type="text" class="form-control celular" placeholder="(00) 0000-0000">
             </div>
-            <div class="col-md-3 col-sm-4">
+            <div class="form-group col-md-3 col-sm-6">
                 <label for="id_celular">Celular</label>
-                <input id="id_celular" name="celular" type="text" class="form-control celular">
+                <input id="id_celular" name="celular" type="text" class="form-control celular" placeholder="(00) 00000-0000">
             </div>
-            <div class="col-md-9 col-sm-9">
-                <label for="id_email">email</label>
-                <input id="id_email" name="email" type="email" class="form-control text-lowercase">
-            </div>
-            <div id="id_cpf_div" class="col-md-3 col-sm-4">
+            <div class="form-group col-md-3 col-sm-6" id="id_cpf_div">
                 <label for="id_cpf">CPF</label>
-                <input id="id_cpf" name="cpf" type="text" class="form-control cpf">
+                <input id="id_cpf" name="cpf" type="text" class="form-control cpf" placeholder="000.000.000-00">
+            </div>
+            <div class="form-group col-md-3 col-sm-6">
+                <label for="id_email">E-mail</label>
+                <input id="id_email" name="email" type="email" class="form-control text-lowercase" placeholder="nome@clinica.com.br">
             </div>
         </div>
     </div>
