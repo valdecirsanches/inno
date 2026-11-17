@@ -11,6 +11,7 @@
  *   [data-cad-estado]                 selo "Novo cadastro" / "Editando"
  *   [data-cad-titulo]                 título do cartão do formulário
  *   [data-cad-novo] / [data-cad-salvar]  botões Novo e Salvar
+ *   [data-cad-so-edicao]              só aparece com um registro aberto
  */
 (function ($) {
     'use strict';
@@ -35,6 +36,7 @@
     function estado(novo, nome) {
         var $e = $('[data-cad-estado]');
         var $t = $('[data-cad-titulo]');
+        $('[data-cad-so-edicao]').toggle(!novo);
         if (novo) {
             $e.removeClass('cad-estado-editando').text('Novo cadastro');
             $t.text($t.data('cad-titulo') || 'Novo cadastro');

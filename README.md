@@ -99,7 +99,21 @@ Com `NUVEM_TIPO=cloud-storage`, o Inno usa o [cloud-storage](https://github.com/
 | 6b | WhatsApp: API (`/api/whatsapp/`: envio da confirmação, texto da agenda, QR code, início e reinício da sessão, foto do contato), `/whatsapp/...` e o robô que lê as respostas dos pacientes (`/webhook/resposta/`) | pronta |
 | 7 | Admin do Django (`/admin/...`) | a fazer |
 
-Enquanto a conversão não termina, use o Inno só para conferir os módulos prontos. O AppClinic continua sendo o sistema principal.
+O Inno atende todos os endereços do AppClinic, menos o admin do Django (`/admin/`). O que se fazia
+por lá e já tem caminho no Inno: redefinir senha (botão **Redefinir senha** na tela de Usuários,
+só para administradores) e ver os logs (`/logs/painel/`). O que ainda só o admin faz: marcar um
+usuário como staff/superusuário e mexer em grupos e permissões do Django.
+
+### Deixando o AppClinic
+
+O Inno já pode ser o sistema principal. Antes de desligar o AppClinic:
+1. **Webhook do WhatsApp:** o WAHA manda as respostas dos pacientes para o endereço configurado
+   nele (`WHATSAPP_HOOK_URL` / webhook da sessão). Troque o endereço do AppClinic pelo do Inno
+   (`http://<servidor>:<porta do Inno>/webhook/resposta/`), senão o robô para de responder.
+2. **Imagens antigas:** rode `node tools/nuvem/migra-media.js` para levar à nuvem o que ainda está
+   só na pasta `media/` do AppClinic, e mantenha a pasta (o Inno ainda a lê se faltar algo).
+3. **Tarefas agendadas:** confira `crontab -l` no servidor; se algo chama o AppClinic, aponte para o Inno.
+4. Pare o gunicorn do AppClinic.
 
 ## Como está organizado
 
@@ -174,6 +188,10 @@ De quebra, duas falhas antigas foram corrigidas nos dois:
 - Usuários: o botão Novo chamava uma função que não existe (`addUsuario`) e, com o campo id
   vazio, salvar um usuário novo dava erro 500; agora Novo limpa o formulário e o id começa em 0.
 - Especialidades: Novo deixava no formulário o grupo e o nome do registro aberto; agora limpa.
+
+Usuários tem também o botão **Redefinir senha** (`POST /seguranca/usuario/senha/`, view `UsuarioSenha`
+no AppClinic): aparece só para administradores e só com um usuário aberto; grava a senha nova e,
+se for a do próprio administrador, ele continua conectado.
 
 ## Diferenças em relação ao AppClinic
 

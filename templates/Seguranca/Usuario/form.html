@@ -64,6 +64,11 @@
     </form>
     <div class="cad-card-rodape">
         <a id="botao_novo_plano" class="cad-btn cad-btn-secundario" data-cad-novo onclick="AddUsuario(); $('.classUsuario #id_id').val(0);"><i class="fa fa-plus"></i> <span class="cad-btn-rotulo">Novo</span></a>
-        <a id="btnSalvaPlano" class="cad-btn cad-btn-primario" data-cad-salvar onclick="SalvaUsuario()" title="Salvar (Ctrl+S)"><i class="fa fa-check"></i> <span class="cad-btn-rotulo">Salvar</span> <kbd>Ctrl S</kbd></a>
+        <div class="cad-card-acoes">
+            {% if user.administrador == 'True' or user.is_superuser %}
+            <a id="btnRedefineSenha" class="cad-btn cad-btn-secundario" data-cad-so-edicao style="display: none" onclick="RedefineSenha()" title="Definir uma senha nova para este usuário"><i class="fa fa-key"></i> <span class="cad-btn-rotulo">Redefinir senha</span></a>
+            {% endif %}
+            <a id="btnSalvaPlano" class="cad-btn cad-btn-primario" data-cad-salvar onclick="SalvaUsuario()" title="Salvar (Ctrl+S)"><i class="fa fa-check"></i> <span class="cad-btn-rotulo">Salvar</span> <kbd>Ctrl S</kbd></a>
+        </div>
     </div>
 </div>

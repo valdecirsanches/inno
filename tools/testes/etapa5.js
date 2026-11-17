@@ -150,6 +150,26 @@ const srv = app.listen(0, async () => {
     });
     r = await vai('/logs/gerenciar/');
     confere('logs/gerenciar: 500 como no AppClinic', () => assert.equal(r.status, 500));
+
+    // ------------------------------------------------- redefinir senha (botão)
+    const SENHA = '/seguranca/usuario/senha/';
+    sq.exec(`UPDATE tb_usuarios SET administrador = 'False', is_superuser = 0 WHERE id = 1`);
+    r = await vai(SENHA, { method: 'POST', body: corpo({ id: '1', senha: 'nova1234' }) }); t = await r.text();
+    confere('redefinir senha: só administrador', () => assert.equal(t, '{"success": false, "error": "S\\u00f3 um administrador pode redefinir senhas."}'));
+    sq.exec(`UPDATE tb_usuarios SET administrador = 'True' WHERE id = 1`);
+    r = await vai(SENHA, { method: 'POST', body: corpo({ id: '1', senha: ' 12 ' }) }); t = await r.text();
+    confere('redefinir senha: senha curta', () => assert.match(t, /pelo menos 4 caracteres/));
+    r = await vai(SENHA, { method: 'POST', body: corpo({ id: 'x', senha: 'nova1234' }) }); t = await r.text();
+    confere('redefinir senha: usuário inexistente', () => assert.equal(t, '{"success": false, "error": "Usu\\u00e1rio n\\u00e3o encontrado."}'));
+    r = await vai(SENHA, { method: 'POST', body: corpo({ id: '1', senha: 'nova1234' }) }); t = await r.text();
+    confere('redefinir senha: grava e a senha nova entra', async () => {
+      assert.equal(t, '{"success": true, "message": "Senha de Maria redefinida."}');
+      const { confere: confereSenha } = require(R + '/server/seguranca/senhas');
+      const pw = sq.prepare('SELECT password FROM tb_usuarios WHERE id = 1').get().password;
+      assert.ok(confereSenha('nova1234', pw) && !confereSenha('s', pw));
+    });
+    r = await vai('/seguranca/', { headers: { 'x-requested-with': '', accept: 'text/html' } }); t = await r.text();
+    confere('tela de usuários mostra o botão ao administrador', () => assert.match(t, /id="btnRedefineSenha"/));
     console.log(`\n${ok} conferências ok`);
   } catch (e) {
     console.error('FALHOU:', e.message);

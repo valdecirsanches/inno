@@ -2,6 +2,17 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.2",
+      "data": "17/11/2026",
+      "titulo": "Redefinir senha de usuário",
+      "itens": [
+        {
+          "tipo": "novo",
+          "texto": "Usuários: botão Redefinir senha (só para administradores) grava uma senha nova para o usuário aberto."
+        }
+      ]
+    },
+    {
       "versao": "2.4.1",
       "data": "17/11/2026",
       "titulo": "WhatsApp: sempre uma mensagem só",

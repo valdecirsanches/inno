@@ -12,8 +12,9 @@ const { render } = require('../templates');
 const { json } = require('../util/http');
 const modelo = require('../util/modelo');
 const { obtem, relacionado, int, erroPython } = require('../util/orm');
-const { exige } = require('../util/python');
+const { exige, pyStrValor } = require('../util/python');
 const QueryDict = require('../util/querydict');
+const senhas = require('../seguranca/senhas');
 
 const a = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 const U = 'TbUsuario';
@@ -160,6 +161,25 @@ module.exports = function (app) {
       await modelo.salva(req, U, u);
     }
     json(res, { success: await row(u) });
+  }));
+
+  // Seguranca/views.py UsuarioSenha: redefine a senha (botão da tela de Usuários)
+  app.post('/seguranca/usuario/senha/', a(async (req, res) => {
+    const eu = req.user;
+    if (!(eu.is_superuser || pyStrValor(eu.administrador) === 'True')) {
+      return json(res, { success: false, error: 'Só um administrador pode redefinir senhas.' });
+    }
+    const idTexto = String(req.POST.get('id') || 0);
+    const id = /^\s*[+-]?\d+\s*$/.test(idTexto) ? parseInt(idTexto, 10) : 0; // int() com ValueError => 0
+    const senha = req.POST.get('senha') || '';
+    if (senha.trim().length < 4) return json(res, { success: false, error: 'A senha nova precisa ter pelo menos 4 caracteres.' });
+    const u = await db.busca(U, { id });
+    if (!u) return json(res, { success: false, error: 'Usuário não encontrado.' });
+    u.password = senhas.codifica(senha);
+    await modelo.salva(req, U, u, { somenteCampos: ['password'] });
+    // a própria senha: continua conectado (update_session_auth_hash)
+    if (u.id === eu.id) require('../seguranca/sessao').entra(req, u);
+    json(res, { success: true, message: `Senha de ${u.first_name || u.login} redefinida.` });
   }));
 
   app.delete(ROTA, a(async (req, res) => {

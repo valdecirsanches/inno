@@ -102,3 +102,40 @@ function DelUsuario(id) {
         });
     });
 }
+
+// Redefinir a senha do usuário aberto no formulário (só administradores)
+function RedefineSenha() {
+    var id = $('.classUsuario #id_id').val();
+    var nome = $('.classUsuario #id_first_name').val() || $('.classUsuario #id_login').val();
+    if (!id || id === '0') {
+        swal('Redefinir senha', 'Abra primeiro o usuário na lista.', 'info');
+        return;
+    }
+    swal({
+        title: 'Redefinir senha',
+        html: 'Nova senha para <b>' + $('<span>').text(nome).html() + '</b>.<br>Passe a senha à pessoa; ela pode trocá-la depois em "Trocar senha".',
+        input: 'text',
+        inputPlaceholder: 'Nova senha (mínimo 4 caracteres)',
+        showCancelButton: true,
+        confirmButtonColor: '#1ab394',
+        confirmButtonText: 'Redefinir',
+        cancelButtonText: 'Cancelar',
+        inputValidator: function (valor) {
+            return new Promise(function (ok, erro) {
+                if ($.trim(valor || '').length < 4) { erro('A senha nova precisa ter pelo menos 4 caracteres.'); } else { ok(); }
+            });
+        }
+    }).then(function (senha) {
+        $.ajax({
+            url: 'usuario/senha/',
+            data: {id: id, senha: senha},
+            type: 'POST'
+        }).success(function (data) {
+            if (data.success) {
+                swal('Senha redefinida', data.message, 'success');
+            } else {
+                swal('Redefinir senha', data.error, 'error');
+            }
+        });
+    }, function () { /* cancelado */ });
+}
