@@ -57,6 +57,10 @@ vira o nome do arquivo na nuvem; `/media/...` e o download buscam o arquivo lá.
    é pulado, e nada é apagado da pasta.
 4. Reinicie o Inno.
 
+Se o envio der erro, `node tools/nuvem/testa.js` testa a ligação com a nuvem (endereço, chave,
+envio, leitura e exclusão de um arquivo de teste) e diz onde parou; o erro completo de cada
+falha fica em `logs/erros.log`.
+
 ## O que já está convertido
 
 | Etapa | Módulos | Situação |
