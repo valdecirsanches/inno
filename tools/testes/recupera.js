@@ -71,13 +71,14 @@ function nuvemFalsa() {
       const out = await roda(...pastas);
       assert.match(out, /3 recuperados/);
       const novos = extras(1).slice(antes1);
-      assert.deepStrictEqual(novos.map((x) => x.file), ['extras/1/2023/03/05/raio_x.png', 'extras/1/2022/07/09/laudo.pdf']);
+      // mesma estrutura e mesmo nome da origem
+      assert.deepStrictEqual(novos.map((x) => x.file), ['extras/1/2023/03/05/raio x.png', 'extras/1/laudo.pdf']);
       assert.strictEqual(novos[0].data_salvo, '2023-03-05 00:00:00');
       assert.strictEqual(novos[1].data_salvo, '2022-07-09 14:30:00');
       assert.ok(novos[0].fk_consulta_id, 'ligado à última consulta do paciente');
       const doPac2 = extras(2).map((x) => x.file);
       assert.strictEqual(doPac2.length, 1);
-      assert.match(doPac2[0], /^extras\/2\/\d{4}\/\d{2}\/\d{2}\/exame\.jpg$/);
+      assert.strictEqual(doPac2[0], 'extras/2/exame.jpg');
       assert.strictEqual(arquivos.size, 4, '3 novos + o já registrado');
       assert.strictEqual(t.sq.prepare("select count(*) n from tb_extra where file = 'extras/1/2024/01/02/ja_registrado.png'").get().n, 1, 'sem registro duplicado');
       assert.strictEqual(t.sq.prepare("select count(*) n from inno_nuvem where caminho = 'extras/1/2024/01/02/ja_registrado.png'").get().n, 1, 'na nuvem com o mesmo caminho');
@@ -85,17 +86,26 @@ function nuvemFalsa() {
     });
     await t.confere('aparece em Imagens e anexos e abre', async () => {
       const j = await (await t.vai('/prontuario/Extras/CarregaExtras/?prontuario=1')).json();
-      const item = j.success.find((x) => x.nome === 'raio_x.png');
+      const item = j.success.find((x) => x.nome === 'raio x.png');
       assert.ok(item);
       assert.strictEqual(item.data, '05/03/2023');
       const r = await t.vai(item.url);
       assert.strictEqual(Buffer.from(await r.arrayBuffer()).toString(), 'png do paciente 1');
     });
+    await t.confere('caminho ocupado por outro arquivo: ganha sufixo, sem sobrescrever', async () => {
+      escreve('terceira/1/2023/03/05/raio x.png', 'OUTRO conteúdo, mesmo nome');
+      const out = await roda(path.join(raiz, 'terceira'));
+      assert.match(out, /1 recuperados/);
+      const ultimo = extras(1).pop().file;
+      assert.match(ultimo, /^extras\/1\/2023\/03\/05\/raio x_[A-Za-z0-9]{7}\.png$/);
+      const r = await t.vai('/media/extras/1/2023/03/05/raio%20x.png');
+      assert.strictEqual(Buffer.from(await r.arrayBuffer()).toString(), 'png do paciente 1', 'o original continua intacto');
+    });
     await t.confere('rodar de novo não duplica', async () => {
       const out = await roda(...pastas);
       assert.match(out, /0 recuperados/);
       assert.match(out, /5 já estavam no prontuário/);   // os 3 recuperados + a cópia + o já registrado
-      assert.strictEqual(arquivos.size, 4);
+      assert.strictEqual(arquivos.size, 5);
     });
     await t.fim();
   } catch (e) { await t.fim(e); }

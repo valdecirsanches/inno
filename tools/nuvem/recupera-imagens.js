@@ -12,8 +12,11 @@
  *   node tools/nuvem/recupera-imagens.js --simular <pasta> [<pasta> ...]   mostra o que faria
  *   node tools/nuvem/recupera-imagens.js <pasta> [<pasta> ...]             recupera
  *
- * - O arquivo fica na nuvem em extras/<paciente>/<ano>/<mês>/<dia>/<nome>, com a data
- *   tirada das pastas (ano/mês/dia) ou, sem elas, da data do próprio arquivo.
+ * - O arquivo mantém a mesma estrutura de pastas e o mesmo nome da origem, como no
+ *   AppClinic: .../extras/123/2024/05/10/foto.png fica extras/123/2024/05/10/foto.png
+ *   no banco e na nuvem (fácil de achar e de restaurar). Só se esse caminho já estiver
+ *   ocupado por outro arquivo (conteúdo diferente) o nome ganha um sufixo, como no Django.
+ * - A data do registro vem das pastas (ano/mês/dia) ou, sem elas, da data do arquivo.
  * - O registro aponta para a última consulta do paciente (e o médico dela), como o
  *   "rastrear" do AppClinic; paciente sem consulta fica sem consulta/médico.
  * - Arquivo que já tem registro em Imagens e anexos com o mesmo caminho (a pasta é
@@ -37,8 +40,6 @@ const pastas = args.filter((a) => !a.startsWith('--'));
 const IGNORA = new Set(['thumbs.db', 'desktop.ini', '.ds_store']);
 const col = (m, a) => db.coluna(m, a);
 
-/** get_valid_filename do Django: espaço vira _, fica só letra, número, - _ . */
-const nomeValido = (n) => String(n).trim().replace(/ /g, '_').replace(/[^-\w.]/g, '') || 'arquivo';
 const p2 = (n) => String(n).padStart(2, '0');
 const sha = (b) => crypto.createHash('sha256').update(b).digest('hex');
 
@@ -114,19 +115,34 @@ function dataDe(abs, relNoPaciente) {
         // já registrado com este mesmo caminho (pasta media/extras do AppClinic): só garante a nuvem
         const original = `extras/${pac}/${resto.join('/')}`;
         if (await db.tabela(EX).where(col(EX, 'file'), original).first()) {
-          if (!(await arm.naNuvem.existe(original).catch(() => false))) {
-            if (!simular) await arm.naNuvem.grava(original, dados, tipoMime(original));
-            resumo.comRegistro++; resumo.bytes += dados.length;
-          } else resumo.repetidos++;
-          if (!vistosNaRodada.has(pac)) vistosNaRodada.set(pac, new Set());
-          vistosNaRodada.get(pac).add(h);
-          continue;
+          const naNuvemJa = await arm.naNuvem.existe(original).catch(() => false);
+          let igual = false;
+          if (naNuvemJa) {
+            const d = await arm.naNuvem.le(original).catch(() => null);
+            igual = !!d && sha(d) === h;
+          }
+          if (!naNuvemJa || igual) {
+            if (!naNuvemJa) {
+              // o registro existe, mas o arquivo ainda não está na nuvem: vai com o mesmo caminho
+              if (!simular) await arm.naNuvem.grava(original, dados, tipoMime(original));
+              resumo.comRegistro++; resumo.bytes += dados.length;
+            } else resumo.repetidos++;
+            if (!vistosNaRodada.has(pac)) vistosNaRodada.set(pac, new Set());
+            vistosNaRodada.get(pac).add(h);
+            continue;
+          }
+          // mesmo caminho, conteúdo diferente: segue abaixo e é recuperado com sufixo no nome
         }
         if (await jaEsta(pac, dados, h)) { resumo.repetidos++; continue; }
         const dt = dataDe(abs, resto.join('/'));
-        const dir = `extras/${pac}/${dt.a}/${p2(dt.m)}/${p2(dt.d)}`;
-        const nome = simular ? nomeValido(resto[resto.length - 1]) : await arm.nomeLivre(dir, nomeValido(resto[resto.length - 1]));
+        // mesma estrutura e mesmo nome da origem (o caminho original já foi conferido acima)
+        const dir = path.posix.dirname(original);
+        const nomeOrig = path.posix.basename(original);
+        const ocupado = await arm.naNuvem.existe(original).catch(() => false)
+          || !!(await db.tabela(EX).where(col(EX, 'file'), original).first());
+        const nome = !ocupado ? nomeOrig : (simular ? `${nomeOrig} (com sufixo)` : await arm.nomeLivre(dir, nomeOrig));
         const destino = `${dir}/${nome}`;
+        if (destino.length > 100) throw new Error(`caminho com ${destino.length} caracteres: o campo do anexo (tb_extra.file) aceita até 100`);
         if (!simular) {
           await arm.naNuvem.grava(destino, dados, tipoMime(nome));
           const ag = db.linha(AG, await db.tabela(AG).where(col(AG, 'fk_paciente_id'), pac).orderBy(col(AG, 'id'), 'desc').first());
