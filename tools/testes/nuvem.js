@@ -1,9 +1,9 @@
 'use strict';
-// Imagens e anexos (só na nuvem), contra um cloud-storage falso
-// (mesmas rotas e respostas de app/api/* do valdecirsanches/cloud-storage).
+// Imagens e anexos (só na nuvem). Por padrão, contra uma nuvem falsa do tipo
+// "simples" (as rotas do ~/apps/nuvem/main.js: POST /upload, GET /download/:id).
 //   node tools/testes/nuvem.js
-// Contra um cloud-storage de verdade (ex.: a versão antiga, server/, rodando local):
-//   NUVEM_REAL_URL=http://127.0.0.1:4000 NUVEM_REAL_KEY=<chave> node tools/testes/nuvem.js
+// Contra uma nuvem de verdade (ex.: uma cópia do main.js rodando local):
+//   NUVEM_REAL_URL=http://127.0.0.1:5190 node tools/testes/nuvem.js
 const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
@@ -11,35 +11,31 @@ const path = require('path');
 const http = require('http');
 const { execFile } = require('child_process');
 
-const CHAVE = 'chave-teste';
-const arquivos = new Map();   // id -> {meta, dados}
+const arquivos = new Map();   // id -> {name, type, dados}
 let seq = 0;
 
-/** cloud-storage falso */
+/** nuvem falsa com as rotas do main.js */
 function nuvemFalsa() {
   const srv = http.createServer(async (req, res) => {
-    const json = (o, st = 200) => { res.writeHead(st, { 'content-type': 'application/json' }); res.end(JSON.stringify(o)); };
-    if (req.url === '/api/health') return json({ status: 'ok' });
-    if (req.headers['x-api-key'] !== CHAVE) return json({ error: 'Não autorizado' }, 401);
     const u = new URL(req.url, 'http://x');
-    if (req.method === 'POST' && u.pathname === '/api/upload') {
-      const r = new Request('http://x' + req.url, { method: 'POST', headers: req.headers, body: req, duplex: 'half' });
+    if (req.method === 'POST' && u.pathname === '/upload') {
+      const r = new Request('http://x/upload', { method: 'POST', headers: req.headers, body: req, duplex: 'half' });
       const f = (await r.formData()).get('file');
-      if (!(f instanceof File)) return json({ error: "Nenhum arquivo enviado (campo 'file')" }, 400);
-      const id = `${Date.now()}-${++seq}`;
-      const meta = { id, clientId: 'inno', name: f.name, type: f.type, size: f.size, uploadedAt: new Date(Date.now() + seq).toISOString() };
-      arquivos.set(id, { meta, dados: Buffer.from(await f.arrayBuffer()) });
-      return json({ ok: true, id, file: meta, view: `/api/files/${id}`, download: `/api/files/${id}?download=1` }, 201);
+      if (!(f instanceof File)) { res.writeHead(400); return res.end('Sem arquivo'); }
+      const id = `${Date.now()}-${(++seq).toString(36)}`;
+      arquivos.set(id, { name: f.name, type: f.type, dados: Buffer.from(await f.arrayBuffer()) });
+      res.writeHead(200, { 'content-type': 'application/json' });
+      return res.end(JSON.stringify({ ok: true, id, view: `/view/${id}`, download: `/download/${id}` }));
     }
-    if (req.method === 'GET' && u.pathname === '/api/files') return json({ files: [...arquivos.values()].map((a) => a.meta), maxUploadBytes: 1e8 });
-    const m = u.pathname.match(/^\/api\/files\/([^/]+)$/);
-    if (m) {
-      const a = arquivos.get(decodeURIComponent(m[1]));
-      if (!a) return json({ error: 'Arquivo não encontrado' }, 404);
-      if (req.method === 'DELETE') { arquivos.delete(a.meta.id); return json({ ok: true }); }
-      res.writeHead(200, { 'content-type': 'application/octet-stream' }); return res.end(a.dados);
+    const m = u.pathname.match(/^\/(view|download)\/([^/]+)$/);
+    if (req.method === 'GET' && m) {
+      const a = arquivos.get(decodeURIComponent(m[2]));
+      if (!a) { res.writeHead(404); return res.end('Não existe'); }
+      res.writeHead(200, { 'content-type': a.type || 'image/jpeg' });
+      return res.end(a.dados);
     }
-    json({ error: 'rota' }, 404);
+    res.writeHead(404, { 'content-type': 'text/html' });
+    res.end(`<pre>Cannot ${req.method} ${u.pathname}</pre>`);
   });
   return new Promise((ok) => srv.listen(0, '127.0.0.1', () => ok(srv)));
 }
@@ -48,21 +44,17 @@ function nuvemFalsa() {
   const real = process.env.NUVEM_REAL_URL;
   const nv = real ? null : await nuvemFalsa();
   const URLN = real || `http://127.0.0.1:${nv.address().port}`;
-  const CH = real ? process.env.NUVEM_REAL_KEY : CHAVE;
-  // (o armazenamento lê a configuração: só depois que o base() montar o ambiente de teste)
-  const daNuvem = (n) => require('../../server/util/armazenamento').daNuvem(n);
-  /** caminhos (como no banco) dos arquivos que estão na nuvem */
-  const naNuvem = async () => {
-    const r = await fetch(URLN + '/api/files', { headers: { 'x-api-key': CH } });
-    return ((await r.json()).files || []).map((f) => daNuvem(f.name !== undefined ? f.name : f.originalName));
-  };
   const media = fs.mkdtempSync(path.join(os.tmpdir(), 'media-'));
   // arquivos antigos na pasta local, para a migração
   fs.mkdirSync(path.join(media, 'extras/1/2024/05/10'), { recursive: true });
   fs.writeFileSync(path.join(media, 'extras/1/2024/05/10/antiga.png'), Buffer.from('png antigo'));
   fs.writeFileSync(path.join(media, 'extras/1/2024/05/10/raio_x.jpg'), Buffer.from('jpg antigo'));
-  const env = { NUVEM_URL: URLN, NUVEM_API_KEY: CH, MEDIA_ROOT: media };
+  const env = { NUVEM_URL: URLN, NUVEM_TIPO: 'simples', MEDIA_ROOT: media };
   const t = await require('./base')({ env });
+  const indice = () => t.sq.prepare('select caminho, nuvem_id from inno_nuvem order by caminho').all();
+  const e2 = () => Object.assign({}, process.env, env, { DB_FILE: process.env.DB_FILE });
+  // assíncrono: a nuvem falsa roda neste mesmo processo
+  const roda = (script, ...a) => new Promise((ok, erro) => execFile(process.execPath, [script, ...a], { env: e2(), encoding: 'utf8' }, (e, out, err) => (e ? erro(new Error(out + err)) : ok(out))));
   try {
     await t.entra();
     const img = Buffer.from('\x89PNG imagem de teste');
@@ -73,16 +65,17 @@ function nuvemFalsa() {
       return t.vai('/prontuario/Extras/uploadFile.json', { method: 'POST', body: fd });
     };
     let caminho;
-    await t.confere('envio vai para a nuvem com o caminho de sempre', async () => {
+    await t.confere('envio vai para a nuvem; o banco guarda o caminho de sempre', async () => {
       const r = await envia('foto teste.png');
       assert.strictEqual(r.status, 200);
       const j = await r.json();
       assert.match(j.success, /^extras\/1\/\d{4}\/\d{2}\/\d{2}\/foto_teste\.png$/);
       caminho = j.success;
-      assert.ok((await naNuvem()).includes(caminho), 'o caminho volta da nuvem igual');
+      assert.strictEqual(t.sq.prepare('select file from tb_extra order by id desc limit 1').get().file, caminho);
+      const l = indice().find((x) => x.caminho === caminho);
+      assert.ok(l && l.nuvem_id, 'caminho ligado ao id da nuvem em inno_nuvem');
       assert.ok(!fs.existsSync(path.join(media, caminho)), 'nada gravado na pasta local');
-      const linha = t.sq.prepare('select file from tb_extra order by id desc limit 1').get();
-      assert.strictEqual(linha.file, caminho);
+      if (!real) assert.strictEqual(arquivos.get(l.nuvem_id).name, caminho.replace(/\//g, '~'));
     });
     await t.confere('mesmo nome de novo ganha sufixo, como o Django', async () => {
       const j = await (await envia('foto teste.png')).json();
@@ -106,15 +99,14 @@ function nuvemFalsa() {
       assert.strictEqual((await t.vai('/media/../.env')).status, 404);
     });
     await t.confere('migração copia a pasta media e pode rodar de novo', async () => {
-      // assíncrono: a nuvem falsa roda neste mesmo processo
-      const roda = (...a) => new Promise((ok, erro) => execFile(process.execPath, ['tools/nuvem/migra-media.js', ...a], { env: Object.assign({}, process.env, env), encoding: 'utf8' }, (e, out, err) => (e ? erro(new Error(err || e.message)) : ok(out))));
-      assert.match(await roda('--simular'), /2 a enviar/);
-      assert.match(await roda(), /2 enviados/);
-      assert.match(await roda(), /0 a enviar/);
-      assert.ok((await naNuvem()).includes('extras/1/2024/05/10/raio_x.jpg'));
+      assert.match(await roda('tools/nuvem/migra-media.js', '--simular'), /2 a enviar/);
+      assert.match(await roda('tools/nuvem/migra-media.js'), /2 enviados/);
+      assert.match(await roda('tools/nuvem/migra-media.js'), /0 a enviar/);
+      assert.ok(indice().some((x) => x.caminho === 'extras/1/2024/05/10/raio_x.jpg'));
+      const migrada = await t.vai('/media/extras/1/2024/05/10/raio_x.jpg');
+      assert.strictEqual(Buffer.from(await migrada.arrayBuffer()).toString(), 'jpg antigo');
     });
     await t.confere('rastrear acha na nuvem as imagens sem registro', async () => {
-      require('../../server/util/armazenamento')._zeraIndice();
       const antes = t.sq.prepare('select count(*) n from tb_extra').get().n;
       const r = await t.vai('/api/extras/rastrear/', { method: 'POST', body: t.corpo({ id_paciente: 1 }) });
       assert.deepStrictEqual(await r.json(), { success: 'OK' });
@@ -123,23 +115,25 @@ function nuvemFalsa() {
       assert.strictEqual(rec.success, 'OK');
       assert.strictEqual(rec.imagens.length, antes + 2);
     });
-    await t.confere('sem a chave certa o envio falha (500) e nada é gravado', async () => {
-      process.env.NUVEM_API_KEY = 'errada';
-      require('../../server/config').nuvem.apiKey = 'errada';
-      const antes = t.sq.prepare('select count(*) n from tb_extra').get().n;
-      assert.strictEqual((await envia('x.png')).status, 500);
-      assert.strictEqual(t.sq.prepare('select count(*) n from tb_extra').get().n, antes);
-      require('../../server/config').nuvem.apiKey = CH;
+    await t.confere('testa.js passa', async () => {
+      assert.match(await roda('tools/nuvem/testa.js'), /A nuvem está funcionando/);
     });
     await t.confere('sem a nuvem configurada: erro, e nada vai para o disco nem para o banco', async () => {
       const cfg = require('../../server/config');
       cfg.nuvem.url = '';
       const antes = t.sq.prepare('select count(*) n from tb_extra').get().n;
-      const r = await envia('sem nuvem.png');
-      assert.strictEqual(r.status, 500);
+      assert.strictEqual((await envia('sem nuvem.png')).status, 500);
       assert.strictEqual(t.sq.prepare('select count(*) n from tb_extra').get().n, antes);
       const noDisco = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((i) => (i.isDirectory() ? noDisco(path.join(d, i.name)) : [i.name]));
       assert.deepStrictEqual(noDisco(media).sort(), ['antiga.png', 'raio_x.jpg'], 'só os arquivos antigos na pasta media');
+      cfg.nuvem.url = URLN;
+    });
+    await t.confere('nuvem fora do ar: erro, e nada vai para o banco', async () => {
+      const cfg = require('../../server/config');
+      cfg.nuvem.url = 'http://127.0.0.1:9';
+      const antes = t.sq.prepare('select count(*) n from tb_extra').get().n;
+      assert.strictEqual((await envia('fora.png')).status, 500);
+      assert.strictEqual(t.sq.prepare('select count(*) n from tb_extra').get().n, antes);
       cfg.nuvem.url = URLN;
     });
     await t.fim();

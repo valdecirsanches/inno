@@ -1,21 +1,20 @@
 'use strict';
 /**
- * Onde ficam os arquivos enviados (imagens e anexos do prontuário): só na nuvem,
- * no servidor cloud-storage (NUVEM_URL + NUVEM_API_KEY). O Inno não grava
- * arquivo nenhum no disco; sem a nuvem configurada, o envio dá erro.
+ * Onde ficam os arquivos enviados (imagens e anexos do prontuário): só na nuvem.
+ * O Inno não grava arquivo nenhum no disco; sem NUVEM_URL, o envio dá erro.
+ *
+ * Dois tipos de nuvem (NUVEM_TIPO no .env):
+ *  - simples (padrão): o servidor "nuvem" do dono (~/apps/nuvem/main.js):
+ *      POST /upload (campo "file") -> {ok, id, view, download}
+ *      GET  /download/:id  e  GET /view/:id
+ *    Não tem chave, nem lista, nem exclusão.
+ *  - cloud-storage: o valdecirsanches/cloud-storage (x-api-key):
+ *      POST /api/upload, GET /api/files/:id?download=1, DELETE /api/files/:id
  *
  * O banco continua guardando o mesmo caminho de sempre (ex.:
- * "extras/12/2026/11/17/foto.png"). Na nuvem, esse caminho vira o nome do
- * arquivo com "~" no lugar de "/" ("extras~12~2026~11~17~foto.png"), porque a
- * versão antiga do cloud-storage (Express + multer) corta o que vem antes da
- * última "/". O "~" nunca aparece nos nomes que o Inno grava (o nome do arquivo
- * passa pelo mesmo filtro do Django, que só deixa letras, números, "-", "_" e ".").
- * O id que a nuvem dá a cada arquivo é achado pela lista dos arquivos do cliente,
- * que fica em memória e é relida quando falta um nome.
- *
- * Funciona com as duas versões do cloud-storage: a atual (Next.js: name, uploadedAt,
- * id no topo da resposta do envio) e a antiga (server/: originalName, createdAt,
- * id dentro de "file").
+ * "extras/12/2026/11/17/foto.png") nas tabelas do AppClinic. A ligação
+ * "caminho -> id na nuvem" fica numa tabela só do Inno, inno_nuvem, criada
+ * sozinha no primeiro uso (o AppClinic não a conhece nem precisa dela).
  *
  * A pasta MEDIA_ROOT (a media/ do AppClinic) só é lida, pelo
  * tools/nuvem/migra-media.js, para copiar os arquivos antigos para a nuvem.
@@ -23,6 +22,9 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../config');
+const db = require('../db');
+
+const TABELA = 'inno_nuvem';
 
 // ------------------------------------- pasta antiga (só leitura, para a migração)
 const origem = {
@@ -44,94 +46,97 @@ const origem = {
   },
 };
 
-// ------------------------------------------------------------------ nuvem
-const nuvemCfg = () => ({ url: String(config.nuvem.url || '').replace(/\/+$/, ''), chave: config.nuvem.apiKey });
-let indice = null;          // Map nome -> id
-let lidoEm = 0;
-let lendo = null;
-const RELER_MS = 15000;     // no máximo uma releitura da lista a cada 15 s por falta de nome
-
-/** caminho do banco <-> nome na nuvem */
-const paraNuvem = (rel) => {
-  if (String(rel).includes('~')) throw new Error(`caminho com "~" não pode ir para a nuvem: ${rel}`);
-  return String(rel).replace(/\//g, '~');
-};
-const daNuvem = (nome) => String(nome).replace(/~/g, '/');
-
-async function chama(metodo, rota, { corpo, timeout = 60000 } = {}) {
-  const { url, chave } = nuvemCfg();
-  if (!url || !chave) throw new Error('Armazenamento na nuvem sem NUVEM_URL ou NUVEM_API_KEY no .env');
-  const r = await fetch(url + rota, { method: metodo, body: corpo, headers: { 'x-api-key': chave }, signal: AbortSignal.timeout(timeout) });
-  return r;
-}
-
-async function carregaIndice(forca = false) {
-  if (indice && !forca) return indice;
-  if (lendo) return lendo;
-  lendo = (async () => {
-    try {
-      const r = await chama('GET', '/api/files');
-      if (!r.ok) throw new Error(`nuvem respondeu ${r.status} ao listar os arquivos`);
-      const j = await r.json();
-      const m = new Map();
-      // se houver dois com o mesmo nome, vale o mais novo
-      const quando = (f) => String(f.uploadedAt || f.createdAt || '');
-      const l = (j.files || []).slice().sort((x, y) => quando(x).localeCompare(quando(y)));
-      for (const f of l) {
-        const nome = f.name !== undefined ? f.name : f.originalName;
-        if (nome && f.id) m.set(daNuvem(nome), f.id);
-      }
-      indice = m;
-      lidoEm = Date.now();
-      return m;
-    } finally { lendo = null; }
-  })();
-  return lendo;
+// --------------------------------------------- índice caminho -> id (no banco)
+let tabelaPronta = null;
+function garanteTabela() {
+  if (!tabelaPronta) {
+    tabelaPronta = (async () => {
+      if (await db.knex.schema.hasTable(TABELA)) return;
+      await db.knex.schema.createTable(TABELA, (t) => {
+        t.string('caminho', 255).primary();
+        t.string('nuvem_id', 100).notNullable();
+        t.bigInteger('tamanho');
+        t.string('tipo', 100);
+        t.dateTime('criado_em');
+      });
+    })().catch((e) => {
+      tabelaPronta = null;
+      throw new Error(`não foi possível criar a tabela ${TABELA} no banco (o usuário do MySQL precisa de permissão CREATE): ${e.message}`);
+    });
+  }
+  return tabelaPronta;
 }
 async function idDe(rel) {
-  const m = await carregaIndice();
-  if (m.has(rel)) return m.get(rel);
-  if (Date.now() - lidoEm > RELER_MS) { const n = await carregaIndice(true); return n.get(rel) || null; }
-  return null;
+  await garanteTabela();
+  const l = await db.knex(TABELA).where('caminho', String(rel)).first();
+  return l ? l.nuvem_id : null;
+}
+async function registra(rel, id, dados, tipo) {
+  await garanteTabela();
+  const linha = { caminho: String(rel), nuvem_id: id, tamanho: dados.length, tipo: tipo || null, criado_em: db.agora() };
+  const ja = await db.knex(TABELA).where('caminho', linha.caminho).first();
+  if (ja) await db.knex(TABELA).where('caminho', linha.caminho).update(linha);
+  else await db.knex(TABELA).insert(linha);
+}
+/** caminhos registrados abaixo de "prefixo" (ordem alfabética) */
+async function caminhos(prefixo) {
+  await garanteTabela();
+  const p = String(prefixo || '').replace(/\/+$/, '');
+  const q = db.knex(TABELA).select('caminho').orderBy('caminho');
+  if (p) q.where('caminho', 'like', `${p.replace(/[\\%_]/g, (c) => '\\' + c)}/%`);
+  return (await q).map((l) => l.caminho);
 }
 
+// ------------------------------------------------------------------ a nuvem
+const cfg = () => ({
+  url: String(config.nuvem.url || '').replace(/\/+$/, ''),
+  chave: config.nuvem.apiKey || '',
+  tipo: String(config.nuvem.tipo || 'simples').toLowerCase(),
+});
+async function chama(metodo, rota, { corpo, timeout = 60000 } = {}) {
+  const { url, chave } = cfg();
+  if (!url) throw new Error('Armazenamento na nuvem sem NUVEM_URL no .env');
+  const headers = chave ? { 'x-api-key': chave } : {};
+  return fetch(url + rota, { method: metodo, body: corpo, headers, signal: AbortSignal.timeout(timeout) });
+}
+const rotas = () => (cfg().tipo === 'cloud-storage'
+  ? { envio: '/api/upload', baixa: (id) => `/api/files/${encodeURIComponent(id)}?download=1`, apaga: (id) => `/api/files/${encodeURIComponent(id)}` }
+  : { envio: '/upload', baixa: (id) => `/download/${encodeURIComponent(id)}`, apaga: null });
+
+/** nome do arquivo enviado à nuvem: o caminho com "~" no lugar de "/" (fica legível nos metadados de lá) */
+const paraNuvem = (rel) => String(rel).replace(/\//g, '~');
+
 const nuvem = {
-  tipo: 'nuvem',
   async existe(rel) { return (await idDe(rel)) !== null; },
-  async existePasta(rel) {
-    const p = String(rel).replace(/\/+$/, '') + '/';
-    for (const n of (await carregaIndice()).keys()) if (n.startsWith(p)) return true;
-    return false;
-  },
+  async existePasta(rel) { return (await caminhos(rel)).length > 0; },
   async le(rel) {
     const id = await idDe(rel);
     if (!id) return null;
-    const r = await chama('GET', `/api/files/${encodeURIComponent(id)}?download=1`);
-    if (r.status === 404) { indice && indice.delete(rel); return null; }
+    const r = await chama('GET', rotas().baixa(id));
+    if (r.status === 404) return null;
     if (!r.ok) throw new Error(`nuvem respondeu ${r.status} ao ler ${rel}`);
     return Buffer.from(await r.arrayBuffer());
   },
   async grava(rel, dados, tipoMime) {
     const fd = new FormData();
     fd.append('file', new Blob([dados], { type: tipoMime || 'application/octet-stream' }), paraNuvem(rel));
-    const r = await chama('POST', '/api/upload', { corpo: fd, timeout: 300000 });
-    const j = await r.json().catch(() => ({}));
+    const r = await chama('POST', rotas().envio, { corpo: fd, timeout: 300000 });
+    const texto = await r.text();
+    let j = {};
+    try { j = JSON.parse(texto); } catch (e) { /* resposta não é JSON */ }
     const id = j.id || (j.file && j.file.id);
-    if (!r.ok || !id) throw new Error(`nuvem recusou ${rel}: ${r.status} ${j.error || ''}`.trim());
-    (await carregaIndice()).set(rel, id);
+    if (!r.ok || !id) throw new Error(`nuvem recusou ${rel}: ${r.status} ${j.error || texto.slice(0, 200)}`.trim());
+    await registra(rel, String(id), dados, tipoMime);
   },
   async exclui(rel) {
     const id = await idDe(rel);
     if (!id) return false;
-    const r = await chama('DELETE', `/api/files/${encodeURIComponent(id)}`);
-    if (r.ok) indice.delete(rel);
-    return r.ok;
+    const rota = rotas().apaga;
+    if (rota) { const r = await chama('DELETE', rota(id)); if (!r.ok && r.status !== 404) return false; }
+    await db.knex(TABELA).where('caminho', String(rel)).del();
+    return true;
   },
-  async lista(prefixo) {
-    const p = String(prefixo || '').replace(/\/+$/, '');
-    const pre = p ? `${p}/` : '';
-    return [...(await carregaIndice(true)).keys()].filter((n) => n.startsWith(pre)).sort();
-  },
+  lista: caminhos,
 };
 
 /** nome livre na pasta, como o get_available_name do Django (sufixo aleatório de 7) */
@@ -162,12 +167,11 @@ function rotaMedia() {
 }
 
 module.exports = {
-  nomeLivre, rotaMedia, nuvem, origem, paraNuvem, daNuvem,
+  nomeLivre, rotaMedia, nuvem, origem, paraNuvem, TABELA,
   existe: (rel) => nuvem.existe(rel),
   existePasta: (rel) => nuvem.existePasta(rel),
   le: (rel) => nuvem.le(rel),
   grava: (rel, dados, tipo) => nuvem.grava(rel, dados, tipo),
   exclui: (rel) => nuvem.exclui(rel),
   lista: (prefixo) => nuvem.lista(prefixo),
-  _zeraIndice: () => { indice = null; lidoEm = 0; },
 };

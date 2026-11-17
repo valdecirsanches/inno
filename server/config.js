@@ -27,7 +27,7 @@ module.exports = {
   // pasta media/ do AppClinic (documentos dos pacientes): as duas versões usam a mesma
   mediaRoot: env('MEDIA_ROOT', path.join(__dirname, '..', 'media')),
   // os arquivos enviados ficam só na nuvem (cloud-storage); MEDIA_ROOT é só lida pela migração
-  nuvem: { url: env('NUVEM_URL', ''), apiKey: env('NUVEM_API_KEY', '') },
+  nuvem: { url: env('NUVEM_URL', ''), apiKey: env('NUVEM_API_KEY', ''), tipo: env('NUVEM_TIPO', 'simples') },
   // mostrado na barra do sistema (user.hostdb / user.database no Django)
   bancoExibido: { host: env('DB_HOST_EXIBIDO', env('DB_HOST', '')), nome: env('DB_NAME', '') },
   // Memed (as mesmas chaves do settings.py do AppClinic)

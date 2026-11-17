@@ -35,7 +35,9 @@ pm2 save
 | `PORTA` | porta do servidor |
 | `SECRET_KEY` | chave das sessões. Gere com `node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"` |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | o MySQL do AppClinic |
-| `NUVEM_URL`, `NUVEM_API_KEY` | o servidor [cloud-storage](https://github.com/valdecirsanches/cloud-storage) e a chave do Inno no `config/clients.json` dele: é lá que ficam as imagens e anexos |
+| `NUVEM_URL` | a nuvem onde ficam as imagens e anexos (ex.: `http://127.0.0.1:5190`, a de `~/apps/nuvem`) |
+| `NUVEM_TIPO` | `simples` (padrão: a nuvem de `~/apps/nuvem`, rotas `/upload` e `/download/:id`) ou `cloud-storage` |
+| `NUVEM_API_KEY` | só para `NUVEM_TIPO=cloud-storage`: a chave do Inno no `config/clients.json` dele |
 | `MEDIA_ROOT` | a pasta `media/` do AppClinic; só é lida, para copiar os arquivos antigos para a nuvem |
 | `DEBUG` | `1` mostra o erro completo na tela; só para desenvolvimento |
 | `MEMED_API_KEY`, `MEMED_SECRET_KEY`, `MEMED_DATA_TOKEN` | as chaves da Memed (as do `settings.py` do AppClinic) |
@@ -44,24 +46,22 @@ O `.env` nunca vai para o GitHub.
 
 ### Imagens e anexos na nuvem
 
-As imagens e anexos do prontuário ficam **só** no cloud-storage (criptografados lá): o Inno
-não grava arquivo nenhum no disco, e sem `NUVEM_URL`/`NUVEM_API_KEY` o envio dá erro. O banco
-continua com o mesmo caminho de sempre (`extras/<paciente>/<ano>/<mês>/<dia>/<arquivo>`); na nuvem
-o nome do arquivo é esse caminho com `~` no lugar de `/` (`extras~12~2026~11~17~foto.png`), e
-`/media/...` e o download buscam o arquivo lá. Funciona com as duas versões do cloud-storage:
-a atual (Next.js) e a antiga (pasta `server/`, em Express).
+As imagens e anexos do prontuário ficam **só** na nuvem: o Inno não grava arquivo nenhum no
+disco, e sem `NUVEM_URL` o envio dá erro. As tabelas do AppClinic continuam com o mesmo caminho
+de sempre (`extras/<paciente>/<ano>/<mês>/<dia>/<arquivo>`); a ligação "caminho → id na nuvem"
+fica na tabela `inno_nuvem`, só do Inno, criada sozinha no primeiro envio (o usuário do MySQL
+precisa de permissão para criar tabela). `/media/...` e o download buscam o arquivo na nuvem.
 
-1. No servidor do cloud-storage, crie uma chave para o Inno no `config/clients.json`
-   (`openssl rand -base64 32`), com o `id` `inno`.
-2. No `.env` do Inno: `NUVEM_URL=https://cloud.x-star.com.br` e `NUVEM_API_KEY=<a chave>`.
+1. No `.env` do Inno: `NUVEM_URL=http://127.0.0.1:5190` (a nuvem de `~/apps/nuvem`, na mesma máquina).
+2. `node tools/nuvem/testa.js` testa tudo (endereço, tabela, envio e leitura de um arquivo de teste)
+   e diz onde parou.
 3. Copie os arquivos que já existem na `media/` do AppClinic: `node tools/nuvem/migra-media.js --simular`
-   mostra o que vai ser enviado; sem `--simular`, envia. Pode rodar de novo: o que já está lá
+   mostra o que vai ser enviado; sem `--simular`, envia. Pode rodar de novo: o que já foi enviado
    é pulado, e nada é apagado da pasta.
-4. Reinicie o Inno.
+4. Reinicie o Inno (`pm2 restart inno`). O erro completo de cada falha fica em `logs/erros.log`.
 
-Se o envio der erro, `node tools/nuvem/testa.js` testa a ligação com a nuvem (endereço, chave,
-envio, leitura e exclusão de um arquivo de teste) e diz onde parou; o erro completo de cada
-falha fica em `logs/erros.log`.
+Com `NUVEM_TIPO=cloud-storage`, o Inno usa o [cloud-storage](https://github.com/valdecirsanches/cloud-storage)
+(versão atual ou antiga), com a chave em `NUVEM_API_KEY`.
 
 ## O que já está convertido
 
