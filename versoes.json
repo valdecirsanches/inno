@@ -2,6 +2,21 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.1",
+      "data": "17/11/2026",
+      "titulo": "WhatsApp: sempre uma mensagem só",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "WhatsApp: a logo e o texto saem sempre numa mensagem só, mesmo com texto longo (antes, texto com mais de 1000 caracteres ia em outra mensagem)."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "WhatsApp: se o servidor do WhatsApp não responder, o texto não é reenviado, para o paciente não receber em dobro."
+        }
+      ]
+    },
+    {
       "versao": "2.4.0",
       "data": "17/11/2026",
       "titulo": "Controle de versões e WhatsApp com a logo no topo",

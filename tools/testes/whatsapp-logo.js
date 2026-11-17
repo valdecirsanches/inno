@@ -1,6 +1,6 @@
 // Envio com a logo no topo (WhatsAppService.enviar_texto_com_logo), contra um WAHA falso local:
 // uma mensagem só (imagem + legenda); imagem recusada => texto sozinho;
-// texto longo => logo e depois o texto; sem logo => só o texto.
+// texto longo => continua uma mensagem; WAHA sem resposta => não reenvia; sem logo => só o texto.
 const http = require('http');
 const path = require('path');
 const assert = require('assert');
@@ -46,13 +46,20 @@ srv.listen(0, async () => {
       assert.equal(pedidos.at(-1).corpo.text, 'Texto');
     });
     pedidos.length = 0; recusaImagem = false;
-    const longo = 'x'.repeat(1001);
+    const longo = 'x'.repeat(3000);
     [r, modo] = await s.enviar_texto_com_logo('5511999990000', longo, LOGO);
-    await confere('texto longo: logo primeiro, texto logo abaixo', () => {
-      assert.equal(modo, 'imagem_e_texto');
+    await confere('texto longo: continua uma mensagem só', () => {
+      assert.equal(modo, 'imagem_com_texto');
       const env = pedidos.filter((p) => p.caminho.startsWith('/api/send'));
-      assert.deepEqual(env.map((p) => p.caminho), ['/api/sendImage', '/api/sendText']);
-      assert.equal(env[0].corpo.caption, ''); assert.equal(env[1].corpo.text, longo);
+      assert.deepEqual(env.map((p) => p.caminho), ['/api/sendImage']);
+      assert.equal(env[0].corpo.caption, longo);
+    });
+    pedidos.length = 0;
+    const mudo = new WhatsAppService(null, 'http://127.0.0.1:1', 'default');
+    mudo.resolver_chat_id = async () => ['5511999990000@c.us', null];
+    [r, modo] = await mudo.enviar_texto_com_logo('5511999990000', 'Texto', LOGO);
+    await confere('WAHA sem resposta: não reenvia o texto (não chega em dobro)', () => {
+      assert.equal(modo, 'sem resposta do WAHA'); assert.equal(r.status_code, 502);
     });
     pedidos.length = 0;
     [r, modo] = await s.enviar_texto_com_logo('5511999990000', 'Sem logo', '/nao/existe.png');

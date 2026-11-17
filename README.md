@@ -156,8 +156,8 @@ node tools/versao/nova.js --confere    # Inno e AppClinic com o mesmo versoes.js
 A confirmação de consulta e as respostas ao paciente (confirmado / cancelado) saem numa
 mensagem só: a logo da clínica (`static/img/neuro100.png`) no topo e o texto como legenda
 (`enviar_texto_com_logo`, igual no Inno e no AppClinic). A imagem vai embutida no envio, sem o
-WAHA precisar baixá-la do servidor; se o WAHA recusar a imagem, o texto sai sozinho; texto com
-mais de 1000 caracteres sai logo abaixo da imagem, em outra mensagem. Teste:
+WAHA precisar baixá-la do servidor; se o WAHA recusar a imagem, o texto sai sozinho (sem
+resposta do WAHA não reenvia, para não chegar em dobro). Sempre uma mensagem só. Teste:
 `node tools/testes/whatsapp-logo.js`.
 
 ## Visual dos cadastros auxiliares

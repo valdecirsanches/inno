@@ -181,11 +181,11 @@ class WhatsAppService {
   }
 
   /**
-   * Mensagem ao paciente com a logo da clínica no topo e o texto junto, como
-   * legenda da imagem (uma mensagem só). A imagem vai embutida (base64), sem o
-   * WAHA precisar baixá-la daqui; se ela for recusada, o texto sai sozinho; texto
-   * maior que a legenda permite sai logo abaixo da imagem.
-   * Devolve [resposta, modo]; a resposta é a do envio que levou o texto.
+   * Mensagem ao paciente numa mensagem só: a logo da clínica no topo e o texto
+   * inteiro como legenda. A imagem vai embutida (base64), sem o WAHA precisar
+   * baixá-la daqui. Só se o WAHA responder recusando a imagem o texto sai sozinho;
+   * sem resposta (timeout/conexão) não reenvia, para não chegar em dobro.
+   * Devolve [resposta, modo].
    */
   async enviar_texto_com_logo(numero, texto, caminhoLogo = null) {
     let dados = null;
@@ -196,19 +196,14 @@ class WhatsAppService {
     const [chatId, erro] = await this.resolver_chat_id(numero);
     if (erro) return [new RespostaFalsa({ error: erro }, 422), 'texto'];
     const tipo = String(caminhoLogo).toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
-    const arquivo = { mimetype: tipo, filename: path.basename(caminhoLogo), data: dados };
     const t = typeof texto === 'string' ? texto : pyStrValor(texto);
-    if (Array.from(t).length <= WhatsAppService.LIMITE_LEGENDA) {
-      const r = await this._post('sendImage', { chatId, file: arquivo, reply_to: null, caption: t, session: this.session });
-      if ([200, 201].includes(r.status_code || 0)) return [r, 'imagem_com_texto'];
-      return [await this.enviar_texto(numero, t), 'texto (imagem recusada)'];
-    }
-    await this._post('sendImage', { chatId, file: arquivo, reply_to: null, caption: '', session: this.session });
-    return [await this.enviar_texto(numero, t), 'imagem_e_texto'];
+    const r = await this._post('sendImage', {
+      chatId, file: { mimetype: tipo, filename: path.basename(caminhoLogo), data: dados }, reply_to: null, caption: t, session: this.session,
+    });
+    if ([200, 201].includes(r.status_code || 0)) return [r, 'imagem_com_texto'];
+    if (r instanceof RespostaFalsa) return [r, 'sem resposta do WAHA'];
+    return [await this.enviar_texto(numero, t), 'texto (imagem recusada)'];
   }
 }
-
-/** limite seguro para a legenda de uma imagem no WhatsApp */
-WhatsAppService.LIMITE_LEGENDA = 1000;
 
 module.exports = { WhatsAppService, RespostaFalsa };
