@@ -101,11 +101,42 @@ function nuvemFalsa() {
       const r = await t.vai('/media/extras/1/2023/03/05/raio%20x.png');
       assert.strictEqual(Buffer.from(await r.arrayBuffer()).toString(), 'png do paciente 1', 'o original continua intacto');
     });
+    await t.confere('nome longo demais: encurtado para caber, mesma pasta e extensão', async () => {
+      const longo = 'KELI CRISTINA VIEIRA DA SILVA PUGAS RM COLUNA LOMBOSSACRA 30 10 2020 CONT 001 E MAIS UM POUCO.jpg';
+      escreve(`longos/1/2020/12/09/${longo}`, 'imagem de nome longo');
+      const out = await roda(path.join(raiz, 'longos'));
+      assert.match(out, /1 recuperados/);
+      assert.match(out, /1 com o nome encurtado/);
+      const f = extras(1).pop().file;
+      assert.ok(f.length <= 100, `${f.length} caracteres`);
+      assert.match(f, /^extras\/1\/2020\/12\/09\/KELI CRISTINA VIEIRA.*\.jpg$/);
+      const r = await t.vai('/media/' + f.split('/').map(encodeURIComponent).join('/'));
+      assert.strictEqual(Buffer.from(await r.arrayBuffer()).toString(), 'imagem de nome longo');
+    });
+    await t.confere('arquivo que ficou na nuvem sem registro (rodada que falhou): ganha o registro, sem reenviar', async () => {
+      // simula a rodada antiga: arquivo enviado com um caminho longo, e o registro falhou
+      const dados = Buffer.from('enviado na rodada que falhou');
+      const fd = new FormData();
+      fd.append('file', new Blob([dados]), 'x');
+      const id = (await (await fetch(URLN + '/upload', { method: 'POST', body: fd })).json()).id;
+      const velho = 'extras/1/2020/12/09/' + 'A'.repeat(110) + '.jpg';
+      t.sq.prepare('insert into inno_nuvem (caminho, nuvem_id, tamanho, tipo, criado_em) values (?, ?, ?, ?, ?)').run(velho, id, dados.length, 'image/jpeg', '2026-11-17 12:00:00');
+      escreve('falhou/1/2020/12/09/' + 'A'.repeat(110) + '.jpg', dados);
+      const envios = arquivos.size;
+      const out = await roda(path.join(raiz, 'falhou'));
+      assert.match(out, /1 recuperados/);
+      assert.match(out, /1 já estavam na nuvem sem registro/);
+      assert.strictEqual(arquivos.size, envios, 'não enviou de novo');
+      const f = extras(1).pop().file;
+      assert.ok(f.length <= 100);
+      const r = await t.vai('/media/' + f.split('/').map(encodeURIComponent).join('/'));
+      assert.strictEqual(Buffer.from(await r.arrayBuffer()).toString(), 'enviado na rodada que falhou');
+    });
     await t.confere('rodar de novo não duplica', async () => {
       const out = await roda(...pastas);
       assert.match(out, /0 recuperados/);
       assert.match(out, /5 já estavam no prontuário/);   // os 3 recuperados + a cópia + o já registrado
-      assert.strictEqual(arquivos.size, 5);
+      assert.strictEqual(arquivos.size, 7);
     });
     await t.fim();
   } catch (e) { await t.fim(e); }

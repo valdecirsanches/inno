@@ -79,23 +79,44 @@ function dataDe(abs, relNoPaciente) {
   // baixando da nuvem só os arquivos com o mesmo tamanho (o tamanho fica em inno_nuvem)
   const vistosNaRodada = new Map();   // pac -> Set(sha) do que esta rodada já tratou
   const hashDaNuvem = new Map();      // caminho -> sha
+  /**
+   * o mesmo conteúdo já está na nuvem para este paciente?
+   *  null                       -> não
+   *  {registrado: true}         -> sim, e com registro em Imagens e anexos (pular)
+   *  {orfao: {caminho, ...}}    -> sim, mas sem registro (uma rodada anterior falhou ao registrar):
+   *                                reaproveita o arquivo da nuvem e cria o registro
+   */
   const jaEsta = async (pac, dados, h) => {
     if (!vistosNaRodada.has(pac)) vistosNaRodada.set(pac, new Set());
-    if (vistosNaRodada.get(pac).has(h)) return true;
-    const mesmos = await db.knex(arm.TABELA).select('caminho').where('tamanho', dados.length)
+    if (vistosNaRodada.get(pac).has(h)) return { registrado: true };
+    const mesmos = await db.knex(arm.TABELA).where('tamanho', dados.length)
       .andWhere('caminho', 'like', `extras/${pac}/%`).catch(() => []);
-    for (const { caminho } of mesmos) {
-      if (!hashDaNuvem.has(caminho)) {
-        const d = await arm.naNuvem.le(caminho).catch(() => null);
-        hashDaNuvem.set(caminho, d ? sha(d) : null);
+    let orfao = null;
+    for (const l of mesmos) {
+      if (!hashDaNuvem.has(l.caminho)) {
+        const d = await arm.naNuvem.le(l.caminho).catch(() => null);
+        hashDaNuvem.set(l.caminho, d ? sha(d) : null);
       }
-      if (hashDaNuvem.get(caminho) === h) return true;
+      if (hashDaNuvem.get(l.caminho) !== h) continue;
+      if (await db.tabela('TbExtra').where(db.coluna('TbExtra', 'file'), l.caminho).first()) return { registrado: true };
+      orfao = orfao || l;
     }
-    return false;
+    return orfao ? { orfao } : null;
+  };
+
+  /** nome que cabe no campo do anexo (tb_extra.file, 100 caracteres): encurta o fim do nome, mantém a extensão */
+  const MAX = 100;
+  const cabe = (dir, nome, reserva = 0) => {
+    const livre = MAX - dir.length - 1 - reserva;
+    if (nome.length <= livre) return nome;
+    let ext = path.posix.extname(nome);
+    if (ext.length > 10) ext = '';
+    const raiz = nome.slice(0, nome.length - ext.length).slice(0, Math.max(1, livre - ext.length)).replace(/[\s_.-]+$/, '');
+    return raiz + ext;
   };
 
   const P = 'TbPacientes', AG = 'TbAgendaCons', EX = 'TbExtra';
-  const resumo = { arquivos: 0, recuperados: 0, repetidos: 0, comRegistro: 0, semPaciente: 0, foraDePadrao: 0, erros: 0, bytes: 0 };
+  const resumo = { arquivos: 0, recuperados: 0, repetidos: 0, comRegistro: 0, encurtados: 0, semRegistro: 0, semPaciente: 0, foraDePadrao: 0, erros: 0, bytes: 0 };
   const pacientesSemCadastro = new Set();
   for (const base of pastas) {
     const raiz = path.resolve(base);
@@ -133,18 +154,30 @@ function dataDe(abs, relNoPaciente) {
           }
           // mesmo caminho, conteúdo diferente: segue abaixo e é recuperado com sufixo no nome
         }
-        if (await jaEsta(pac, dados, h)) { resumo.repetidos++; continue; }
+        const ja = await jaEsta(pac, dados, h);
+        if (ja && ja.registrado) { resumo.repetidos++; continue; }
         const dt = dataDe(abs, resto.join('/'));
-        // mesma estrutura e mesmo nome da origem (o caminho original já foi conferido acima)
+        // mesma estrutura e mesmo nome da origem; o nome só encurta se não couber no campo do anexo
         const dir = path.posix.dirname(original);
         const nomeOrig = path.posix.basename(original);
-        const ocupado = await arm.naNuvem.existe(original).catch(() => false)
-          || !!(await db.tabela(EX).where(col(EX, 'file'), original).first());
-        const nome = !ocupado ? nomeOrig : (simular ? `${nomeOrig} (com sufixo)` : await arm.nomeLivre(dir, nomeOrig));
+        const ocupadoPor = async (rel) => (await arm.naNuvem.existe(rel).catch(() => false))
+          || !!(await db.tabela(EX).where(col(EX, 'file'), rel).first());
+        let nome = cabe(dir, nomeOrig);
+        if (await ocupadoPor(`${dir}/${nome}`)) {
+          nome = cabe(dir, nomeOrig, 8);   // espaço para o sufixo "_XXXXXXX"
+          nome = simular ? `${nome} (com sufixo)` : await arm.nomeLivre(dir, nome);
+        }
         const destino = `${dir}/${nome}`;
-        if (destino.length > 100) throw new Error(`caminho com ${destino.length} caracteres: o campo do anexo (tb_extra.file) aceita até 100`);
+        if (cabe(dir, nomeOrig) !== nomeOrig) resumo.encurtados++;
         if (!simular) {
-          await arm.naNuvem.grava(destino, dados, tipoMime(nome));
+          if (ja && ja.orfao) {
+            // o arquivo já está na nuvem (rodada anterior): só liga o caminho novo ao mesmo arquivo
+            if (ja.orfao.caminho !== destino && !(await arm.naNuvem.existe(destino))) {
+              await db.knex(arm.TABELA).insert({ caminho: destino, nuvem_id: ja.orfao.nuvem_id, tamanho: ja.orfao.tamanho, tipo: ja.orfao.tipo, criado_em: db.agora() });
+            }
+          } else {
+            await arm.naNuvem.grava(destino, dados, tipoMime(nome));
+          }
           const ag = db.linha(AG, await db.tabela(AG).where(col(AG, 'fk_paciente_id'), pac).orderBy(col(AG, 'id'), 'desc').first());
           await db.tabela(EX).insert({
             [col(EX, 'fk_prontuario_id')]: pac,
@@ -155,6 +188,7 @@ function dataDe(abs, relNoPaciente) {
             [col(EX, 'data_salvo')]: `${dt.a}-${p2(dt.m)}-${p2(dt.d)} ${dt.hora}`,
           });
         }
+        if (ja && ja.orfao) resumo.semRegistro++;
         vistosNaRodada.get(pac).add(h);
         resumo.recuperados++; resumo.bytes += dados.length;
         if (resumo.recuperados <= 20 || resumo.recuperados % 100 === 0) console.log(`  ${simular ? 'iria para' : 'ok'} paciente ${pac}: ${rel} -> ${destino}`);
@@ -165,6 +199,8 @@ function dataDe(abs, relNoPaciente) {
   }
   console.log(`\n${resumo.arquivos} arquivos lidos`);
   console.log(`  ${resumo.recuperados} ${simular ? 'seriam recuperados' : 'recuperados'} (${(resumo.bytes / 1048576).toFixed(1)} MB)`);
+  if (resumo.encurtados) console.log(`  ${resumo.encurtados} com o nome encurtado para caber no campo do anexo (100 caracteres)`);
+  if (resumo.semRegistro) console.log(`  ${resumo.semRegistro} já estavam na nuvem sem registro (rodada anterior): registro criado, sem enviar de novo`);
   if (resumo.comRegistro) console.log(`  ${resumo.comRegistro} já tinham registro no prontuário: ${simular ? 'seriam copiados' : 'copiados'} para a nuvem com o mesmo caminho`);
   console.log(`  ${resumo.repetidos} já estavam no prontuário e na nuvem: pulados`);
   if (resumo.semPaciente) console.log(`  ${resumo.semPaciente} de pacientes que não existem no cadastro (ids: ${[...pacientesSemCadastro].slice(0, 30).join(', ')}${pacientesSemCadastro.size > 30 ? '...' : ''}): pulados`);

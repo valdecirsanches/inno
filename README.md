@@ -62,8 +62,10 @@ faria) e, sem `--simular`, recupera: cada arquivo vai para a nuvem e ganha um re
 paciente (última consulta do paciente; data pelas pastas ano/mês/dia ou pela do arquivo). O arquivo **mantém a
 mesma estrutura e o mesmo nome** da origem (`.../extras/123/2024/05/10/foto.png` fica `extras/123/2024/05/10/foto.png`
 no banco e na nuvem), para ser fácil de achar e de restaurar; só se o caminho já estiver ocupado por outro arquivo
-(conteúdo diferente) o nome ganha um sufixo, como no Django. Arquivo que já tem registro com o mesmo caminho só é
-copiado para a nuvem; arquivo com o mesmo conteúdo já no prontuário é pulado, então pode rodar de novo. As pastas
+(conteúdo diferente) o nome ganha um sufixo, como no Django, e só se o caminho passar de 100 caracteres (o limite do
+campo do anexo) o fim do nome é encurtado, mantendo a pasta e a extensão. Arquivo que já tem registro com o mesmo caminho só é
+copiado para a nuvem; arquivo com o mesmo conteúdo já no prontuário é pulado, então pode rodar de novo; arquivo que
+ficou na nuvem sem registro (uma rodada que falhou) ganha o registro sem ser enviado de novo. As pastas
 de origem nunca são alteradas.
 
 O roteiro `tools/comparacao/roteiro-extras.js` confere os dois lado a lado (precisa de uma nuvem
