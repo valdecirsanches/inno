@@ -35,9 +35,8 @@ pm2 save
 | `PORTA` | porta do servidor |
 | `SECRET_KEY` | chave das sessões. Gere com `node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"` |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | o MySQL do AppClinic |
-| `MEDIA_ROOT` | a pasta `media/` do AppClinic (documentos dos pacientes) |
-| `ARMAZENAMENTO` | onde ficam as imagens e anexos enviados: `local` (padrão, na `MEDIA_ROOT`) ou `nuvem` |
-| `NUVEM_URL`, `NUVEM_API_KEY` | o servidor [cloud-storage](https://github.com/valdecirsanches/cloud-storage) e a chave do Inno no `config/clients.json` dele |
+| `NUVEM_URL`, `NUVEM_API_KEY` | o servidor [cloud-storage](https://github.com/valdecirsanches/cloud-storage) e a chave do Inno no `config/clients.json` dele: é lá que ficam as imagens e anexos |
+| `MEDIA_ROOT` | a pasta `media/` do AppClinic; só é lida, para copiar os arquivos antigos para a nuvem |
 | `DEBUG` | `1` mostra o erro completo na tela; só para desenvolvimento |
 | `MEMED_API_KEY`, `MEMED_SECRET_KEY`, `MEMED_DATA_TOKEN` | as chaves da Memed (as do `settings.py` do AppClinic) |
 
@@ -45,17 +44,17 @@ O `.env` nunca vai para o GitHub.
 
 ### Imagens e anexos na nuvem
 
-Com `ARMAZENAMENTO=nuvem`, os arquivos de "Imagens e anexos" do prontuário vão para o
-cloud-storage (criptografados lá) em vez da pasta `media/`. O banco continua com o mesmo
-caminho de sempre (`extras/<paciente>/<ano>/<mês>/<dia>/<arquivo>`), que vira o nome do
-arquivo na nuvem; `/media/...` e o download buscam o arquivo lá.
+As imagens e anexos do prontuário ficam **só** no cloud-storage (criptografados lá): o Inno
+não grava arquivo nenhum no disco, e sem `NUVEM_URL`/`NUVEM_API_KEY` o envio dá erro. O banco
+continua com o mesmo caminho de sempre (`extras/<paciente>/<ano>/<mês>/<dia>/<arquivo>`), que
+vira o nome do arquivo na nuvem; `/media/...` e o download buscam o arquivo lá.
 
 1. No servidor do cloud-storage, crie uma chave para o Inno no `config/clients.json`
    (`openssl rand -base64 32`), com o `id` `inno`.
-2. No `.env` do Inno: `ARMAZENAMENTO=nuvem`, `NUVEM_URL=https://cloud.x-star.com.br` e `NUVEM_API_KEY=<a chave>`.
-3. Copie os arquivos que já existem: `node tools/nuvem/migra-media.js --simular` mostra o que
-   vai ser enviado; sem `--simular`, envia. Pode rodar de novo: o que já está lá é pulado,
-   e nada é apagado da pasta local.
+2. No `.env` do Inno: `NUVEM_URL=https://cloud.x-star.com.br` e `NUVEM_API_KEY=<a chave>`.
+3. Copie os arquivos que já existem na `media/` do AppClinic: `node tools/nuvem/migra-media.js --simular`
+   mostra o que vai ser enviado; sem `--simular`, envia. Pode rodar de novo: o que já está lá
+   é pulado, e nada é apagado da pasta.
 4. Reinicie o Inno.
 
 ## O que já está convertido
@@ -119,6 +118,7 @@ O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As 
 - A primeira vez que um usuário sem preferências salvas abre um paciente (ou a agenda), o Django dava erro. O Inno cria as preferências com os valores padrão.
 - Impressos: o nome do arquivo com acento (resumo de atendimentos) vai no formato MIME (`=?utf-8?b?...?=`), porque o Node não envia latin-1 cru no cabeçalho.
 - Criar horários com intervalo negativo travava o AppClinic num laço sem fim; o Inno ignora esse intervalo.
+- Imagens e anexos ficam só na nuvem (cloud-storage), não na pasta `media/` como no AppClinic; o banco guarda o mesmo caminho.
 - Ao abrir a agenda, se a lista de médicos chegava antes do calendário ter data, a tela pedia a agenda de "NaN-NaN-NaN" e recebia erro. O Inno espera a data.
 - WhatsApp e Memed: quando o servidor de fora não responde, algumas respostas trazem o texto do erro de rede (`"error": "..."`). O texto é parecido com o do Python (`HTTPConnectionPool(...): Max retries exceeded...`), mas não idêntico, porque vem do Node.
 - Atestado antigo: o CID gravado que não está na tabela de CID (ex.: "G43") não aparecia

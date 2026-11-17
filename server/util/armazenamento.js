@@ -1,37 +1,31 @@
 'use strict';
 /**
- * Onde ficam os arquivos enviados (imagens e anexos do prontuário).
- *
- * ARMAZENAMENTO=local  (padrão) pasta MEDIA_ROOT, como no AppClinic
- * ARMAZENAMENTO=nuvem  servidor cloud-storage (NUVEM_URL + NUVEM_API_KEY)
+ * Onde ficam os arquivos enviados (imagens e anexos do prontuário): só na nuvem,
+ * no servidor cloud-storage (NUVEM_URL + NUVEM_API_KEY). O Inno não grava
+ * arquivo nenhum no disco; sem a nuvem configurada, o envio dá erro.
  *
  * O banco continua guardando o mesmo caminho de sempre (ex.:
  * "extras/12/2026/11/17/foto.png"). Na nuvem, esse caminho é o nome do
  * arquivo; o id que a nuvem dá a cada arquivo é encontrado pela lista dos
  * arquivos do cliente, que fica em memória e é relida quando falta um nome.
+ *
+ * A pasta MEDIA_ROOT (a media/ do AppClinic) só é lida, pelo
+ * tools/nuvem/migra-media.js, para copiar os arquivos antigos para a nuvem.
  */
 const fs = require('fs');
 const path = require('path');
 const config = require('../config');
 
-// ------------------------------------------------------------------ local
-const local = {
-  tipo: 'local',
+// ------------------------------------- pasta antiga (só leitura, para a migração)
+const origem = {
   abs: (rel) => path.join(config.mediaRoot, rel),
-  async existe(rel) { try { return fs.statSync(local.abs(rel)).isFile(); } catch (e) { return false; } },
-  async existePasta(rel) { try { return fs.statSync(local.abs(rel)).isDirectory(); } catch (e) { return false; } },
-  async le(rel) { try { return fs.readFileSync(local.abs(rel)); } catch (e) { return null; } },
-  async grava(rel, dados) {
-    fs.mkdirSync(path.dirname(local.abs(rel)), { recursive: true });
-    fs.writeFileSync(local.abs(rel), dados);
-  },
-  async exclui(rel) { try { fs.unlinkSync(local.abs(rel)); return true; } catch (e) { return false; } },
-  /** caminhos (relativos à raiz) dos arquivos abaixo de "prefixo", na ordem do disco */
+  async le(rel) { try { return fs.readFileSync(origem.abs(rel)); } catch (e) { return null; } },
+  /** caminhos (relativos à raiz) dos arquivos abaixo de "prefixo" */
   async lista(prefixo) {
     const out = [];
     const anda = (rel) => {
       let itens;
-      try { itens = fs.readdirSync(local.abs(rel), { withFileTypes: true }); } catch (e) { return; }
+      try { itens = fs.readdirSync(origem.abs(rel), { withFileTypes: true }); } catch (e) { return; }
       for (const i of itens) {
         const r = rel ? `${rel}/${i.name}` : i.name;
         if (i.isDirectory()) anda(r); else if (i.isFile()) out.push(r);
@@ -120,24 +114,19 @@ const nuvem = {
   },
 };
 
-function atual() { return config.armazenamento === 'nuvem' ? nuvem : local; }
-
 /** nome livre na pasta, como o get_available_name do Django (sufixo aleatório de 7) */
 async function nomeLivre(dir, nome) {
-  const a = atual();
   let n = nome;
-  while (await a.existe(`${dir}/${n}`)) {
+  while (await nuvem.existe(`${dir}/${n}`)) {
     const ext = path.extname(nome);
     n = `${path.basename(nome, ext)}_${Math.random().toString(36).slice(2, 9).padEnd(7, '0')}${ext}`;
   }
   return n;
 }
 
-/** /media/<caminho>: entrega o arquivo de onde estiver */
+/** /media/<caminho>: entrega o arquivo da nuvem */
 function rotaMedia() {
-  const estatico = require('express').static(config.mediaRoot);
   return (req, res, next) => {
-    if (config.armazenamento !== 'nuvem') return estatico(req, res, next);
     if (req.method !== 'GET' && req.method !== 'HEAD') return next();
     let rel;
     try { rel = decodeURIComponent(req.path).replace(/^\/+/, ''); } catch (e) { return next(); }
@@ -153,12 +142,12 @@ function rotaMedia() {
 }
 
 module.exports = {
-  atual, nomeLivre, rotaMedia, local, nuvem,
-  existe: (rel) => atual().existe(rel),
-  existePasta: (rel) => atual().existePasta(rel),
-  le: (rel) => atual().le(rel),
-  grava: (rel, dados, tipo) => atual().grava(rel, dados, tipo),
-  exclui: (rel) => atual().exclui(rel),
-  lista: (prefixo) => atual().lista(prefixo),
+  nomeLivre, rotaMedia, nuvem, origem,
+  existe: (rel) => nuvem.existe(rel),
+  existePasta: (rel) => nuvem.existePasta(rel),
+  le: (rel) => nuvem.le(rel),
+  grava: (rel, dados, tipo) => nuvem.grava(rel, dados, tipo),
+  exclui: (rel) => nuvem.exclui(rel),
+  lista: (prefixo) => nuvem.lista(prefixo),
   _zeraIndice: () => { indice = null; lidoEm = 0; },
 };

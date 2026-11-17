@@ -25,7 +25,7 @@ const PARALELO = 4;
   if (!config.nuvem.url || !config.nuvem.apiKey) { console.error('Preencha NUVEM_URL e NUVEM_API_KEY no .env.'); process.exit(1); }
   console.log(`Pasta local: ${config.mediaRoot}${pasta ? '/' + pasta : ''}`);
   console.log(`Nuvem:       ${config.nuvem.url}`);
-  const locais = await arm.local.lista(pasta);
+  const locais = await arm.origem.lista(pasta);
   const naNuvem = new Set(await arm.nuvem.lista(''));
   const faltam = locais.filter((r) => !naNuvem.has(r));
   console.log(`${locais.length} arquivos na pasta, ${locais.length - faltam.length} já na nuvem, ${faltam.length} a enviar.`);
@@ -36,7 +36,7 @@ const PARALELO = 4;
     while (i < faltam.length) {
       const rel = faltam[i++];
       try {
-        const dados = await arm.local.le(rel);
+        const dados = await arm.origem.le(rel);
         await arm.nuvem.grava(rel, dados, tipo(rel));
         ok++; bytes += dados.length;
       } catch (e) { erro++; console.error(`  ERRO ${rel}: ${e.message}`); }

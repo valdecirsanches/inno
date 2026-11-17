@@ -1,5 +1,5 @@
 'use strict';
-// Imagens e anexos com ARMAZENAMENTO=nuvem, contra um cloud-storage falso
+// Imagens e anexos (só na nuvem), contra um cloud-storage falso
 // (mesmas rotas e respostas de app/api/* do valdecirsanches/cloud-storage).
 //   node tools/testes/nuvem.js
 const assert = require('assert');
@@ -50,7 +50,7 @@ function nuvemFalsa() {
   fs.mkdirSync(path.join(media, 'extras/1/2024/05/10'), { recursive: true });
   fs.writeFileSync(path.join(media, 'extras/1/2024/05/10/antiga.png'), Buffer.from('png antigo'));
   fs.writeFileSync(path.join(media, 'extras/1/2024/05/10/raio_x.jpg'), Buffer.from('jpg antigo'));
-  const env = { ARMAZENAMENTO: 'nuvem', NUVEM_URL: URLN, NUVEM_API_KEY: CHAVE, MEDIA_ROOT: media };
+  const env = { NUVEM_URL: URLN, NUVEM_API_KEY: CHAVE, MEDIA_ROOT: media };
   const t = await require('./base')({ env });
   try {
     await t.entra();
@@ -119,6 +119,17 @@ function nuvemFalsa() {
       assert.strictEqual((await envia('x.png')).status, 500);
       assert.strictEqual(t.sq.prepare('select count(*) n from tb_extra').get().n, antes);
       require('../../server/config').nuvem.apiKey = CHAVE;
+    });
+    await t.confere('sem a nuvem configurada: erro, e nada vai para o disco nem para o banco', async () => {
+      const cfg = require('../../server/config');
+      cfg.nuvem.url = '';
+      const antes = t.sq.prepare('select count(*) n from tb_extra').get().n;
+      const r = await envia('sem nuvem.png');
+      assert.strictEqual(r.status, 500);
+      assert.strictEqual(t.sq.prepare('select count(*) n from tb_extra').get().n, antes);
+      const noDisco = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((i) => (i.isDirectory() ? noDisco(path.join(d, i.name)) : [i.name]));
+      assert.deepStrictEqual(noDisco(media).sort(), ['antiga.png', 'raio_x.jpg'], 'só os arquivos antigos na pasta media');
+      cfg.nuvem.url = URLN;
     });
     await t.fim();
   } catch (e) { await t.fim(e); }

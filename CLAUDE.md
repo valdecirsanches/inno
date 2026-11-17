@@ -32,8 +32,10 @@ O dono do projeto fala português: responda em português.
   para as rotas `/api/` (veja `server/rotas/api-medico.js` como exemplo).
 - `server/util/requests.js`: a biblioteca requests do Python (status_code, ok, json(), Timeout,
   ConnectionError...); `server/util/whatsapp.js`: o WhatsAppService (servidor WAHA).
-- `server/util/armazenamento.js`: onde ficam os arquivos enviados (pasta local ou o
-  cloud-storage, `ARMAZENAMENTO=nuvem`). Todo acesso a arquivo de `media/` passa por ele.
+- `server/util/armazenamento.js`: os arquivos enviados ficam **só na nuvem** (cloud-storage).
+  O Inno não grava arquivo no disco: todo acesso a arquivo de `media/` passa por ele, e a
+  pasta `MEDIA_ROOT` só é lida pela migração (`tools/nuvem/migra-media.js`). Não volte a
+  gravar no disco (decisão do dono).
 - `server/util/pdf.js`: equivalente do ReportLab (canvas e platypus) para os impressos.
 - `server/db.js`: acesso ao banco, com os tipos de `server/modelos.json`.
   O `modelos.json` tem também três tabelas acrescentadas à mão (o exportador não as gera):
