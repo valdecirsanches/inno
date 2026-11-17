@@ -56,6 +56,12 @@ O AppClinic usa a **mesma nuvem e a mesma tabela** (`appClinic/nuvem.py` no repo
 um envia, o outro vê. Um arquivo que ainda não está na nuvem (enviado antes dessa mudança, na pasta
 `media/`) é lido da pasta `MEDIA_ROOT` (só leitura) e copiado para a nuvem na mesma hora, nos dois
 sistemas; a nuvem vai se completando sozinha, e `tools/nuvem/migra-media.js` copia tudo de uma vez.
+Imagens perdidas em outras pastas (uma subpasta por paciente, com o id no nome, ex.: `.../media/extra/123/...`)
+voltam para o prontuário com `node tools/nuvem/recupera-imagens.js --simular <pasta> [<pasta>...]` (mostra o que
+faria) e, sem `--simular`, recupera: cada arquivo vai para a nuvem e ganha um registro em Imagens e anexos do
+paciente (data pelas pastas ano/mês/dia ou pela do arquivo; última consulta do paciente). Arquivo com o mesmo
+conteúdo já no prontuário é pulado, então pode rodar de novo; as pastas de origem não são alteradas.
+
 O roteiro `tools/comparacao/roteiro-extras.js` confere os dois lado a lado (precisa de uma nuvem
 rodando e `NUVEM_URL`).
 

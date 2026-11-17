@@ -1,0 +1,97 @@
+'use strict';
+// tools/nuvem/recupera-imagens.js: pastas antigas -> nuvem + Imagens e anexos do paciente.
+//   node tools/testes/recupera.js
+const assert = require('assert');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const http = require('http');
+const { execFile } = require('child_process');
+
+const arquivos = new Map();
+let seq = 0;
+function nuvemFalsa() {
+  const srv = http.createServer(async (req, res) => {
+    const u = new URL(req.url, 'http://x');
+    if (req.method === 'POST' && u.pathname === '/upload') {
+      const f = (await new Request('http://x/upload', { method: 'POST', headers: req.headers, body: req, duplex: 'half' }).formData()).get('file');
+      const id = `${Date.now()}-${(++seq).toString(36)}`;
+      arquivos.set(id, Buffer.from(await f.arrayBuffer()));
+      res.writeHead(200, { 'content-type': 'application/json' });
+      return res.end(JSON.stringify({ ok: true, id }));
+    }
+    const m = u.pathname.match(/^\/download\/([^/]+)$/);
+    if (m && arquivos.has(m[1])) { res.writeHead(200); return res.end(arquivos.get(m[1])); }
+    res.writeHead(404); res.end('Não existe');
+  });
+  return new Promise((ok) => srv.listen(0, '127.0.0.1', () => ok(srv)));
+}
+
+(async () => {
+  const nv = await nuvemFalsa();
+  const URLN = `http://127.0.0.1:${nv.address().port}`;
+  const raiz = fs.mkdtempSync(path.join(os.tmpdir(), 'recupera-'));
+  const escreve = (rel, txt, data) => {
+    const f = path.join(raiz, rel);
+    fs.mkdirSync(path.dirname(f), { recursive: true });
+    fs.writeFileSync(f, txt);
+    if (data) fs.utimesSync(f, data, data);
+  };
+  // pasta 1 (como .../media/extra): paciente 1 com ano/mês/dia e arquivo solto; paciente 999 não existe
+  escreve('extra/1/2023/03/05/raio x.png', 'png do paciente 1');
+  escreve('extra/1/laudo.pdf', 'pdf solto', new Date(2022, 6, 9, 14, 30, 0));
+  escreve('extra/999/foto.jpg', 'paciente que não existe');
+  escreve('extra/solto.txt', 'fora de pasta de paciente');
+  // pasta 2: cópia do mesmo raio x (não pode duplicar) e uma nova do paciente 2
+  escreve('outro/1/copia.png', 'png do paciente 1');
+  escreve('outro/2/exame.jpg', 'jpg do paciente 2');
+  const env = { NUVEM_URL: URLN, NUVEM_TIPO: 'simples', MEDIA_ROOT: path.join(raiz, 'media-vazia') };
+  const t = await require('./base')({ env });
+  const roda = (...a) => new Promise((ok, erro) => execFile(process.execPath, ['tools/nuvem/recupera-imagens.js', ...a],
+    { env: Object.assign({}, process.env, env), encoding: 'utf8' }, (e, out, err) => (e && e.code !== 2 ? erro(new Error(out + err)) : ok(out))));
+  const extras = (pac) => t.sq.prepare('select file, fk_consulta_id, data_salvo from tb_extra where fk_prontuario_id = ? order by id').all(pac);
+  const pastas = [path.join(raiz, 'extra'), path.join(raiz, 'outro')];
+  try {
+    await t.entra();
+    const antes1 = extras(1).length;
+    await t.confere('simulação mostra e não grava nada', async () => {
+      const out = await roda('--simular', ...pastas);
+      assert.match(out, /3 seriam recuperados/);
+      assert.match(out, /1 já estavam no prontuário/);
+      assert.match(out, /pacientes que não existem no cadastro \(ids: 999\)/);
+      assert.match(out, /1 fora de uma pasta com o id do paciente/);
+      assert.strictEqual(arquivos.size, 0);
+      assert.strictEqual(extras(1).length, antes1);
+    });
+    await t.confere('recupera para o prontuário de cada paciente, com a data das pastas ou do arquivo', async () => {
+      const out = await roda(...pastas);
+      assert.match(out, /3 recuperados/);
+      const novos = extras(1).slice(antes1);
+      assert.deepStrictEqual(novos.map((x) => x.file), ['extras/1/2023/03/05/raio_x.png', 'extras/1/2022/07/09/laudo.pdf']);
+      assert.strictEqual(novos[0].data_salvo, '2023-03-05 00:00:00');
+      assert.strictEqual(novos[1].data_salvo, '2022-07-09 14:30:00');
+      assert.ok(novos[0].fk_consulta_id, 'ligado à última consulta do paciente');
+      const doPac2 = extras(2).map((x) => x.file);
+      assert.strictEqual(doPac2.length, 1);
+      assert.match(doPac2[0], /^extras\/2\/\d{4}\/\d{2}\/\d{2}\/exame\.jpg$/);
+      assert.strictEqual(arquivos.size, 3);
+      assert.ok(fs.existsSync(path.join(raiz, 'extra/1/2023/03/05/raio x.png')), 'origem intacta');
+    });
+    await t.confere('aparece em Imagens e anexos e abre', async () => {
+      const j = await (await t.vai('/prontuario/Extras/CarregaExtras/?prontuario=1')).json();
+      const item = j.success.find((x) => x.nome === 'raio_x.png');
+      assert.ok(item);
+      assert.strictEqual(item.data, '05/03/2023');
+      const r = await t.vai(item.url);
+      assert.strictEqual(Buffer.from(await r.arrayBuffer()).toString(), 'png do paciente 1');
+    });
+    await t.confere('rodar de novo não duplica', async () => {
+      const out = await roda(...pastas);
+      assert.match(out, /0 recuperados/);
+      assert.match(out, /4 já estavam no prontuário/);   // os 3 recuperados + a cópia
+      assert.strictEqual(arquivos.size, 3);
+    });
+    await t.fim();
+  } catch (e) { await t.fim(e); }
+  nv.close();
+})();

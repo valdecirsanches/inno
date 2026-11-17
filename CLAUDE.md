@@ -53,7 +53,8 @@ O dono do projeto fala português: responda em português.
   Exemplo completo em `tools/impressos/gera_inno.js` (cria as tabelas, faz login e chama as rotas).
 - Rotas: `node tools/testes/etapa5.js` (usuários, painel, logs, presença) e
   `node tools/testes/etapa6-memed.js` (Memed) e `node tools/testes/etapa6-whatsapp.js`
-  (WhatsApp e robô) e `node tools/testes/nuvem.js` (imagens na nuvem),
+  (WhatsApp e robô) e `node tools/testes/nuvem.js` (imagens na nuvem) e
+  `node tools/testes/recupera.js` (recuperação de imagens de pastas antigas),
   cada um com o serviço externo falso, local.
   Para testes novos, use `tools/testes/base.js` (banco, login e cliente prontos).
 - Cobertura: `python3 tools/testes/rotas_django.py ../appclinic > /tmp/django.txt` e
