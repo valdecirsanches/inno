@@ -231,6 +231,12 @@ Teste: `node tools/testes/prontuario.js`.
   do usuário ou, sem médico vinculado, os de todos (antes o relatório salvo não aparecia); salvar
   na tela de Configurações mantém o médico do padrão quando o usuário não tem médico. Relatórios
   em ordem alfabética. Exame / padrão sem CID (`cid10` nulo) abre (antes `None.split`, erro 500).
+- (2.4.9) Excluir anexo (Imagens e anexos): o log de auditoria falhava com "FieldFile is not JSON
+  serializable" e a exclusão não acontecia (o Inno imitava isso). Agora o log guarda o caminho do
+  arquivo (AppClinic: `convert_json_safe` em `logs/signals.py`) e o registro é apagado; o arquivo
+  fica na nuvem, que não tem exclusão. O botão Excluir tinha a aspa do `class` aberta.
+- (2.4.9) Nome: "Inno" no `<title>` das páginas (era "AppClinic 2.0") e no rodapé dos impressos
+  (era "AppClinic 1.0"), nos dois sistemas.
 
 ## WhatsApp: logo no topo da mensagem
 

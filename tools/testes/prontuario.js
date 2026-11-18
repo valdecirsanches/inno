@@ -88,6 +88,18 @@ const R = path.join(__dirname, '..', '..');
         assert.equal(n('SELECT count(*) n FROM tb_extra WHERE fk_exames_id = 1'), 0);
       });
     }
+    // excluir anexo: antes o log falhava ("FieldFile is not JSON serializable") e nada era apagado
+    {
+      t.sq.exec("INSERT INTO tb_extra (id, fk_prontuario_id, file, data_salvo) VALUES (777, 1, 'extras/1/x.png', '2026-11-18 08:00:00')");
+      const y = await t.vai('/prontuario/Extras/uploadFile.json', { method: 'DELETE', body: t.corpo({ doc: '777' }) });
+      const ty = await y.text();
+      const log = t.sq.prepare("SELECT data FROM tb_usuarios_log WHERE model_name = 'TbExtra' ORDER BY id DESC").get();
+      await t.confere('excluir anexo apaga o registro (e registra no log com o caminho)', () => {
+        assert.equal(ty, '{"success": 1}');
+        assert.equal(t.sq.prepare('SELECT count(*) n FROM tb_extra WHERE id = 777').get().n, 0);
+        assert.ok(log && /extras\/1\/x.png/.test(log.data), JSON.stringify(log));
+      });
+    }
     await t.fim();
   } catch (e) { await t.fim(e); }
 })();

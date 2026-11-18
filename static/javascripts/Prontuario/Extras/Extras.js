@@ -30,7 +30,7 @@ function CarregaExtras(id){
                         '       </a>' +
                         '       <div class="text-center"> '+
                         '           <a onClick="DeleteDocumento(\'' + file.id + '\', \'' + file.pasta + '\', \'' + file.nome + '\')" ' +
-                        '             class="btn btn-danger btn-outline btn-xs btn-rounded?><i class="fa fa-trash"> Excluir</i></a>' +
+                        '             class="btn btn-danger btn-outline btn-xs btn-rounded"><i class="fa fa-trash"></i> Excluir</a>' +
                         '       </div>'+
                         '   </div>' +
 

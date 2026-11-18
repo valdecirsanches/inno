@@ -238,10 +238,7 @@ function jsonSeguro(nomeModelo, dict, inteiros = new Set()) {
 async function registraLog(req, acao, nomeModelo, pk, antes, depois, conexao = db.knex) {
   const u = req && req.user;
   if (!u || !u.is_authenticated || IGNORAR_NO_LOG.has(nomeModelo)) return;
-  if (temArquivo(nomeModelo)) {
-    console.error(`[LOG ERRO] Falha ao registrar log para ${nomeModelo}: Object of type FieldFile is not JSON serializable`);
-    return;
-  }
+  // anexo (FileField): o log guarda o caminho do arquivo (antes falhava, como no AppClinic)
   let data = null;
   if (antes !== undefined || depois !== undefined) {
     // o log de auditoria não guarda o código (hash) da senha
@@ -390,7 +387,6 @@ function modelToDictAtrib(nomeModelo, obj) {
  * ao excluir, a falha desfaz a exclusão inteira (o Django marca a transação
  * para desfazer). O Inno faz igual.
  */
-const temArquivo = (nomeModelo) => db.modelo(nomeModelo).campos.some((c) => c.tipo === 'FileField' || c.tipo === 'ImageField');
 
 /**
  * on_delete=SET_NULL (Collector do Django): antes de apagar, quem aponta para os
@@ -444,10 +440,8 @@ async function apagaOuExplica(q) {
 
 async function exclui(req, nomeModelo, obj) {
   const m = db.modelo(nomeModelo);
-  if (temArquivo(nomeModelo) && req && req.user && req.user.is_authenticated) {
-    console.error(`[LOG ERRO] Falha ao registrar exclusão para ${nomeModelo}: Object of type FieldFile is not JSON serializable`);
-    return;
-  }
+  // (anexo: antes o log falhava com "FieldFile is not JSON serializable" e a exclusão não
+  // acontecia, a imagem continuava no prontuário; corrigido também no AppClinic, logs/signals.py)
   await trataDependentes(req, nomeModelo, [obj[m.pk]]);
   await anulaReferencias(nomeModelo, [obj[m.pk]]);
   await apagaOuExplica(db.tabela(nomeModelo).where(db.coluna(nomeModelo, m.pk), obj[m.pk]).del());
@@ -463,7 +457,6 @@ async function excluiLista(req, nomeModelo, objs) {
   const m = db.modelo(nomeModelo);
   const ordenados = objs.slice().sort((x, y) => Number(x[m.pk]) - Number(y[m.pk])).reverse();
   if (!ordenados.length) return;
-  if (temArquivo(nomeModelo) && req && req.user && req.user.is_authenticated) return;
   await trataDependentes(req, nomeModelo, ordenados.map((o) => o[m.pk]));
   await anulaReferencias(nomeModelo, ordenados.map((o) => o[m.pk]));
   await apagaOuExplica(db.tabela(nomeModelo).whereIn(db.coluna(nomeModelo, m.pk), ordenados.map((o) => o[m.pk])).del());

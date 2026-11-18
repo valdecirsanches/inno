@@ -29,7 +29,7 @@ function strf(v, f) { if (v === null || v === undefined || v === '') throw erroP
 /** funcoes.ifnull */
 const ifnull = (v, d) => (!v ? d : v);
 /** funcoes.RODAPE */
-const rodape = () => `*** AppClinic 1.0  © EDSSolution Tecnologia  (1989 - ${db.hoje().slice(0, 4)}) ***  Osasco - SP - Brasil Fone: 55 11 3605-5366`;
+const rodape = () => `*** Inno  © EDSSolution Tecnologia  (1989 - ${db.hoje().slice(0, 4)}) ***  Osasco - SP - Brasil Fone: 55 11 3605-5366`;
 /** funcoes.moeda: locale.currency(valor, grouping=True, symbol=None) em pt_BR */
 function moeda(v) {
   const n = Number(v);

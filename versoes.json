@@ -2,6 +2,26 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.9",
+      "data": "18/11/2026",
+      "titulo": "Anexos e nome do sistema",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Prontuário: imagem ou documento excluído em Imagens e anexos continuava na tela (não era apagado); agora é excluído."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Prontuário: o botão Excluir dos anexos aparece formatado."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "O sistema passa a se chamar Inno no título das páginas e no rodapé dos impressos."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.8",
       "data": "18/11/2026",
       "titulo": "Padrões de relatório e exame",
