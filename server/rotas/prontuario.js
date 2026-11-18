@@ -500,6 +500,14 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
     await modelo.exclui(req, M, await obtem(M, { id: numero(exige(req.GET, 'id')) }));
     json(res, { success: 'OK' });
   }));
+  // aplicar padrão: o médico do usuário; sem médico vinculado, o da consulta (antes o documento
+  // ficava sem médico e o impresso dava erro 500), como já acontecia ao criar pelo botão Novo
+  async function medicoParaPadrao(req, cons) {
+    if (req.user.fk_medico_id) return req.user.fk_medico_id;
+    const ag = /^\d+$/.test(String(cons)) ? await db.busca('TbAgendaCons', { id: parseInt(cons, 10) }) : null;
+    return ag ? ag.fk_medico_id : null;
+  }
+
   app.get(`${P}/Exames/UtilizaConfExame/`, a(async (req, res) => {
     const conf = exige(req.GET, 'conf'), pr = exige(req.GET, 'prontuario'), cons = exige(req.GET, 'consulta'), med = exige(req.GET, 'medico');
     const c = await obtem('TbConfExames', { id: numero(conf) });
@@ -604,8 +612,9 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
   }));
   app.get(`${P}/Relatorios/UtilizaConfRelatorio/`, a(async (req, res) => {
     const conf = exige(req.GET, 'conf'), pr = exige(req.GET, 'prontuario'), cons = exige(req.GET, 'consulta');
+    const medico = await medicoParaPadrao(req, cons);
     const c = await obtem('TbConfRelatorios', { id: numero(conf) });
-    const r = { fk_prontuario_id: pr, fk_consulta_id: cons, fk_medico_id: req.user.fk_medico_id, titulo: c.titulo, texto: c.texto, cid10: c.cid10 };
+    const r = { fk_prontuario_id: pr, fk_consulta_id: cons, fk_medico_id: medico, titulo: c.titulo, texto: c.texto, cid10: c.cid10 };
     await modelo.salva(req, 'TbRelatorios', r);
     json(res, { success: r.id });
   }));
@@ -826,8 +835,9 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
     json(res, { success: { id } });
   }));
   async function utilizaConfPrescricao(req, conf, pront, cons) {
+    const medico = await medicoParaPadrao(req, cons);
     const c = await obtem('TbConfPrescricoes', { id: numero(conf) });
-    const p = { fk_prontuario_id: pront, fk_consulta_id: cons, fk_medico_id: req.user.fk_medico_id, data_prescricao: hoje(), cont_esp: c.cont_esp, prescricao: c.prescricao };
+    const p = { fk_prontuario_id: pront, fk_consulta_id: cons, fk_medico_id: medico, data_prescricao: hoje(), cont_esp: c.cont_esp, prescricao: c.prescricao };
     await modelo.salva(req, PR, p);
     for (const cr of await lista('TbConfPrescricaoRemedios', (q) => q.where(col('TbConfPrescricaoRemedios', 'fk_prescricao_id'), c.id), null)) {
       await modelo.salva(req, RM, { fk_prescricao_id: p.id, nome: cr.nome, qtdade: cr.qtdade, unidade: cr.unidade, tipo: cr.tipo, descricao: cr.descricao });

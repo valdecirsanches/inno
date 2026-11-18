@@ -188,9 +188,17 @@ function assinatura(med, st) {
 const tituloComLinha = (t, st) => new Table([[new Paragraph(t, st.Heading2)], [new Spacer(1, 1)]], { style: [['LINEBELOW', [0, 0], [0, 0], 0.5, colors.black]] });
 const docPadrao = (title, o = {}) => new SimpleDocTemplate(Object.assign({ pagesize: letter, title, rightMargin: 55, leftMargin: 55, topMargin: 162, bottomMargin: 100 }, o));
 /** médico do impresso: o do usuário; sem ele, o do registro */
-async function medicoDe(req, fkMedicoId) {
+async function medicoDe(req, fkMedicoId, fkConsultaId) {
   if (req.user.fk_medico_id) return relacionado('TbMedicos', req.user.fk_medico_id);
-  return relacionado('TbMedicos', fkMedicoId);
+  const m = await relacionado('TbMedicos', fkMedicoId);
+  if (m) return m;
+  // documento sem médico gravado (feito por usuário sem médico vinculado): o médico da
+  // consulta (antes dava erro 500 ao imprimir)
+  try {
+    const c = fkConsultaId ? await db.busca('TbAgendaCons', { id: fkConsultaId }) : null;
+    if (c && c.fk_medico_id) return await db.busca('TbMedicos', { id: c.fk_medico_id });
+  } catch (e) { /* como o try/except do AppClinic */ }
+  return null;
 }
 const exigeMed = (m) => { if (!m) throw erroPython("'NoneType' object has no attribute 'medico'"); return m; };
 const cids = (t) => String(t).split(',').join(', ');
@@ -737,7 +745,7 @@ module.exports = function (app) {
   // ====================================== Prontuario/Exames/reports.py
   app.get('/atendimento/ImprimeExame/', a(async (req, res) => {
     const ex = await get('TbExames', idDe(req.GET.get('id_exame')));
-    const med = exigeMed(await medicoDe(req, ex.fk_medico_id));
+    const med = exigeMed(await medicoDe(req, ex.fk_medico_id, ex.fk_consulta_id));
     const pront = await relacionado('TbPacientes', ex.fk_prontuario_id);
     const titulo = !ex.descricao ? '' : ex.descricao.toUpperCase();
     const doc = docPadrao(titulo);
@@ -764,7 +772,7 @@ module.exports = function (app) {
   // =================================== Prontuario/Relatorios/reports.py
   app.get('/atendimento/ImprimeRelatorio/', a(async (req, res) => {
     const rel = await get('TbRelatorios', idDe(req.GET.get('id_relatorio')));
-    const med = exigeMed(await medicoDe(req, rel.fk_medico_id));
+    const med = exigeMed(await medicoDe(req, rel.fk_medico_id, rel.fk_consulta_id));
     const pront = await relacionado('TbPacientes', rel.fk_prontuario_id);
     const doc = docPadrao(rel.titulo);
     const st = getSampleStyleSheet();
@@ -790,7 +798,7 @@ module.exports = function (app) {
   app.get('/atendimento/ImprimePrescricao/', a(async (req, res) => {
     const PR = 'TbPrescricoes';
     const presc = await get(PR, idDe(req.GET.get('id_prescricao')));
-    const med = exigeMed(await medicoDe(req, presc.fk_medico_id));
+    const med = exigeMed(await medicoDe(req, presc.fk_medico_id, presc.fk_consulta_id));
     const titulo = presc.cont_esp ? 'RECEITUARIO DE CONTROLE ESPECIAL' : 'RECEITUARIO';
     const doc = presc.cont_esp ? docPadrao(titulo, { topMargin: 150, bottomMargin: 250 }) : docPadrao(titulo);
     const st = getSampleStyleSheet();

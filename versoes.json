@@ -2,6 +2,22 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.12",
+      "data": "18/11/2026",
+      "titulo": "Médico nas prescrições, relatórios e exames",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Imprimir prescrição, relatório ou exame sem médico gravado dava erro 500; agora usa o médico da consulta."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Aplicar um padrão de prescrição ou relatório com usuário sem médico vinculado gravava o documento sem médico; agora grava o médico da consulta."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.11",
       "data": "18/11/2026",
       "titulo": "Convênio no atendimento",

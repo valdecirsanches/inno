@@ -121,6 +121,30 @@ const R = path.join(__dirname, '..', '..');
       const nome2 = t.sq.prepare('SELECT convenio FROM convenio WHERE id = 2').get().convenio;
       await t.confere('abrir o atendimento mostra (e grava) o convênio do cadastro', () => { assert.equal(ini.success.convenio, nome2); assert.equal(c(3), 2); assert.equal(c(1), 1); });
     }
+    // imprimir prescrição/exame/relatório sem médico gravado, por usuário sem médico: usa o da consulta
+    {
+      t.sq.exec('UPDATE tb_usuarios SET id_medico = NULL WHERE id = 1');
+      const out = [];
+      for (const [tb, url, par] of [['tb_prescricoes', 'ImprimePrescricao', 'id_prescricao'], ['tb_relatorios', 'ImprimeRelatorio', 'id_relatorio']]) {
+        const id = t.sq.prepare(`SELECT id FROM ${tb} ORDER BY id LIMIT 1`).get().id;
+        t.sq.prepare(`UPDATE ${tb} SET fk_medico_id = NULL, fk_consulta_id = 3 WHERE id = ?`).run(id);
+        const r = await t.vai(`/atendimento/${url}/?${par}=${id}`);
+        out.push([url, r.status, r.headers.get('content-type')]);
+      }
+      for (const [url, tb] of [['/prontuario/prescricoes/UtilizaConfPrescricao/', 'tb_prescricoes'], ['/prontuario/Relatorios/UtilizaConfRelatorio/', 'tb_relatorios']]) {
+        const conf = t.sq.prepare(`SELECT id FROM ${tb.replace('tb_', 'tb_conf_')} ORDER BY id LIMIT 1`).get();
+        if (!conf) continue;
+        const r = await t.vai(url + '?' + t.corpo({ conf: String(conf.id), prontuario: '1', consulta: '3' }));
+        const id = (await r.json()).success;
+        out.push([url, r.status, 'pdf', t.sq.prepare(`SELECT fk_medico_id m FROM ${tb} WHERE id = ?`).get(id).m]);
+      }
+      await t.confere('padrão aplicado por usuário sem médico fica com o médico da consulta', () => {
+        for (const [u, , , m] of out.filter((x) => x.length === 4)) assert.ok(m, u);
+      });
+      await t.confere('impressão sem médico gravado usa o médico da consulta', () => {
+        for (const [u, st, ct] of out) { assert.equal(st, 200, u); assert.match(ct, /pdf/, u); }
+      });
+    }
     await t.fim();
   } catch (e) { await t.fim(e); }
 })();
