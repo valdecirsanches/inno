@@ -146,6 +146,8 @@ function AdicionaExamePadrao(){
             if (data.success){
                 swal("Ótimo!", "Exame padrão '" + inputValue + "' adicionado", "success");
                 if (typeof $tableConfExames !== 'undefined') { $tableConfExames.bootstrapTable('refresh'); }
+            } else if (data.error === 'medico') {
+                swal("Desculpe!", "Seu usuário não tem um médico vinculado. Vincule um médico ao usuário em Cadastros auxiliares > Usuários (ou abra uma prescrição feita por um médico) para salvar o padrão.", "error");
             } else if (data.error === 'existe') {
                 swal("Desculpe!", "Já existe um padrão chamado '" + inputValue + "'. Escolha outro nome.", "error");
             } else {

@@ -215,6 +215,10 @@ Teste: `node tools/testes/prontuario.js`.
   existiam e endereços que não existem; reescrito com os endereços que existem (Carrega/Salva/
   Exclui...Conf...). Prescrições: a lista de remédios do padrão aparece (a resposta vem em
   `success`), o botão do remédio não envia mais o formulário, e editar/excluir remédio funcionam.
+- (2.4.6) Padrão de prescrição: a coluna do médico não aceita vazio. Usuário sem médico vinculado
+  dava erro 500 ("Erro ao adicionar ... como prescrição padrão"); agora o padrão fica com o médico
+  da prescrição (sem nenhum dos dois: `{"error": "medico"}` e a tela explica), "controle especial"
+  vazio vira "não", e esse usuário vê os padrões de prescrição de todos os médicos.
 
 ## WhatsApp: logo no topo da mensagem
 

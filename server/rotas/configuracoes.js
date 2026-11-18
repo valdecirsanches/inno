@@ -73,10 +73,14 @@ module.exports = function (app) {
   app.get(`${C}/prescricoes/AdicionaConfPrescricaoPadrao/`, a(async (req, res) => {
     const desc = exige(req.GET, 'descricao'), presc = exige(req.GET, 'prescricao');
     if (!(desc && presc)) return json(res, { error: 'erro' });
-    if (await doMesmoMedico(db.tabela(CP).where(col(CP, 'nome'), desc), CP, req.user.fk_medico_id).first()) return json(res, { error: 'existe' });
     const p = await buscaOrigem('TbPrescricoes', presc);
     if (!p) return json(res, { error: 'salve' });
-    const c = { fk_medico_id: req.user.fk_medico_id, nome: desc, cont_esp: p.cont_esp, prescricao: p.prescricao };
+    // o padrão de prescrição precisa de um médico (a coluna não aceita vazio): o do usuário;
+    // usuário sem médico vinculado: o da prescrição (antes dava erro 500 e a tela só dizia "Erro")
+    const medicoId = req.user.fk_medico_id || p.fk_medico_id;
+    if (!medicoId) return json(res, { error: 'medico' });
+    if (await doMesmoMedico(db.tabela(CP).where(col(CP, 'nome'), desc), CP, medicoId).first()) return json(res, { error: 'existe' });
+    const c = { fk_medico_id: medicoId, nome: desc, cont_esp: !!p.cont_esp, prescricao: p.prescricao };
     await modelo.salva(req, CP, c);
     const RM = 'TbPrescricaoRemedios';
     for (const r of db.linhas(RM, await db.tabela(RM).where(col(RM, 'fk_prescricao_id'), p.id))) {
@@ -85,7 +89,9 @@ module.exports = function (app) {
     json(res, { success: p.id });
   }));
   app.get(`${C}/prescricoes/CarregaConfPrescricoes/`, a(async (req, res) => {
-    const l = db.linhas(CP, await doMedico(db.tabela(CP), CP, 'fk_medico_id', req.user.fk_medico_id).orderBy(col(CP, 'nome')));
+    // usuário sem médico vinculado vê os padrões de todos os médicos (antes não via nenhum)
+    const q = req.user.fk_medico_id ? doMedico(db.tabela(CP), CP, 'fk_medico_id', req.user.fk_medico_id) : db.tabela(CP);
+    const l = db.linhas(CP, await q.orderBy(col(CP, 'nome')));
     json(res, l.map((i) => ({ id: i.id, fk_medico_id: i.fk_medico_id, nome: i.nome })));
   }));
   app.get(`${C}/prescricoes/CarregaConfPrescricao/`, a(async (req, res) => {
@@ -98,7 +104,9 @@ module.exports = function (app) {
     const f = await modelo.validaForm(CP, new (require('../util/querydict'))(String(form)), { instancia: inst, exclui: ['fk_medico'] });
     if (!f.valido) dictErro();
     const obj = Object.assign(inst ? Object.assign({}, inst) : {}, f.valores);
-    obj.fk_medico_id = req.user.fk_medico_id;
+    // usuário sem médico vinculado: mantém o médico do padrão (a coluna não aceita vazio)
+    obj.fk_medico_id = req.user.fk_medico_id || obj.fk_medico_id;
+    if (!obj.fk_medico_id) return json(res, { error: 'medico' });
     await modelo.salva(req, CP, obj);
     json(res, { success: { id: obj.id, dataSalvo: dataSalvo(obj) } });
   }));

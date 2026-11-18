@@ -2,6 +2,22 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.6",
+      "data": "18/11/2026",
+      "titulo": "Padrão de prescrição",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Salvar prescrição como padrão dava erro para usuário sem médico vinculado (ou com o controle especial em branco); agora usa o médico da prescrição."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "Usuário sem médico vinculado vê os padrões de prescrição de todos os médicos."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.5",
       "data": "17/11/2026",
       "titulo": "Padrões de exame, prescrição e relatório",

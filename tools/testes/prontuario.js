@@ -27,6 +27,23 @@ const R = path.join(__dirname, '..', '..');
         assert.deepEqual(c, [200, '{"error": "salve"}']);
       });
     }
+    // usuário sem médico vinculado e prescrição com "controle especial" vazio (antes: erro 500)
+    t.sq.exec('UPDATE tb_usuarios SET id_medico = NULL WHERE id = 1');
+    t.sq.exec('UPDATE tb_prescricoes SET cont_esp = NULL, fk_medico_id = 1 WHERE id = 1');
+    let x = await t.vai('/configuracoes/prescricoes/AdicionaConfPrescricaoPadrao/?' + t.corpo({ descricao: 'sem medico', prescricao: '1' }));
+    const xs = [x.status, await x.text()];
+    const cp = t.sq.prepare("SELECT * FROM tb_conf_prescricoes WHERE nome = 'sem medico'").get();
+    x = await t.vai('/configuracoes/prescricoes/CarregaConfPrescricoes/');
+    const lista = (await x.json()).map((i) => i.nome);
+    t.sq.exec('UPDATE tb_prescricoes SET fk_medico_id = NULL WHERE id = 1');
+    x = await t.vai('/configuracoes/prescricoes/AdicionaConfPrescricaoPadrao/?' + t.corpo({ descricao: 'sem medico 2', prescricao: '1' }));
+    const xs2 = await x.text();
+    await t.confere('prescrição padrão de usuário sem médico: usa o médico da prescrição', () => {
+      assert.deepEqual(xs, [200, '{"success": 1}']);
+      assert.equal(cp.fk_medico_id, 1); assert.equal(cp.cont_esp, 0);
+      assert.ok(lista.includes('sem medico'), 'aparece na lista');
+      assert.equal(xs2, '{"error": "medico"}');
+    });
     await t.fim();
   } catch (e) { await t.fim(e); }
 })();

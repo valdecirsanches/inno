@@ -131,7 +131,7 @@ function SalvaPrescricao(qual) {
             $tablePrescricao.bootstrapTable('refresh');
             toastr.success('Padrão de prescrição salvo.', 'Salvo com sucesso!');
         } else {
-            swal('Prescrição padrão', 'Erro ao salvar: ' + (data.error || ''), 'error');
+            swal('Prescrição padrão', data.error === 'medico' ? 'Seu usuário não tem um médico vinculado. Vincule um médico ao usuário em Cadastros auxiliares > Usuários para salvar o padrão.' : 'Erro ao salvar: ' + (data.error || ''), 'error');
         }
     }).fail(function () {
         swal('Prescrição padrão', 'Erro ao salvar. Confira os campos.', 'error');
