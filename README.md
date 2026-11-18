@@ -240,7 +240,8 @@ Teste: `node tools/testes/prontuario.js`.
   paciente com outro convênio, as consultas dele em aberto (data de hoje em diante e status
   AGENDADO, AGUARDANDO ou ATENDIMENTO) passam para o novo; as atendidas ficam como estavam.
   Consultas já marcadas antes disso: `node tools/manutencao/convenio-consultas.js` (lista) e
-  `--corrige`.
+  `--corrige`. (2.4.11) Além disso, ao abrir o atendimento (`IniciaAtendimento`) de uma consulta
+  em aberto, o convênio dela é acertado para o do cadastro antes de montar o cabeçalho.
 - (2.4.9) Nome: "Inno" no `<title>` das páginas (era "AppClinic 2.0") e no rodapé dos impressos
   (era "AppClinic 1.0"), nos dois sistemas.
 

@@ -160,6 +160,15 @@ module.exports = function (app) {
       Object.assign(formConsulta, { atdm, atdm_c: atdmC, atdm_cn: atdmCn });
       formConsulta = { success: formConsulta };
     } else formConsulta = { error: 'error' };
+    // Consulta em aberto: o convênio é o que está hoje no cadastro do paciente (a consulta guarda
+    // o do dia em que foi marcada, e o médico via o antigo). Consultas encerradas ficam como estão.
+    if (c.fk_paciente_id && ['AGENDADO', 'AGUARDANDO', 'ATENDIMENTO'].includes(c.status) && c.data && String(c.data).slice(0, 10) >= db.hoje()) {
+      const pc = await db.busca('TbPacientes', { id: c.fk_paciente_id });
+      if (pc && (pc.fk_convenio_id || null) !== (c.fk_convenio_id || null)) {
+        await db.tabela(A).where(C('id'), c.id).update({ [C('fk_convenio_id')]: pc.fk_convenio_id || null });
+        c.fk_convenio_id = pc.fk_convenio_id || null;
+      }
+    }
     const conv = await relacionado('TbConvenio', c.fk_convenio_id);
     const p = await relacionado('TbPacientes', c.fk_paciente_id);
     if (!p) throw erroPython("'NoneType' object has no attribute 'profissao'");

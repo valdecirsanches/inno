@@ -2,6 +2,18 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.11",
+      "data": "18/11/2026",
+      "titulo": "Convênio no atendimento",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Ao abrir o atendimento de uma consulta em aberto, o convênio mostrado (e gravado na consulta) é o do cadastro do paciente, mesmo que a consulta tenha sido marcada com outro."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.10",
       "data": "18/11/2026",
       "titulo": "Convênio da consulta",

@@ -114,6 +114,12 @@ const R = path.join(__dirname, '..', '..');
       await r.text();
       const c = (id) => t.sq.prepare('SELECT id_convenio c FROM tb_agendas WHERE id = ?').get(id).c;
       await t.confere('convênio mudado no cadastro vai para as consultas em aberto', () => { assert.equal(c(3), 2); assert.equal(c(1), 1); });
+      // consulta marcada antes com outro convênio: ao abrir o atendimento, passa para o do cadastro
+      t.sq.exec('UPDATE tb_agendas SET id_convenio = 1 WHERE id = 3');
+      r = await t.vai('/atendimento/IniciaAtendimento/?consulta=3');
+      const ini = await r.json();
+      const nome2 = t.sq.prepare('SELECT convenio FROM convenio WHERE id = 2').get().convenio;
+      await t.confere('abrir o atendimento mostra (e grava) o convênio do cadastro', () => { assert.equal(ini.success.convenio, nome2); assert.equal(c(3), 2); assert.equal(c(1), 1); });
     }
     await t.fim();
   } catch (e) { await t.fim(e); }
