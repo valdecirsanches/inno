@@ -118,26 +118,41 @@ function AdicionaExamePadrao(){
         showCancelButton: true,
         animation: "slide-from-top",
         inputPlaceholder: "Escreva a descrição aqui"
-    }).then( function(inputValue) {
+    }).then(async function(inputValue) {
         if (inputValue === false) return false;
         if (inputValue === "") {
             swal("Padrão", "É necessário informar uma descrição para o padrão.", "warning");  // a função antiga de erro no campo não existe no sweetalert2 e travava
+            return false;
+        }
+        // grava o exame antes: o padrão é copiado do registro salvo (logo depois de "Novo" o id
+        // ainda era 0 e o padrão não era criado, sem nenhum aviso)
+        // (só com o formulário aberto para edição: sem isso gravaria um registro vazio)
+        if (!$('#id_descricao_exames').prop('disabled')) {
+            try { await UpdateExame(true); } catch (e) { /* o aviso de erro já sai do próprio salvar */ }
+        }
+        var id = (exame.object && exame.object.id) || $('#id_id_exames').val();
+        if (!id || String(id) === '0') {
+            swal("Padrão", "Preencha o exame antes de salvá-lo como padrão.", "warning");
             return false;
         }
         $.ajax({
             url: '/configuracoes/exames/AdicionaConfExamePadrao',
             data: {
                 'descricao': inputValue,
-                'exame': $('#id_id_exames').val()
+                'exame': id
             },
             method: 'GET',
-        }).success(function Ret(data) {
-            if (data.success) {
-                // CarregaExame(data.success);
+        }).success(function Ret(data){
+            if (data.success){
                 swal("Ótimo!", "Exame padrão '" + inputValue + "' adicionado", "success");
+                if (typeof $tableConfExames !== 'undefined') { $tableConfExames.bootstrapTable('refresh'); }
+            } else if (data.error === 'existe') {
+                swal("Desculpe!", "Já existe um padrão chamado '" + inputValue + "'. Escolha outro nome.", "error");
             } else {
-                swal("Desculpe!", "Erro ao adicionar '" + inputValue + "' como exame padrão ", "error");
+                swal("Desculpe!", "Erro ao adicionar '" + inputValue + "' como exame padrão", "error");
             }
+        }).fail(function () {
+            swal("Desculpe!", "Erro ao adicionar '" + inputValue + "' como exame padrão", "error");
         });
     });
 }
@@ -170,7 +185,7 @@ async function UtilizaConfExame(conf){
 
 function ExcluiConfExame(row) {
     swal({
-            title: "Exclusão de exame padrão: "+row.descricao,
+            title: "Exclusão de exame padrão: " + (row.nome || row.descricao || ""),
             text: "Confirma a exclusão definitiva deste exame?",
             type: "warning",
             showCancelButton: true,

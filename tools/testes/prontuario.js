@@ -15,6 +15,18 @@ const R = path.join(__dirname, '..', '..');
       for (const f of ['Exames/Exames.js', 'Prescricoes/Prescricoes.js', 'Relatorios/Relatorios.js']) assert.ok(!/showInputError/.test(js(f)), f);
     });
     await t.confere('anamnese não recarrega com o paciente que a resposta não traz', () => assert.ok(!/CarregaAnamnese\(data\.success\.paciente\)/.test(js('Anamnese/Anamnese.js'))));
+    // salvar como padrão: nome repetido e registro inexistente respondem com erro (antes: 500 mudo)
+    for (const [url, par] of [['/configuracoes/exames/AdicionaConfExamePadrao/', 'exame'], ['/configuracoes/prescricoes/AdicionaConfPrescricaoPadrao/', 'prescricao'], ['/configuracoes/relatorios/AdicionaConfRelatorio/', 'relatorio']]) {
+      const vai = async (o) => { const x = await t.vai(url + '?' + t.corpo(o)); return [x.status, await x.text()]; };
+      const a = await vai({ descricao: 'teste1', [par]: '1' });
+      const b = await vai({ descricao: 'teste1', [par]: '1' });
+      const c = await vai({ descricao: 'teste9', [par]: '0' });
+      await t.confere(`${par}: padrão novo, repetido e sem registro`, () => {
+        assert.deepEqual(a, [200, '{"success": 1}']);
+        assert.deepEqual(b, [200, '{"error": "existe"}']);
+        assert.deepEqual(c, [200, '{"error": "salve"}']);
+      });
+    }
     await t.fim();
   } catch (e) { await t.fim(e); }
 })();

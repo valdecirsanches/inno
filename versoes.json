@@ -2,6 +2,26 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.5",
+      "data": "17/11/2026",
+      "titulo": "Padrões de exame, prescrição e relatório",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Salvar como padrão logo depois de escrever um exame, prescrição ou relatório novo não era gravado e não avisava nada; agora grava o que está na tela."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Nome de padrão repetido agora avisa (antes falhava calado), e a repetição só conta entre os padrões do mesmo médico."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Configurações > Exames, Prescrições e Relatórios: criar, editar e excluir padrões voltaram a funcionar, inclusive os remédios dos padrões de prescrição."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.4",
       "data": "17/11/2026",
       "titulo": "Prontuário: correções internas",

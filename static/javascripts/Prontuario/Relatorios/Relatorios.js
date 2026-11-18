@@ -156,25 +156,41 @@ function AdicionaRelatorioPadrao(){
         closeOnConfirm: false,
         animation: "slide-from-top",
         inputPlaceholder: "Escreva a descrição aqui"
-    }).then(function(inputValue){
+    }).then(async function(inputValue){
         if (inputValue === false) return false;
         if (inputValue === "") {
             swal("Padrão", "É necessário informar uma descrição para o padrão.", "warning");  // a função antiga de erro no campo não existe no sweetalert2 e travava
+            return false;
+        }
+        // grava o relatório antes: o padrão é copiado do registro salvo (logo depois de "Novo" o id
+        // ainda era 0 e o padrão não era criado, sem nenhum aviso)
+        // (só com o formulário aberto para edição: sem isso gravaria um registro vazio)
+        if (!$('#id_texto_relatorio').prop('disabled')) {
+            try { await UpdateRelatorio(true); } catch (e) { /* o aviso de erro já sai do próprio salvar */ }
+        }
+        var id = (relatorio.object && relatorio.object.id) || $('#id_id_relatorio').val();
+        if (!id || String(id) === '0') {
+            swal("Padrão", "Preencha o relatório antes de salvá-lo como padrão.", "warning");
             return false;
         }
         $.ajax({
             url: '/configuracoes/relatorios/AdicionaConfRelatorio',
             data: {
                 'descricao': inputValue,
-                'relatorio': $('#id_id_relatorio').val()
+                'relatorio': id
             },
             method: 'GET',
         }).success(function Ret(data){
             if (data.success){
-                swal("Ótimo!", "Relatório padrão '" + inputValue +"' adicionado", "success");
+                swal("Ótimo!", "Relatório padrão '" + inputValue + "' adicionado", "success");
+                if (typeof $tableConfRelatorios !== 'undefined') { $tableConfRelatorios.bootstrapTable('refresh'); }
+            } else if (data.error === 'existe') {
+                swal("Desculpe!", "Já existe um padrão chamado '" + inputValue + "'. Escolha outro nome.", "error");
             } else {
-                swal("Desculpe!", "Erro ao adicionar '" + inputValue +"' como relatório padrão ", "error");
+                swal("Desculpe!", "Erro ao adicionar '" + inputValue + "' como relatório padrão", "error");
             }
+        }).fail(function () {
+            swal("Desculpe!", "Erro ao adicionar '" + inputValue + "' como relatório padrão", "error");
         });
     });
 }
@@ -205,7 +221,7 @@ function UtilizaConfRelatorio(conf){
 
 function ExcluiConfRelatorio(row) {
     swal({
-        title: "Exclusão de relatório padrão: "+row.titulo,
+        title: "Exclusão de relatório padrão: " + (row.nome || row.titulo || ""),
         text: "Confirma a exclusão definitiva deste relatorio?",
         type: "warning",
         showCancelButton: true,

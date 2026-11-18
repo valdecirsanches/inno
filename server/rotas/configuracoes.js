@@ -7,7 +7,7 @@ const db = require('../db');
 const { render } = require('../templates');
 const { json } = require('../util/http');
 const modelo = require('../util/modelo');
-const { obtem, relacionado, erroPython } = require('../util/orm');
+const { obtem, erroPython } = require('../util/orm');
 const { exige } = require('../util/python');
 const { formata } = require('../util/formato-data');
 const { numero, formulario, listaErros, cidsDe } = require('./prontuario');
@@ -17,7 +17,12 @@ const col = (m, at) => db.coluna(m, at);
 const dataSalvo = (o) => { if (!o.data_salvo) throw erroPython("'NoneType' object has no attribute 'strftime'"); return formata(o.data_salvo, 'd/m/Y'); };
 const doMedico = (q, m, coluna, id) => (id === null || id === undefined ? q.whereNull(col(m, coluna)) : q.where(col(m, coluna), id));
 // HttpResponse(..., mimetype=...) não existe no Django 3: erro
-const nomeRepetido = () => { throw erroPython("__init__() got an unexpected keyword argument 'mimetype'"); };
+// "salvar como padrão": nome repetido só conta na lista do mesmo médico (a que ele vê) e volta
+// como {"error": "existe"}; registro de origem inexistente (ainda não salvo) volta {"error": "salve"}.
+// Antes: erro 500 ("mimetype") ou "matching query does not exist", e a tela não avisava nada.
+const doMesmoMedico = (q, M, medicoId) => (medicoId === null || medicoId === undefined
+  ? q.whereNull(col(M, 'fk_medico_id')) : q.where(col(M, 'fk_medico_id'), medicoId));
+const buscaOrigem = async (M, id) => (/^\d+$/.test(String(id)) ? db.busca(M, { id: parseInt(id, 10) }) : null);
 const dictErro = () => { throw erroPython('dictionary update sequence element #0 has length 1; 2 is required'); };
 
 module.exports = function (app) {
@@ -34,8 +39,9 @@ module.exports = function (app) {
   app.get(`${C}/exames/AdicionaConfExamePadrao/`, a(async (req, res) => {
     const desc = exige(req.GET, 'descricao'), exame = exige(req.GET, 'exame');
     if (!(desc && exame)) return json(res, { error: 'erro' });
-    if (await db.tabela(CE).where(col(CE, 'nome'), desc).first()) nomeRepetido();
-    const ex = await obtem('TbExames', { id: numero(exame) });
+    if (await doMesmoMedico(db.tabela(CE).where(col(CE, 'nome'), desc), CE, req.user.fk_medico_id).first()) return json(res, { error: 'existe' });
+    const ex = await buscaOrigem('TbExames', exame);
+    if (!ex) return json(res, { error: 'salve' });
     await modelo.salva(req, CE, { fk_medico_id: req.user.fk_medico_id, nome: desc, descricao: ex.descricao, pedido: ex.pedido, motivo: ex.motivo, cid10: ex.cid10 });
     json(res, { success: ex.id });
   }));
@@ -67,8 +73,9 @@ module.exports = function (app) {
   app.get(`${C}/prescricoes/AdicionaConfPrescricaoPadrao/`, a(async (req, res) => {
     const desc = exige(req.GET, 'descricao'), presc = exige(req.GET, 'prescricao');
     if (!(desc && presc)) return json(res, { error: 'erro' });
-    if (await db.tabela(CP).where(col(CP, 'nome'), desc).first()) nomeRepetido();
-    const p = await obtem('TbPrescricoes', { id: numero(presc) });
+    if (await doMesmoMedico(db.tabela(CP).where(col(CP, 'nome'), desc), CP, req.user.fk_medico_id).first()) return json(res, { error: 'existe' });
+    const p = await buscaOrigem('TbPrescricoes', presc);
+    if (!p) return json(res, { error: 'salve' });
     const c = { fk_medico_id: req.user.fk_medico_id, nome: desc, cont_esp: p.cont_esp, prescricao: p.prescricao };
     await modelo.salva(req, CP, c);
     const RM = 'TbPrescricaoRemedios';
@@ -126,10 +133,12 @@ module.exports = function (app) {
   app.get(`${C}/relatorios/AdicionaConfRelatorio/`, a(async (req, res) => {
     const desc = exige(req.GET, 'descricao'), rel = exige(req.GET, 'relatorio');
     if (!(desc && rel)) return json(res, { error: 'erro' });
-    if (await db.tabela(CL).where(col(CL, 'nome'), desc).first()) nomeRepetido();
-    const r = await obtem('TbRelatorios', { id: numero(rel) });
-    if (r.fk_medico_id) await relacionado('TbMedicos', r.fk_medico_id);
-    await modelo.salva(req, CL, { fk_medico_id: r.fk_medico_id, nome: desc, titulo: r.titulo, texto: r.texto, cid10: r.cid10 });
+    const r = await buscaOrigem('TbRelatorios', rel);
+    if (!r) return json(res, { error: 'salve' });
+    // o padrão vai para a lista do médico do usuário (é a que ele vê); sem médico, a do relatório
+    const medicoId = req.user.fk_medico_id || r.fk_medico_id;
+    if (await doMesmoMedico(db.tabela(CL).where(col(CL, 'nome'), desc), CL, medicoId).first()) return json(res, { error: 'existe' });
+    await modelo.salva(req, CL, { fk_medico_id: medicoId, nome: desc, titulo: r.titulo, texto: r.texto, cid10: r.cid10 });
     json(res, { success: r.id });
   }));
   app.get(`${C}/relatorios/CarregaConfRelatorio/`, a(async (req, res) => {

@@ -140,25 +140,41 @@ function AdicionaPrescricaoPadrao(){
         closeOnConfirm: true,
         animation: "slide-from-top",
         inputPlaceholder: "Escreva a descrição aqui"
-    }).then( function(inputValue){
+    }).then(async function(inputValue){
         if (inputValue === false) return false;
         if (inputValue === "") {
             swal("Padrão", "É necessário informar uma descrição para o padrão.", "warning");  // a função antiga de erro no campo não existe no sweetalert2 e travava
+            return false;
+        }
+        // grava a prescrição antes: o padrão é copiado do registro salvo (logo depois de "Novo" o id
+        // ainda era 0 e o padrão não era criado, sem nenhum aviso)
+        // (só com o formulário aberto para edição: sem isso gravaria um registro vazio)
+        if (!$('#id_prescricao').prop('disabled')) {
+            try { await UpdatePrescricao(true); } catch (e) { /* o aviso de erro já sai do próprio salvar */ }
+        }
+        var id = (prescricao.object && prescricao.object.id) || $('#id_id_prescricao').val();
+        if (!id || String(id) === '0') {
+            swal("Padrão", "Preencha a prescrição antes de salvá-lo como padrão.", "warning");
             return false;
         }
         $.ajax({
             url: '/configuracoes/prescricoes/AdicionaConfPrescricaoPadrao',
             data: {
                 'descricao': inputValue,
-                'prescricao': $('#id_id_prescricao').val()
+                'prescricao': id
             },
             method: 'GET',
         }).success(function Ret(data){
             if (data.success){
-                swal("Ótimo!", "Prescrição padrão '" + inputValue +"' adicionada", "success");
+                swal("Ótimo!", "Prescrição padrão '" + inputValue + "' adicionada", "success");
+                if (typeof $tableConfPrescricoes !== 'undefined') { $tableConfPrescricoes.bootstrapTable('refresh'); }
+            } else if (data.error === 'existe') {
+                swal("Desculpe!", "Já existe um padrão chamado '" + inputValue + "'. Escolha outro nome.", "error");
             } else {
-                swal("Desculpe!", "Erro ao adicionar '" + inputValue +"' como prescrição padrão ", "error");
+                swal("Desculpe!", "Erro ao adicionar '" + inputValue + "' como prescrição padrão", "error");
             }
+        }).fail(function () {
+            swal("Desculpe!", "Erro ao adicionar '" + inputValue + "' como prescrição padrão", "error");
         });
     });
 }

@@ -203,6 +203,19 @@ histórico e impressão do prontuário inteiro. Corrigido nos dois sistemas:
 - Textos: "relat´rio" e "Ano de Pesquise".
 Teste: `node tools/testes/prontuario.js`.
 
+### Padrões de exame, prescrição e relatório (2.4.5)
+
+- "Salvar como padrão" (o `+` ao lado de Padrões), nos dois sistemas:
+  - a tela grava o registro antes (logo depois de "Novo" o id ainda era 0) e manda o id dele;
+  - nome repetido só conta entre os padrões do mesmo médico e volta `{"error": "existe"}`
+    (antes: `HttpResponse(..., mimetype=...)`, erro 500, sem aviso); registro inexistente volta
+    `{"error": "salve"}`; a tela avisa nos dois casos;
+  - relatório: o padrão vai para a lista do médico do usuário (sem médico, a do relatório).
+- Configurações > Exames, Prescrições e Relatórios: o JavaScript chamava funções que não
+  existiam e endereços que não existem; reescrito com os endereços que existem (Carrega/Salva/
+  Exclui...Conf...). Prescrições: a lista de remédios do padrão aparece (a resposta vem em
+  `success`), o botão do remédio não envia mais o formulário, e editar/excluir remédio funcionam.
+
 ## WhatsApp: logo no topo da mensagem
 
 A confirmação de consulta e as respostas ao paciente (confirmado / cancelado) saem numa
