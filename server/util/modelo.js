@@ -407,14 +407,50 @@ async function anulaReferencias(nomeModelo, ids) {
   }
 }
 
+/**
+ * Filhos que pertencem ao registro e cuja chave é DO_NOTHING no modelo: no MySQL a exclusão do
+ * pai falhava ("Cannot delete or update a parent row"). Exceção a favor do usuário (também no
+ * AppClinic, nos delete() dos modelos): os remédios saem junto com a prescrição / o padrão, e o
+ * anexo de um exame fica no prontuário, só sem o vínculo com o exame.
+ */
+const DEPENDENTES = {
+  TbPrescricoes: [['TbPrescricaoRemedios', 'fk_prescricao_id', 'apaga']],
+  TbConfPrescricoes: [['TbConfPrescricaoRemedios', 'fk_prescricao_id', 'apaga']],
+  TbExames: [['TbExtra', 'fk_exames_id', 'anula']],
+};
+async function trataDependentes(req, nomeModelo, ids) {
+  for (const [filho, atributo, acao] of DEPENDENTES[nomeModelo] || []) {
+    const c = db.coluna(filho, atributo);
+    if (acao === 'anula') {
+      await db.tabela(filho).whereIn(c, ids).update({ [c]: null });
+    } else {
+      const linhas = db.linhas(filho, await db.tabela(filho).whereIn(c, ids));
+      if (linhas.length) await excluiLista(req, filho, linhas);
+    }
+  }
+}
+/** registro usado em outro cadastro (chave estrangeira): mensagem clara em vez do SQL */
+async function apagaOuExplica(q) {
+  try {
+    return await q;
+  } catch (e) {
+    if (e && (e.errno === 1451 || e.code === 'ER_ROW_IS_REFERENCED_2' || e.code === 'SQLITE_CONSTRAINT_FOREIGNKEY')) {
+      const t = /\(`[^`]+`\.`([^`]+)`/.exec(String(e.sqlMessage || e.message));
+      throw new Error('Não foi possível excluir: este registro está em uso em outro cadastro' + (t && t[1] ? ` (${t[1]})` : '') + '.');
+    }
+    throw e;
+  }
+}
+
 async function exclui(req, nomeModelo, obj) {
   const m = db.modelo(nomeModelo);
   if (temArquivo(nomeModelo) && req && req.user && req.user.is_authenticated) {
     console.error(`[LOG ERRO] Falha ao registrar exclusão para ${nomeModelo}: Object of type FieldFile is not JSON serializable`);
     return;
   }
+  await trataDependentes(req, nomeModelo, [obj[m.pk]]);
   await anulaReferencias(nomeModelo, [obj[m.pk]]);
-  await db.tabela(nomeModelo).where(db.coluna(nomeModelo, m.pk), obj[m.pk]).del();
+  await apagaOuExplica(db.tabela(nomeModelo).where(db.coluna(nomeModelo, m.pk), obj[m.pk]).del());
   try {
     await registraLog(req, 'Exclusão de registro', nomeModelo, obj[m.pk], jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, obj)), {});
   } catch (e) {
@@ -428,8 +464,9 @@ async function excluiLista(req, nomeModelo, objs) {
   const ordenados = objs.slice().sort((x, y) => Number(x[m.pk]) - Number(y[m.pk])).reverse();
   if (!ordenados.length) return;
   if (temArquivo(nomeModelo) && req && req.user && req.user.is_authenticated) return;
+  await trataDependentes(req, nomeModelo, ordenados.map((o) => o[m.pk]));
   await anulaReferencias(nomeModelo, ordenados.map((o) => o[m.pk]));
-  await db.tabela(nomeModelo).whereIn(db.coluna(nomeModelo, m.pk), ordenados.map((o) => o[m.pk])).del();
+  await apagaOuExplica(db.tabela(nomeModelo).whereIn(db.coluna(nomeModelo, m.pk), ordenados.map((o) => o[m.pk])).del());
   for (const o of ordenados) {
     try {
       await registraLog(req, 'Exclusão de registro', nomeModelo, o[m.pk], jsonSeguro(nomeModelo, modelToDictAtrib(nomeModelo, o)), {});

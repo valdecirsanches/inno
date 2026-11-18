@@ -44,6 +44,28 @@ const R = path.join(__dirname, '..', '..');
       assert.ok(lista.includes('sem medico'), 'aparece na lista');
       assert.equal(xs2, '{"error": "medico"}');
     });
+    // exclusões com filhos (no MySQL davam "Cannot delete or update a parent row")
+    {
+      const n = (sql) => t.sq.prepare(sql).get().n;
+      t.sq.exec("INSERT INTO tb_conf_prescricao_remedios (fk_prescricao_id, nome) SELECT id, 'R1' FROM tb_conf_prescricoes WHERE nome = 'sem medico'");
+      const cid = t.sq.prepare("SELECT id FROM tb_conf_prescricoes WHERE nome = 'sem medico'").get().id;
+      let y = await t.vai('/configuracoes/prescricoes/ExcluiConfPrescricao/?id=' + cid);
+      const y1 = await y.text();
+      t.sq.exec("INSERT INTO tb_prescricao_remedios (fk_prescricao_id, nome) VALUES (1, 'R2')");
+      y = await t.vai('/api/prescricao/1/', { method: 'DELETE' });
+      const y2 = y.status;
+      t.sq.exec('UPDATE tb_extra SET fk_exames_id = 1 WHERE id = (SELECT min(id) FROM tb_extra)');
+      const extras = n('SELECT count(*) n FROM tb_extra');
+      y = await t.vai('/api/exames/1/', { method: 'DELETE' });
+      const y3 = y.status;
+      await t.confere('excluir padrão/prescrição apaga os remédios; excluir exame mantém o anexo', () => {
+        assert.equal(y1, '{"success": "OK"}');
+        assert.equal(n(`SELECT count(*) n FROM tb_conf_prescricao_remedios WHERE fk_prescricao_id = ${cid}`), 0);
+        assert.equal(y2, 204); assert.equal(n('SELECT count(*) n FROM tb_prescricao_remedios WHERE fk_prescricao_id = 1'), 0);
+        assert.equal(y3, 204); assert.equal(n('SELECT count(*) n FROM tb_extra'), extras);
+        assert.equal(n('SELECT count(*) n FROM tb_extra WHERE fk_exames_id = 1'), 0);
+      });
+    }
     await t.fim();
   } catch (e) { await t.fim(e); }
 })();

@@ -219,6 +219,13 @@ Teste: `node tools/testes/prontuario.js`.
   dava erro 500 ("Erro ao adicionar ... como prescrição padrão"); agora o padrão fica com o médico
   da prescrição (sem nenhum dos dois: `{"error": "medico"}` e a tela explica), "controle especial"
   vazio vira "não", e esse usuário vê os padrões de prescrição de todos os médicos.
+- (2.4.7) Exclusões com filhos (chave DO_NOTHING; no MySQL: "Cannot delete or update a parent
+  row"): prescrição e padrão de prescrição apagam os remédios junto; exame apagado deixa o anexo
+  (`tb_extra`) no prontuário sem o vínculo. Inno: `DEPENDENTES` em `server/util/modelo.js`;
+  AppClinic: `delete()` de `TbPrescricoes`, `TbConfPrescricoes` e `TbExames`. No Inno, qualquer
+  outra exclusão barrada por chave estrangeira responde "Não foi possível excluir: este registro
+  está em uso em outro cadastro (tabela)." em vez do SQL (o banco de teste, SQLite, não tem as
+  chaves estrangeiras: estes casos só aparecem no MySQL).
 
 ## WhatsApp: logo no topo da mensagem
 

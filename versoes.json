@@ -2,6 +2,26 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.7",
+      "data": "18/11/2026",
+      "titulo": "Excluir padrão e prescrição com remédios",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Excluir uma prescrição padrão (ou uma prescrição do prontuário) que tinha remédios dava erro do banco; agora os remédios saem junto."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Excluir um exame com anexo não dá mais erro: o anexo fica no prontuário."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "Excluir algo que está em uso em outro cadastro mostra uma mensagem clara em vez do erro do banco."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.6",
       "data": "18/11/2026",
       "titulo": "Padrão de prescrição",
