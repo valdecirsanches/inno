@@ -226,6 +226,15 @@ module.exports = function (app) {
     const p = Object.assign(instancia ? Object.assign({}, instancia) : {}, form.valores);
     p.fk_clinica_id = usuario.fk_clinica_id;
     await modelo.salva(req, 'TbPacientes', p);
+    // A consulta guarda o convênio do paciente no dia em que foi marcada. Mudou o convênio no
+    // cadastro: as consultas ainda em aberto (de hoje em diante) passam a usar o novo, senão o
+    // médico via o convênio antigo no atendimento. Consultas atendidas ficam como estavam.
+    if (instancia && (instancia.fk_convenio_id || null) !== (p.fk_convenio_id || null)) {
+      const A = 'TbAgendaCons';
+      await db.tabela(A).where(db.coluna(A, 'fk_paciente_id'), p.id).where(db.coluna(A, 'data'), '>=', db.hoje())
+        .whereIn(db.coluna(A, 'status'), ['AGENDADO', 'AGUARDANDO', 'ATENDIMENTO'])
+        .update({ [db.coluna(A, 'fk_convenio_id')]: p.fk_convenio_id || null });
+    }
     const opcoes = await opcoesGet(usuario, req);
     opcoes.ultimo_pac = p.id;
     await modelo.salva(req, 'TbOpcoes', opcoes);

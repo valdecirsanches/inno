@@ -235,6 +235,12 @@ Teste: `node tools/testes/prontuario.js`.
   serializable" e a exclusão não acontecia (o Inno imitava isso). Agora o log guarda o caminho do
   arquivo (AppClinic: `convert_json_safe` em `logs/signals.py`) e o registro é apagado; o arquivo
   fica na nuvem, que não tem exclusão. O botão Excluir tinha a aspa do `class` aberta.
+- (2.4.10) Convênio da consulta: a consulta (`tb_agendas.id_convenio`) guarda o convênio do
+  paciente no dia em que foi marcada, e o cabeçalho do atendimento mostra esse. Agora, ao salvar o
+  paciente com outro convênio, as consultas dele em aberto (data de hoje em diante e status
+  AGENDADO, AGUARDANDO ou ATENDIMENTO) passam para o novo; as atendidas ficam como estavam.
+  Consultas já marcadas antes disso: `node tools/manutencao/convenio-consultas.js` (lista) e
+  `--corrige`.
 - (2.4.9) Nome: "Inno" no `<title>` das páginas (era "AppClinic 2.0") e no rodapé dos impressos
   (era "AppClinic 1.0"), nos dois sistemas.
 

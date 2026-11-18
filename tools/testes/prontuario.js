@@ -100,6 +100,21 @@ const R = path.join(__dirname, '..', '..');
         assert.ok(log && /extras\/1\/x.png/.test(log.data), JSON.stringify(log));
       });
     }
+    // convênio mudado no cadastro: consultas em aberto passam para o novo; atendidas não
+    {
+      const hoje = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
+      t.sq.prepare("UPDATE tb_agendas SET data = ?, status = 'AGENDADO', id_paciente = 1, id_convenio = 1 WHERE id = 3").run(hoje);
+      t.sq.prepare("UPDATE tb_agendas SET data = '2026-01-02', status = 'ATENDIDO', id_paciente = 1, id_convenio = 1 WHERE id = 1").run();
+      t.sq.exec('UPDATE paciente SET id_convenio = 1 WHERE id = 1');
+      let r = await t.vai('/cadastros/paciente/CarregaPaciente/?paciente=1');
+      const campos = {};
+      for (const [k, v] of Object.entries((await r.json()).success.fields)) campos[k.replace(/^id_/, '')] = v === 'None' ? '' : v;
+      campos.fk_convenio = '2';
+      r = await t.vai('/cadastros/paciente/SalvaPaciente/', { method: 'POST', body: t.corpo({ paciente: '1', form: t.corpo(campos) }) });
+      await r.text();
+      const c = (id) => t.sq.prepare('SELECT id_convenio c FROM tb_agendas WHERE id = ?').get(id).c;
+      await t.confere('convênio mudado no cadastro vai para as consultas em aberto', () => { assert.equal(c(3), 2); assert.equal(c(1), 1); });
+    }
     await t.fim();
   } catch (e) { await t.fim(e); }
 })();
