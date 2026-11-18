@@ -39,19 +39,23 @@ module.exports = function (app) {
   app.get(`${C}/exames/AdicionaConfExamePadrao/`, a(async (req, res) => {
     const desc = exige(req.GET, 'descricao'), exame = exige(req.GET, 'exame');
     if (!(desc && exame)) return json(res, { error: 'erro' });
-    if (await doMesmoMedico(db.tabela(CE).where(col(CE, 'nome'), desc), CE, req.user.fk_medico_id).first()) return json(res, { error: 'existe' });
     const ex = await buscaOrigem('TbExames', exame);
     if (!ex) return json(res, { error: 'salve' });
-    await modelo.salva(req, CE, { fk_medico_id: req.user.fk_medico_id, nome: desc, descricao: ex.descricao, pedido: ex.pedido, motivo: ex.motivo, cid10: ex.cid10 });
+    // o padrão vai para a lista do médico do usuário; sem médico, a do exame
+    const medicoId = req.user.fk_medico_id || ex.fk_medico_id;
+    if (await doMesmoMedico(db.tabela(CE).where(col(CE, 'nome'), desc), CE, medicoId).first()) return json(res, { error: 'existe' });
+    await modelo.salva(req, CE, { fk_medico_id: medicoId, nome: desc, descricao: ex.descricao, pedido: ex.pedido, motivo: ex.motivo, cid10: ex.cid10 });
     json(res, { success: ex.id });
   }));
   app.get(`${C}/exames/CarregaConfExame/`, a(async (req, res) => {
     const e = await obtem(CE, { id: numero(exige(req.GET, 'exames')) });
-    if (e.cid10 === null || e.cid10 === undefined) throw erroPython("'NoneType' object has no attribute 'split'");
-    json(res, { success: { id: e.id, dataSalvo: dataSalvo(e), fields: modelo.inicialEmTexto(CE, e), cid: await cidsDe(e.cid10) } });
+    // sem CID gravado: antes dava erro ao abrir (str.split em None)
+    json(res, { success: { id: e.id, dataSalvo: dataSalvo(e), fields: modelo.inicialEmTexto(CE, e), cid: await cidsDe(e.cid10 || '') } });
   }));
   app.get(`${C}/exames/CarregaConfExames/`, a(async (req, res) => {
-    const l = db.linhas(CE, await doMedico(db.tabela(CE), CE, 'fk_medico_id', req.user.fk_medico_id).orderBy(col(CE, 'nome')));
+    // usuário sem médico vinculado vê os padrões de todos os médicos (antes só os sem médico)
+    const q = req.user.fk_medico_id ? doMedico(db.tabela(CE), CE, 'fk_medico_id', req.user.fk_medico_id) : db.tabela(CE);
+    const l = db.linhas(CE, await q.orderBy(col(CE, 'nome')));
     json(res, l.map((i) => ({ id: i.id, nome: i.nome, descricao: i.descricao, data_salvo: dataSalvo(i) })));
   }));
   app.get(`${C}/exames/SalvaConfExame/`, a(async (req, res) => {
@@ -59,7 +63,8 @@ module.exports = function (app) {
     const inst = String(exame) > '0' ? await obtem(CE, { id: numero(exame) }) : null;
     const { f, obj } = await formulario(CE, form, inst);
     if (!f.valido) dictErro();
-    obj.fk_medico_id = req.user.fk_medico_id;
+    // usuário sem médico vinculado: mantém o médico do padrão
+    obj.fk_medico_id = req.user.fk_medico_id || obj.fk_medico_id || null;
     await modelo.salva(req, CE, obj);
     json(res, { success: { id_exame: obj.id } });
   }));
@@ -151,11 +156,14 @@ module.exports = function (app) {
   }));
   app.get(`${C}/relatorios/CarregaConfRelatorio/`, a(async (req, res) => {
     const r = await obtem(CL, { id: numero(exige(req.GET, 'relatorio')) });
-    if (r.cid10 === null || r.cid10 === undefined) throw erroPython("'NoneType' object has no attribute 'split'");
-    json(res, { success: { id: r.id, dataSalvo: dataSalvo(r), fields: modelo.inicialEmTexto(CL, r), cid: await cidsDe(r.cid10) } });
+    // sem CID gravado: antes dava erro ao abrir (str.split em None)
+    json(res, { success: { id: r.id, dataSalvo: dataSalvo(r), fields: modelo.inicialEmTexto(CL, r), cid: await cidsDe(r.cid10 || '') } });
   }));
   app.get(`${C}/relatorios/CarregaConfRelatorios/`, a(async (req, res) => {
-    const l = db.linhas(CL, await doMedico(db.tabela(CL), CL, 'fk_medico_id', req.user.fk_medico_id));
+    // usuário sem médico vinculado vê os padrões de todos os médicos (antes não via os que
+    // salvava: o padrão fica com o médico do relatório)
+    const q = req.user.fk_medico_id ? doMedico(db.tabela(CL), CL, 'fk_medico_id', req.user.fk_medico_id) : db.tabela(CL);
+    const l = db.linhas(CL, await q.orderBy(col(CL, 'nome')));
     json(res, l.map((i) => ({ id: i.id, nome: i.nome, titulo: i.titulo, data_salvo: dataSalvo(i) })));
   }));
   app.get(`${C}/relatorios/SalvaConfRelatorio/`, a(async (req, res) => {
@@ -163,7 +171,8 @@ module.exports = function (app) {
     const inst = String(rel) > '0' ? await obtem(CL, { id: numero(rel) }) : null;
     const { f, obj } = await formulario(CL, form, inst);
     if (!f.valido) return json(res, { error: listaErros(f) });
-    obj.fk_medico_id = req.user.fk_medico_id;
+    // usuário sem médico vinculado: mantém o médico do padrão
+    obj.fk_medico_id = req.user.fk_medico_id || obj.fk_medico_id || null;
     await modelo.salva(req, CL, obj);
     json(res, { success: { id_exame: obj.id } });
   }));

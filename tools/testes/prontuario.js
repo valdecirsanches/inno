@@ -44,6 +44,28 @@ const R = path.join(__dirname, '..', '..');
       assert.ok(lista.includes('sem medico'), 'aparece na lista');
       assert.equal(xs2, '{"error": "medico"}');
     });
+    // usuário sem médico: o padrão de relatório/exame aparece na lista; exame/padrão sem CID abre
+    {
+      let y = await t.vai('/configuracoes/relatorios/AdicionaConfRelatorio/?' + t.corpo({ descricao: 'rel sem medico', relatorio: '1' }));
+      const r1 = await y.text();
+      y = await t.vai('/configuracoes/relatorios/CarregaConfRelatorios/');
+      const lr = (await y.json()).map((i) => i.nome);
+      y = await t.vai('/configuracoes/exames/CarregaConfExames/');
+      const le = (await y.json()).map((i) => i.nome);
+      t.sq.exec('UPDATE tb_exames SET cid10 = NULL WHERE id = 1');
+      y = await t.vai('/prontuario/Exames/CarregaExame/?exames=1');
+      const e1 = y.status;
+      t.sq.exec("UPDATE tb_conf_exames SET cid10 = NULL WHERE nome = 'teste1'");
+      const ce = t.sq.prepare("SELECT id FROM tb_conf_exames WHERE nome = 'teste1'").get().id;
+      y = await t.vai('/configuracoes/exames/CarregaConfExame/?exames=' + ce);
+      const e2 = y.status;
+      await t.confere('usuário sem médico vê os padrões; exame e padrão sem CID abrem', () => {
+        assert.equal(r1, '{"success": 1}');
+        assert.ok(lr.includes('rel sem medico') && lr.includes('teste1'), JSON.stringify(lr));
+        assert.ok(le.includes('teste1'), JSON.stringify(le));
+        assert.equal(e1, 200); assert.equal(e2, 200);
+      });
+    }
     // exclusões com filhos (no MySQL davam "Cannot delete or update a parent row")
     {
       const n = (sql) => t.sq.prepare(sql).get().n;

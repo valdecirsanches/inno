@@ -226,6 +226,11 @@ Teste: `node tools/testes/prontuario.js`.
   outra exclusão barrada por chave estrangeira responde "Não foi possível excluir: este registro
   está em uso em outro cadastro (tabela)." em vez do SQL (o banco de teste, SQLite, não tem as
   chaves estrangeiras: estes casos só aparecem no MySQL).
+- (2.4.8) Regra única para os três padrões (exame, prescrição, relatório): salvar como padrão usa
+  o médico do usuário ou, sem médico vinculado, o do registro; a lista mostra os padrões do médico
+  do usuário ou, sem médico vinculado, os de todos (antes o relatório salvo não aparecia); salvar
+  na tela de Configurações mantém o médico do padrão quando o usuário não tem médico. Relatórios
+  em ordem alfabética. Exame / padrão sem CID (`cid10` nulo) abre (antes `None.split`, erro 500).
 
 ## WhatsApp: logo no topo da mensagem
 

@@ -460,16 +460,16 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
     fields.id = e.id; row.id = e.id;
     fields.id_data_salvo = dataSalvo(e, 'd/m/Y H:i:s');
     row.data_salvo = dataSalvo(e, 'd/m/Y H:i:s');
-    if (e.cid10 === null || e.cid10 === undefined) throw erroPython("'NoneType' object has no attribute 'split'");
-    const cid = await cidsDe(e.cid10);
+    // sem CID gravado: antes dava erro ao abrir (str.split em None)
+    const cid = await cidsDe(e.cid10 || '');
     return { success: { id: e.id, dataSalvo: dataSalvo(e, 'd/m/Y H:i:s'), fields, row, cid } };
   }
   app.get(`${P}/Exames/CarregaExame/`, a(async (req, res) => {
     const M = 'TbExames';
     const e = await obtem(M, { id: numero(exige(req.GET, 'exames')) });
     const fields = campos(M, e);
-    if (e.cid10 === null || e.cid10 === undefined) throw erroPython("'NoneType' object has no attribute 'split'");
-    const cid = await cidsDe(e.cid10);
+    // sem CID gravado: antes dava erro ao abrir (str.split em None)
+    const cid = await cidsDe(e.cid10 || '');
     json(res, { success: { id: e.id, dataSalvo: dataSalvo(e), fields, cid } });
   }));
   app.get(`${P}/Exames/CarregaExames/`, a(async (req, res) => {
@@ -570,7 +570,7 @@ ${pad}${hd.diagnostico ? `<h3>${D}: ${diag} <h3>` : ''}${hd.outros_diagnosticos 
   async function carregaRelatorio(r, fmt) {
     const M = 'TbRelatorios';
     const fields = campos(M, r);
-    const cid = r.cid10 ? await cidsDe(r.cid10) : [];
+    const cid = r.cid10 ? await cidsDe(r.cid10 || '') : [];
     return { success: { id: r.id, dataSalvo: dataSalvo(r, fmt), fields, cid } };
   }
   app.get(`${P}/Relatorios/`, a(async (req, res) => {

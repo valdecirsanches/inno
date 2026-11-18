@@ -2,6 +2,26 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.8",
+      "data": "18/11/2026",
+      "titulo": "Padrões de relatório e exame",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Relatório salvo como padrão por um usuário sem médico vinculado não aparecia na lista; agora esse usuário vê os padrões de todos os médicos (exames, prescrições e relatórios)."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Exame ou padrão sem CID gravado não abria (dava erro); agora abre."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "Padrões de relatório em ordem alfabética."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.7",
       "data": "18/11/2026",
       "titulo": "Excluir padrão e prescrição com remédios",
