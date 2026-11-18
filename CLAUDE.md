@@ -59,7 +59,8 @@ O dono do projeto fala português: responda em português.
   `node tools/testes/etapa6-memed.js` (Memed) e `node tools/testes/etapa6-whatsapp.js`
   (WhatsApp e robô) e `node tools/testes/nuvem.js` (imagens na nuvem) e
   `node tools/testes/recupera.js` (recuperação de imagens de pastas antigas) e
-  `node tools/testes/whatsapp-logo.js` (WhatsApp com a logo no topo),
+  `node tools/testes/whatsapp-logo.js` (WhatsApp com a logo no topo) e
+  `node tools/testes/prontuario.js` (correções da revisão do prontuário),
   cada um com o serviço externo falso, local.
   Para testes novos, use `tools/testes/base.js` (banco, login e cliente prontos).
 - Cobertura: `python3 tools/testes/rotas_django.py ../appclinic > /tmp/django.txt` e

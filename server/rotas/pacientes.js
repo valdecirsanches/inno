@@ -97,9 +97,9 @@ module.exports = function (app) {
     for (const p of lista) {
       if (!(p.fk_clinica_id in clinicas)) clinicas[p.fk_clinica_id] = await db.busca('TbClinica', { id: p.fk_clinica_id });
       const cl = clinicas[p.fk_clinica_id];
-      if (!cl) throw new Error("'NoneType' object has no attribute 'nome'");
+      // paciente sem clínica (ou com clínica apagada): a pesquisa inteira dava erro
       const [nasc, id] = nascEIdade(p.data_nasc);
-      pacs.push({ id: p.id, paciente: p.paciente, codigo: p.codigo, nasc, idade: id, clinica: cl.nome, cpf: p.cpf });
+      pacs.push({ id: p.id, paciente: p.paciente, codigo: p.codigo, nasc, idade: id, clinica: cl ? cl.nome : '', cpf: p.cpf });
     }
     json(res, pacs);
   }));

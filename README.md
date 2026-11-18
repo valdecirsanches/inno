@@ -189,6 +189,20 @@ Corrigidas nos dois sistemas, sem mudar nenhuma tela:
 - Pacientes: sem paciente aberto, a tela não dá mais erro de JavaScript.
 - Auditoria: o log não guarda mais o hash da senha (`password` vira `***`).
 
+### Revisão do prontuário (2.4.4)
+
+Testado no navegador, aba por aba: anamnese, exame físico, hipótese, evolução (salvar ao sair do
+campo); exames, prescrições (com remédios), relatórios e atestado (novo, salvar, editar, imprimir,
+clonar, apagar, salvar como padrão e aplicar padrão); resumo; encerrar consulta; consulta passada;
+histórico e impressão do prontuário inteiro. Corrigido nos dois sistemas:
+- Pesquisa de paciente (`LocalizaPaciente`): paciente sem clínica (ou com a clínica apagada)
+  derrubava a pesquisa inteira; agora vem com a clínica em branco.
+- Salvar como padrão sem descrição chamava `swal.showInputError` (do sweetalert antigo) e travava.
+- Anamnese: depois de salvar recarregava com `data.success.paciente`, que a resposta não traz
+  (GET sem paciente, erro 500); agora usa o id e a data que a resposta traz.
+- Textos: "relat´rio" e "Ano de Pesquise".
+Teste: `node tools/testes/prontuario.js`.
+
 ## WhatsApp: logo no topo da mensagem
 
 A confirmação de consulta e as respostas ao paciente (confirmado / cancelado) saem numa

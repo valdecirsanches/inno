@@ -121,7 +121,7 @@ function AdicionaExamePadrao(){
     }).then( function(inputValue) {
         if (inputValue === false) return false;
         if (inputValue === "") {
-            swal.showInputError("É necessario Adicionar uma descrição");
+            swal("Padrão", "É necessário informar uma descrição para o padrão.", "warning");  // a função antiga de erro no campo não existe no sweetalert2 e travava
             return false;
         }
         $.ajax({

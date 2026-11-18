@@ -74,7 +74,7 @@ async function UpdateRelatorio(silent=false) {
 function DeleteRelatorio(id){
     swal({
         title: "Você tem certeza?",
-        text: 'Está ação apagará este relat´rio do cadastro',
+        text: 'Está ação apagará este relatório do cadastro',
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",

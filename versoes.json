@@ -2,6 +2,30 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.4",
+      "data": "17/11/2026",
+      "titulo": "Prontuário: correções internas",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Pesquisa de paciente (Histórico e Pacientes): um paciente sem clínica gravada fazia a pesquisa inteira falhar."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Exames, Prescrições e Relatórios: salvar como padrão sem descrição travava a tela."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Anamnese: depois de salvar, a tela não pede mais a anamnese sem paciente (dava erro)."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Textos: relatório e ano da pesquisa escritos corretamente."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.3",
       "data": "17/11/2026",
       "titulo": "Correções internas",

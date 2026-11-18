@@ -53,10 +53,13 @@ function SalvaAnamnese(silent){
         method: 'PUT',
     }).success(function Ret(data){
         if (data.success && !silent){
-             if(!silent) {CarregaAnamnese(data.success.paciente);}
-             if(!silent) {toastr.success('Dados Corretamente guardados no prontuario', 'Salvo com sucesso!');}
+             // a resposta traz o id e a data do registro salvo (não traz o paciente: recarregar
+             // com data.success.paciente pedia a anamnese sem paciente e dava erro)
+             $('#id_id_anamnese').val(data.success.id);
+             $('#data_anamnese').html(data.success.dataSalvo);
+             toastr.success('Dados Corretamente guardados no prontuario', 'Salvo com sucesso!');
         } else if (!silent){
-             if(!silent) {swal(data.success.error, 'Problemas ao salvar!', 'error');}
+             swal(String(data.error || 'Erro'), 'Problemas ao salvar!', 'error');
         }
     });
 }
