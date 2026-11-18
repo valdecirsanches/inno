@@ -2,6 +2,46 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.3",
+      "data": "17/11/2026",
+      "titulo": "Correções internas",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Usuários: salvar um usuário pela tela não desativa mais a conta nem apaga o nome; usuário novo já nasce ativo."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Especialidades: salvar e excluir voltaram a funcionar."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Médicos: médico sem especialidade pode ser salvo."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Usuário novo: Pacientes e Agenda não dão mais erro no primeiro acesso."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Agenda: o calendário de dias livres não falha mais por horário sem período."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Painel de chamada: o relógio volta a funcionar."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Logs: a tela abre sem erro quando ainda não há registros."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "Segurança: o log de auditoria não guarda mais o código da senha."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.2",
       "data": "17/11/2026",
       "titulo": "Redefinir senha de usuário",

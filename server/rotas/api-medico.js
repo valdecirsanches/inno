@@ -150,7 +150,8 @@ module.exports = function (app) {
 /** MedicoSerializer (também usado pelo MemedViewSet) */
 function serializerMedico() {
   return viewset.criaSerializer('TbMedicos', Object.assign({}, S.medico.opc, {
-    gravaveis: { fk_especialidade: S.relacionadoGravavel('TbEspecialidades', 'fk_especialidade_id') },
+    // médico sem especialidade (chave vazia, o modelo permite): aceita o null ao salvar
+    gravaveis: { fk_especialidade: S.relacionadoGravavel('TbEspecialidades', 'fk_especialidade_id', { aceitaNulo: true }) },
   }));
 }
 /** cpf_hash = HiddenField(default=CurrentCPFHash()): não vale no PATCH (parcial) */

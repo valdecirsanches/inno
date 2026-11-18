@@ -221,6 +221,7 @@ function CarregaPaciente(value){
         if(data.erro){
             swal('Erro', "Impossivel Carregar Prontuário", 'error');
         } else {
+            if (!data.success || !data.success.fields) { return; }  // nenhum paciente aberto ainda
             $('.classPaciente #id_id').val(data.success.id);
             ChangeIdPaciente(data.success.id);
             for (var key in data.success.fields) {

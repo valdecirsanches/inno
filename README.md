@@ -163,7 +163,31 @@ Para registrar uma versão (grava nos dois sistemas):
 node tools/versao/nova.js 2.4.1 "Título" novo:"o que entrou" melhoria:"o que melhorou" correcao:"o que foi corrigido"
 node tools/versao/nova.js --lista      # versões registradas
 node tools/versao/nova.js --confere    # Inno e AppClinic com o mesmo versoes.json?
+node tools/versao/nova.js --silenciosa 2.4.4 "Correções internas" correcao:"..."
 ```
+
+Versão **silenciosa** (só correções internas): entra em Novidades, mas não mostra o aviso
+"Sistema atualizado" (o aviso anuncia a última versão que não é silenciosa).
+
+### Correções internas (2.4.3)
+
+Corrigidas nos dois sistemas, sem mudar nenhuma tela:
+- Usuários: o formulário não manda "ativo", "nome", "equipe" e "código", e o Django gravava
+  `is_active = False` (a conta salva pela tela não entrava mais) e apagava o nome. Agora o
+  campo que a tela não manda fica como estava (usuário novo: o padrão, ativo).
+  Para achar e reativar contas desativadas assim: `node tools/manutencao/usuarios-inativos.js`
+  (só lista) e `--reativa 3,7`.
+- Especialidades: a confirmação de salvar e de excluir lia um campo que não existe e travava.
+- Médicos: médico sem especialidade (chave vazia) pode ser salvo.
+- Preferências (`tb_usuarios_opcoes`): criadas no login quando o usuário não tem; no Inno,
+  também ao salvar paciente / abrir as consultas dele.
+- Agenda: horário sem período não derruba mais o calendário de dias livres (DDHLivres).
+- Painel de chamada: relógio em `static/javascripts/Tarefas/relogio.js` (o `js/clock.js` não
+  existia); tiradas as chamadas a `ion.sound.js` e `Base/ajax.js`, que também não existem.
+- Logs: sem registros, a tabela abria com erro (linha com colspan na DataTable).
+- Convênios: tirado o `<script src="/static/js/">` vazio.
+- Pacientes: sem paciente aberto, a tela não dá mais erro de JavaScript.
+- Auditoria: o log não guarda mais o hash da senha (`password` vira `***`).
 
 ## WhatsApp: logo no topo da mensagem
 

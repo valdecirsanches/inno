@@ -90,11 +90,8 @@
                             <td>{{ log.object_id }}</td>
                             <td>{{ log.created_at|date("d/m/Y H:i") }}</td>
                         </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6" class="text-center text-muted">Nenhum log registrado ainda.</td>
-                        </tr>
                         {% endfor %}
+                        {# sem logs: a própria DataTable mostra "nenhum registro" (a linha com colspan quebrava a tabela) #}
                     </tbody>
                 </table>
             </div>

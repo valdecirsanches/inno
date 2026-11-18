@@ -1,4 +1,5 @@
-ion.sound({
+// o plugin ion.sound não faz parte do projeto: só configura o som se ele estiver carregado
+if (window.ion && ion.sound) ion.sound({
     sounds: [
         {name: "Beep"}
     ],

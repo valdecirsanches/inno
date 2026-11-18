@@ -4,6 +4,7 @@
  */
 const config = require('../config');
 const db = require('../db');
+const modelo = require('../util/modelo');
 const { render, SafeString } = require('../templates');
 const senhas = require('../seguranca/senhas');
 const { entra, sai } = require('../seguranca/sessao');
@@ -58,6 +59,14 @@ module.exports = function (app) {
     entra(req, u);
     await db.tabela('TbUsuario').where(db.coluna('TbUsuario', 'id'), u.id)
       .update({ [db.coluna('TbUsuario', 'last_login')]: db.agora() });
+    // usuário sem preferências (o recém-criado): cria as padrão, senão Pacientes e
+    // Agenda davam erro (TbOpcoes matching query does not exist)
+    try {
+      const T = 'TbOpcoes';
+      if (!(await db.tabela(T).where(db.coluna(T, 'fk_usuario_id'), u.id).first())) {
+        await modelo.salva(Object.assign({}, req, { user: u }), T, { fk_usuario_id: u.id, iniciar_pesquisa: '', login_atualizacao: false, ultimo_pac: 0 });
+      }
+    } catch (e) { /* como o try/except do AppClinic */ }
     // como o Django: vai para o "next" do formulário (vazio = "None" -> raiz)
     const destino = req.POST.get('next');
     redireciona(res, destino && destino !== 'None' && destino.startsWith('/') ? destino : '/');

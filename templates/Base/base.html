@@ -355,7 +355,7 @@
     <link href="/static/css/Home/versoes.css?{{ user.release }}" rel="stylesheet">
     <script>
         (function () {
-            var atual = '{{ user.release }}', chave = 'appclinic_versao_vista';
+            var atual = '{{ user.release_aviso }}', chave = 'appclinic_versao_vista';
             try {
                 if (location.pathname === '/versoes/') { localStorage.setItem(chave, atual); return; }
                 if (localStorage.getItem(chave) === atual) { return; }

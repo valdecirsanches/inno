@@ -15,6 +15,8 @@ module.exports = {
   segredo: env('SECRET_KEY', ''),
   // versão atual: a primeira de versoes.json (o RELEASE do .env não é mais usado)
   release: require('./util/versoes').atual(),
+  // versões só de correções internas ("silenciosa": true) não mostram o aviso de versão nova
+  releaseAviso: require('./util/versoes').aviso(),
   nomeSistema: env('NOME_SISTEMA', 'GERENCIADOR DE CLÍNICAS'),
   banco: {
     cliente: env('DB_CLIENT', 'mysql2'),          // mysql2 (produção) ou better-sqlite3 (testes)

@@ -23,6 +23,7 @@ async function carregaUsuario(id) {
   u.fk_clinica = u.fk_clinica_id ? await db.busca('TbClinica', { id: u.fk_clinica_id }) : null;
   u.fk_medico = u.fk_medico_id ? await db.busca('TbMedicos', { id: u.fk_medico_id }) : null;
   u.release = config.release;
+  u.release_aviso = config.releaseAviso;
   u.hostdb = config.bancoExibido.host;
   u.database = config.bancoExibido.nome;
   u.is_authenticated = true;
@@ -30,7 +31,7 @@ async function carregaUsuario(id) {
   return u;
 }
 
-const ANONIMO = Object.freeze({ is_authenticated: false, release: config.release });
+const ANONIMO = Object.freeze({ is_authenticated: false, release: config.release, release_aviso: config.releaseAviso });
 
 async function usuario(req, res, next) {
   try {

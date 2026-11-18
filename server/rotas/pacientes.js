@@ -29,11 +29,19 @@ async function obtem(nomeModelo, filtro) {
   return o;
 }
 
-/** TbOpcoes.objects.get(fk_usuario=usuario): erro se não houver exatamente 1 */
-async function opcoesGet(usuario) {
-  const l = await db.tabela('TbOpcoes').where(db.coluna('TbOpcoes', 'fk_usuario_id'), usuario.id);
-  if (l.length !== 1) throw naoExiste('TbOpcoes');
-  return db.linha('TbOpcoes', l[0]);
+/**
+ * TbOpcoes.objects.get(fk_usuario=usuario). No Django, usuário sem preferências (o
+ * recém-criado) ou com mais de uma recebia erro ao salvar ou abrir as consultas do paciente.
+ * Exceção a favor do usuário: cria as preferências padrão / usa a última.
+ */
+async function opcoesGet(usuario, req) {
+  const T = 'TbOpcoes';
+  let l = await db.tabela(T).where(db.coluna(T, 'fk_usuario_id'), usuario.id).orderBy(db.coluna(T, 'id'), 'desc');
+  if (!l.length) {
+    await modelo.salva(req, T, { fk_usuario_id: usuario.id, iniciar_pesquisa: '', login_atualizacao: false, ultimo_pac: 0 });
+    l = await db.tabela(T).where(db.coluna(T, 'fk_usuario_id'), usuario.id).orderBy(db.coluna(T, 'id'), 'desc');
+  }
+  return db.linha(T, l[0]);
 }
 
 async function opcoesLast(usuario) {
@@ -218,7 +226,7 @@ module.exports = function (app) {
     const p = Object.assign(instancia ? Object.assign({}, instancia) : {}, form.valores);
     p.fk_clinica_id = usuario.fk_clinica_id;
     await modelo.salva(req, 'TbPacientes', p);
-    const opcoes = await opcoesGet(usuario);
+    const opcoes = await opcoesGet(usuario, req);
     opcoes.ultimo_pac = p.id;
     await modelo.salva(req, 'TbOpcoes', opcoes);
     json(res, { success: { id: p.id, paciente: p.paciente, codigo: p.codigo, nasc: p.data_nasc ? dmy(p.data_nasc) : '' } });
@@ -226,7 +234,7 @@ module.exports = function (app) {
 
   // CarregaConsultas (consultas do paciente)
   app.get(`${BASE}/CarregaConsultasPaciente/`, a(async (req, res) => {
-    const opcoes = await opcoesGet(req.user);
+    const opcoes = await opcoesGet(req.user, req);
     const paciente = req.GET.get('paciente');
     const consulta = [];
     if (paciente) {

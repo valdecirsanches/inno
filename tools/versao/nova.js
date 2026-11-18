@@ -5,6 +5,9 @@
  * AppClinic ao mesmo tempo (os dois mostram a mesma versão e as mesmas novidades).
  *
  *   node tools/versao/nova.js 2.4.1 "Título da versão" novo:"..." melhoria:"..." correcao:"..."
+ *   node tools/versao/nova.js --silenciosa 2.4.3 "..." correcao:"..."
+ *                                                 só correções internas: entra em Novidades,
+ *                                                 mas não mostra o aviso "Sistema atualizado"
  *   node tools/versao/nova.js --confere          os dois arquivos estão iguais?
  *   node tools/versao/nova.js --lista            versões registradas
  *
@@ -30,11 +33,13 @@ function maior(a, b) {
 }
 function sai(msg) { console.error(msg); process.exit(1); }
 
-const args = process.argv.slice(2);
+let args = process.argv.slice(2);
+const silenciosa = args.includes('--silenciosa');
+args = args.filter((x) => x !== '--silenciosa');
 const temApp = fs.existsSync(APP);
 
 if (args[0] === '--lista') {
-  for (const v of le(INNO).versoes) console.log(`${v.versao.padEnd(8)} ${v.data}  ${v.titulo}`);
+  for (const v of le(INNO).versoes) console.log(`${v.versao.padEnd(8)} ${v.data}  ${v.titulo}${v.silenciosa ? '  (silenciosa)' : ''}`);
   process.exit(0);
 }
 if (args[0] === '--confere') {
@@ -60,7 +65,9 @@ const atual = dados.versoes[0].versao;
 if (!maior(versao, atual)) sai(`a versão nova (${versao}) tem de ser maior que a atual (${atual})`);
 const hoje = new Date();
 const d2 = (n) => String(n).padStart(2, '0');
-dados.versoes.unshift({ versao, data: `${d2(hoje.getDate())}/${d2(hoje.getMonth() + 1)}/${hoje.getFullYear()}`, titulo, itens });
+const nova = { versao, data: `${d2(hoje.getDate())}/${d2(hoje.getMonth() + 1)}/${hoje.getFullYear()}`, titulo, itens };
+if (silenciosa) nova.silenciosa = true;
+dados.versoes.unshift(nova);
 grava(INNO, dados);
 console.log(`Inno: versão ${versao} registrada (${INNO})`);
 if (temApp) { grava(APP, dados); console.log(`AppClinic: versão ${versao} registrada (${APP})`); } else console.log(`AppClinic não encontrado em ${APP}: copie o versoes.json para lá.`);

@@ -244,7 +244,9 @@ async function registraLog(req, acao, nomeModelo, pk, antes, depois, conexao = d
   }
   let data = null;
   if (antes !== undefined || depois !== undefined) {
-    data = pyJson({ antes: antes || {}, depois: depois || {} });
+    // o log de auditoria não guarda o código (hash) da senha
+    const semSenha = (d) => (d && typeof d === 'object' && 'password' in d ? Object.assign({}, d, { password: '***' }) : d);
+    data = pyJson({ antes: semSenha(antes || {}), depois: semSenha(depois || {}) });
   }
   await conexao(db.modelo('UserLog').tabela).insert(db.paraColunas('UserLog', {
     user_id: u.id, action: acao, model_name: nomeModelo, object_id: pk === null ? null : String(pk),

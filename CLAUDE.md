@@ -15,6 +15,7 @@ O dono do projeto fala português: responda em português.
 4. **Toda atualização que o usuário vê ganha uma versão nova** com o que foi feito:
    `node tools/versao/nova.js <versão> "<título>" novo:"..." melhoria:"..." correcao:"..."`
    (grava `versoes.json` no Inno e no AppClinic; commit nos dois). Aparece na tela Novidades.
+   Só correções internas: `--silenciosa` (não mostra o aviso "Sistema atualizado").
 
 ## Regras da conversão
 

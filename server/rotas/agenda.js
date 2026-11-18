@@ -490,9 +490,9 @@ module.exports = function (app) {
         const [ya, ma, da] = d.split('-').map(Number);
         if (yy !== ya || mm !== ma || dd !== da) {
           yy = ya; mm = ma; dd = da;
-          if (periodo === null) throw erroPython("'NoneType' object is not subscriptable");
-          if (periodo === '') throw erroPython('string index out of range');
-          dhl[`${yy}-${mm - 1}-${dd}`] = periodo[0];
+          // horário sem período gravado: o dia fica livre sem a marca de período
+          // (antes a agenda inteira dava erro e o calendário não mostrava os dias livres)
+          dhl[`${yy}-${mm - 1}-${dd}`] = periodo ? periodo[0] : '';
         }
       }
     }

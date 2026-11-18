@@ -151,6 +151,20 @@ const srv = app.listen(0, async () => {
     r = await vai('/logs/gerenciar/');
     confere('logs/gerenciar: 500 como no AppClinic', () => assert.equal(r.status, 500));
 
+    // ------------------------------------------------- salvar pela tela não desativa
+    {
+      const antes = sq.prepare('SELECT * FROM tb_usuarios WHERE id = 1').get();
+      const form = corpo({ id: '1', login: antes.login, cpf: '', administrador: 'True', first_name: 'Maria', email: '', fk_medico: '1', fk_clinica: '1' });
+      r = await vai('/seguranca/usuario.json/', { method: 'POST', body: corpo({ id: '1', form }) }); await r.text();
+      const dep = sq.prepare('SELECT * FROM tb_usuarios WHERE id = 1').get();
+      confere('salvar usuário pela tela mantém ativo e nome', () => { assert.equal(dep.is_active, antes.is_active); assert.equal(dep.nome, antes.nome); });
+      r = await vai('/seguranca/usuario.json/?order=asc'); await r.text();
+      confere('quem salvou o próprio usuário continua conectado', () => assert.equal(r.status, 200));
+      const novo = corpo({ id: '0', login: 'novato', cpf: '', administrador: 'False', first_name: 'Novato', email: '', fk_medico: '1', fk_clinica: '1' });
+      r = await vai('/seguranca/usuario.json/', { method: 'POST', body: corpo({ id: '0', form: novo }) }); await r.text();
+      confere('usuário novo pela tela nasce ativo', () => assert.equal(sq.prepare("SELECT is_active FROM tb_usuarios WHERE login = 'novato'").get().is_active, 1));
+    }
+
     // ------------------------------------------------- redefinir senha (botão)
     const SENHA = '/seguranca/usuario/senha/';
     sq.exec(`UPDATE tb_usuarios SET administrador = 'False', is_superuser = 0 WHERE id = 1`);

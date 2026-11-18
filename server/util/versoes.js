@@ -18,4 +18,10 @@ function atual(padrao = '2.0.17') {
   return v.length ? v[0].versao : padrao;
 }
 
-module.exports = { ARQUIVO, carrega, atual };
+/** a versão que o aviso "Sistema atualizado" anuncia: a última que não é silenciosa */
+function aviso(padrao = '2.0.17') {
+  const v = carrega().find((x) => !x.silenciosa);
+  return v ? v.versao : padrao;
+}
+
+module.exports = { ARQUIVO, carrega, atual, aviso };

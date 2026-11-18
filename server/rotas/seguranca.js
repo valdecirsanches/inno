@@ -153,6 +153,15 @@ module.exports = function (app) {
       return json(res, { error: r.erros.map(([k, msgs]) => `Favor corrigir: ${k} ==> ${errorList(msgs)}\n`).join('') });
     }
     const u = r.obj;
+    // Exceção a favor do usuário: campo do TbUsuarioForm que a tela não manda (ativo, nome,
+    // equipe, código) não é apagado. O Django gravava is_active = False e o usuário
+    // salvo pela tela não entrava mais. Usuário existente: fica como estava; novo: o padrão.
+    const enviados = new QueryDict(String(texto));
+    for (const c of CAMPOS()) {
+      if (enviados.has(c.nome) || !(c.atributo in u)) continue;
+      if (inst) u[c.atributo] = inst[c.atributo];
+      else if (c.padrao !== undefined && c.padrao !== null) u[c.atributo] = c.padrao;
+    }
     if (!inst) {
       // padrões do AbstractUser que não estão no formulário (date_joined = timezone.now)
       u.date_joined = db.agora();

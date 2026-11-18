@@ -22,7 +22,7 @@ function addEspecialidade(){
 
 function SalvaEspecialidade() {
     swal({
-        title: $('.classEspecialidade #id_descricao').val(),
+        title: $('.classEspecialidade #id_nome').val() || 'Especialidade',
         text: 'Deseja salvar a especialidade?',
         type: "warning",
         showCancelButton: true,
@@ -54,7 +54,7 @@ function SalvaEspecialidade() {
 
 function ExcluirEspecialidade(row){
     swal({
-        title: row.descricao,
+        title: row.nome || row.descricao || 'Especialidade',
         text: 'Tem certeza que deseja excluir a Especialidade?',
         type: "warning",
         showCancelButton: true,
@@ -70,7 +70,7 @@ function ExcluirEspecialidade(row){
                 method: 'GET',
             }).success(function Ret(data){
                 if (data.success){
-                    swal('Especialidade', '"'+row.descricao+'" Excluído com sucesso', 'success');
+                    swal('Especialidade', '"'+(row.nome || row.descricao)+'" Excluído com sucesso', 'success');
                     $tableEspecialidade.bootstrapTable('removeByUniqueId', row.id);
                 }
             });
