@@ -241,10 +241,14 @@ async function respostaComResultado(req, res) {
 
 module.exports = function (app) {
   // @require_http_methods(["POST"]): outro método recebe 405 vazio
-  app.all('/webhook/resposta/', (req, res, next) => {
+  const rota = (req, res, next) => {
     if (req.method !== 'POST') return res.status(405).set('Allow', 'POST').type('html').send('');
     Promise.resolve(respostaComResultado(req, res)).catch(next);
-  });
+  };
+  app.all('/webhook/resposta/', rota);
+  // Evolution API com "Webhook by Events" ligado: acrescenta o evento no fim
+  // (.../resposta/messages-upsert ou .../resposta//messages-upsert)
+  app.all(/^\/webhook\/resposta\/+[\w.-]+\/?$/, rota);
 };
 
 module.exports.interpretaResposta = interpretaResposta;

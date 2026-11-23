@@ -58,7 +58,7 @@ async function roteiro(base, arq, { admin = ['diego', 'teste123'], comum = ['med
   r = J(await n.pede('GET', '/api/whatsapp/read_qrcode/?host=-&sessionId=clin1', { ajax: true }));
   ok(r.status === 'SCAN_QR_CODE' && String(r.qr).startsWith('data:image/png;base64,'), 'QR Code vem da Evolution', r);
   let lg = await evoLog();
-  ok(lg.some((x) => x.p === '/instance/create' && x.corpo.instanceName === 'clin1') && lg.some((x) => x.p === '/webhook/set/clin1' && x.corpo.webhook.url === 'https://teste.local/webhook/resposta/'),
+  ok(lg.some((x) => x.p === '/instance/create' && x.corpo.instanceName === 'clin1') && lg.some((x) => x.p === '/webhook/set/clin1' && x.corpo.webhook.url === 'https://teste.local/webhook/resposta/' && x.corpo.webhook.webhookByEvents === false),
     'instância criada com o webhook das respostas', lg.map((x) => x.p));
   ok(lg.every((x) => x.p.startsWith('/__') || x.apikey === 'chave-evo'), 'chave da Evolution enviada', lg.map((x) => x.apikey));
 
@@ -106,6 +106,11 @@ async function roteiro(base, arq, { admin = ['diego', 'teste123'], comum = ['med
   ok(r.success === true && r.acao === 'CANCELAMENTO' && r.consulta === consultas[1], 'resposta "2" de um @lid cancela', r);
   r = J(await anon.pede('POST', '/webhook/resposta/', { json: { ...evento('oi', 'RESP3'), data: { key: { remoteJid: '5511988887777@s.whatsapp.net', fromMe: true, id: 'X' }, message: { conversation: '1' } } } }));
   ok(r.success === true && /ignorada/.test(r.info || ''), 'mensagem da própria clínica ignorada', r);
+  // "Webhook by Events" ligado na Evolution: o evento vem no fim do endereço
+  r = J(await anon.pede('POST', '/webhook/resposta//messages-upsert', { json: { event: 'connection.update', instance: 'clin1', data: { state: 'open' } } }));
+  ok(r.success === true && /ignorado/.test(r.info || ''), 'endereço com o evento no fim (//messages-upsert) é aceito', r);
+  r = J(await anon.pede('POST', '/webhook/resposta/messages-upsert', { json: { event: 'connection.update', instance: 'clin1', data: { state: 'open' } } }));
+  ok(r.success === true && /ignorado/.test(r.info || ''), 'endereço com o evento no fim (/messages-upsert) é aceito', r);
   r = J(await anon.pede('POST', '/webhook/resposta/', { json: { event: 'connection.update', instance: 'clin1', data: { state: 'open' } } }));
   ok(r.success === true && /ignorado/.test(r.info || ''), 'outros eventos ignorados', r);
 

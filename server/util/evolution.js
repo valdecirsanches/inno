@@ -131,7 +131,7 @@ class Evolution {
   async configuraWebhook(url) {
     if (!url) return false;
     try {
-      let [st] = await this.chama('POST', `/webhook/set/${this.inst}`, { webhook: { enabled: true, url, byEvents: false, base64: false, events: ['MESSAGES_UPSERT'] } });
+      let [st] = await this.chama('POST', `/webhook/set/${this.inst}`, { webhook: { enabled: true, url, byEvents: false, webhookByEvents: false, base64: false, webhookBase64: false, events: ['MESSAGES_UPSERT'] } });
       if (st < 400) return true;
       [st] = await this.chama('POST', `/webhook/set/${this.inst}`, { url, enabled: true, webhook_by_events: false, events: ['MESSAGES_UPSERT'] });
       return st < 400;

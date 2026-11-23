@@ -271,6 +271,9 @@ O botão mostra também as últimas mensagens recebidas e o que o robô fez com 
 de cada evento fica gravado em `tbWhatsappLog` logo depois dele, com `tipo: resultado_webhook`).
 Resposta de um contato `@lid` sem o telefone no evento: na Evolution, o telefone é procurado nos
 contatos da instância (`/chat/findContacts`) e em qualquer chave do evento (senderPn, participantPn...).
+Com "Webhook by Events" ligado, a Evolution chama `/webhook/resposta/<evento>` (ex.:
+`/webhook/resposta//messages-upsert`); esse endereço também é aceito, e "Aplicar no servidor"
+desliga a opção (`webhookByEvents: false`).
 Teste: `node tools/testes/evolution/roda.js ../appclinic ~/venv-dj/bin/python` (Evolution e WAHA
 falsos; o mesmo roteiro passa no AppClinic e no Inno).
 
