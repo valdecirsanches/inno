@@ -12,6 +12,7 @@ const db = require('../db');
 const modelo = require('../util/modelo');
 const { json } = require('../util/http');
 const { WhatsAppService } = require('../util/whatsapp');
+const evolution = require('../util/evolution');
 const { pyStrValor, pyGet, pyBool, ehDict, pyJsonLoads, pyJson } = require('../util/python');
 const { variantesTelefone } = require('./api-whatsapp');
 const { peloRobo } = require('./presenca');
@@ -55,7 +56,8 @@ function telefonesNoPayload(obj, achados) {
 async function clinicaDaSessao(sessao) {
   const C = 'TbClinica', cu = db.coluna(C, 'whatsapp_url');
   const base = () => db.tabela(C).whereNotNull(cu).whereNot(cu, '').orderBy(db.coluna(C, 'id'));
-  let c = sessao ? await base().where(db.coluna(C, 'whatsappClient'), sessao).first() : null;
+  // a clínica da sessão (na Evolution o endereço do WAHA pode estar vazio)
+  let c = sessao ? await db.tabela(C).where(db.coluna(C, 'whatsappClient'), sessao).orderBy(db.coluna(C, 'id')).first() : null;
   if (!c) c = await base().first();
   return db.linha(C, c);
 }
@@ -68,7 +70,7 @@ async function telefonesDoRemetente(remetente, payload, sessao) {
   if (b.endsWith('@lid') && !tels.size) {
     const cl = await clinicaDaSessao(sessao);
     if (cl) {
-      const s = new WhatsAppService(null, cl.whatsapp_url, sessao || cl.whatsappClient);
+      const s = new WhatsAppService(null, cl.whatsapp_url, sessao || cl.whatsappClient, undefined, cl);
       const pn = await s.pn_do_lid(b);
       if (pn) tels.add(pn);
     }
@@ -127,7 +129,7 @@ async function enviaMensagem(req, ag, sessaoId, telefone, mensagem) {
   try {
     const cl = ag.fk_clinica_id === null ? null : await db.busca('TbClinica', { id: ag.fk_clinica_id });
     if (!cl) throw new Error("'NoneType' object has no attribute 'whatsapp_url'");
-    const s = new WhatsAppService(null, cl.whatsapp_url, sessaoId || cl.whatsappClient);
+    const s = new WhatsAppService(null, cl.whatsapp_url, sessaoId || cl.whatsappClient, undefined, cl);
     detalhes.sessao = s.session;
     let texto = mensagem;
     if (ehDict(mensagem)) texto = mensagem.success || mensagem.processado || pyStrValor(mensagem);
@@ -159,11 +161,17 @@ async function resposta(req, res) {
     if (!ehDict(corpo)) return json(res, { success: false, error: 'Payload inválido' }, 400);
     await registraRecebido(req, comoJson(corpo));
 
-    const event = pyGet(corpo, 'event');
-    let payload = pyGet(corpo, 'payload');
-    if (!pyBool(payload)) payload = {};
-    const sessaoBruta = pyGet(corpo, 'session');
-    const sessao = pyBool(sessaoBruta) ? sessaoBruta : '';
+    let event, payload, sessao;
+    if (evolution.ehEventoEvolution(corpo)) {
+      // Evolution API: "messages.upsert" vira o mesmo evento do WAHA
+      [event, payload, sessao] = evolution.eventoComoWaha(corpo);
+    } else {
+      event = pyGet(corpo, 'event');
+      payload = pyGet(corpo, 'payload');
+      if (!pyBool(payload)) payload = {};
+      const sessaoBruta = pyGet(corpo, 'session');
+      sessao = pyBool(sessaoBruta) ? sessaoBruta : '';
+    }
 
     if (!['message_received', 'message', 'message.any'].includes(event)) {
       return json(res, { success: true, info: `Evento ${pyStrValor(event)} ignorado` });

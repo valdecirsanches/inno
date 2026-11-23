@@ -255,6 +255,9 @@ function ReadQRCode2(container, host, session) {
   host = (host || document.querySelector("#id_whatsapp_url")?.value || "").trim().replace(/\/$/, "");
   session = (session || document.querySelector("#id_whatsappClient")?.value || "").trim();
 
+  // Na Evolution API o endereço vem do servidor do sistema: basta o ID da sessão
+  const naEvolution = typeof whatsappProvedor !== "undefined" && whatsappProvedor === "evolution";
+  if (naEvolution && !host) host = "-";
   if (!host || !session) {
     alert("Informe a URL do WhatsApp e o ID da sessão antes de autenticar.");
     console.error("[QR] Parâmetros ausentes:", { host, session });
@@ -390,13 +393,16 @@ function StopReadQRCode2() {
 }
 
 async function ReiniciarWhatsapp() {
-  const host = (
+  let host = (
     document.querySelector("#id_whatsapp_url")?.value || ""
   ).trim().replace(/\/$/, "");
 
   const session = (
     document.querySelector("#id_whatsappClient")?.value || ""
   ).trim();
+
+  // Na Evolution API o endereço vem do servidor do sistema: basta o ID da sessão
+  if (!host && typeof whatsappProvedor !== "undefined" && whatsappProvedor === "evolution") host = "-";
 
   if (!host || !session) {
     swal("Dados obrigatórios", "Informe a URL do WhatsApp e o ID da sessão.", "warning");

@@ -249,6 +249,19 @@ Teste: `node tools/testes/prontuario.js`.
 - (2.4.9) Nome: "Inno" no `<title>` das páginas (era "AppClinic 2.0") e no rodapé dos impressos
   (era "AppClinic 1.0"), nos dois sistemas.
 
+## WhatsApp: WAHA ou Evolution API
+
+Cada clínica usa o WAHA (padrão) ou a Evolution API. Quem escolhe é o superusuário ou o
+administrador, no cadastro da clínica ("Servidor do WhatsApp"); a escolha fica na tabela
+`tb_clinica_whatsapp` (a mesma no AppClinic, criada na primeira gravação) e o endereço do WAHA
+da clínica fica guardado para voltar a ele. O servidor da Evolution vem do `.env`
+(`EVOLUTION_URL`, `EVOLUTION_API_KEY` e, opcional, `EVOLUTION_WEBHOOK_URL`) e a instância tem o
+nome do "ID da sessão" da clínica. Ao conectar pelo QR Code, a instância é criada e o webhook
+das respostas (`/webhook/resposta/`, evento `MESSAGES_UPSERT`) é configurado nela.
+O `WhatsAppService` (`server/util/whatsapp.js`) e o robô traduzem os pedidos e eventos do WAHA
+para a Evolution (`server/util/evolution.js`, fonte única com `WhatsApp/evolution.py`).
+Teste: `tools/testes/evolution/` (Evolution falsa; o mesmo roteiro passa no AppClinic e no Inno).
+
 ## WhatsApp: logo no topo da mensagem
 
 A confirmação de consulta e as respostas ao paciente (confirmado / cancelado) saem numa

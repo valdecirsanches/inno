@@ -9,6 +9,7 @@ const requests = require('./requests');
 const { pyQuote } = require('./http');
 const { pyStrValor, pyGet, pyBool } = require('./python');
 const { erroPython } = require('./orm');
+const evolution = require('./evolution');
 
 /** json.dumps(payload, ensure_ascii=False) de um dicionário simples */
 function dumpsSemAscii(v) {
@@ -39,8 +40,9 @@ class WhatsAppService {
    * user: o usuário (com fk_clinica carregada) ou null; clinica é lida de user.fk_clinica
    * quando host/session não vierem (erro do Python se não houver)
    */
-  constructor(user, host = '', session = '', apiKey = API_KEY) {
+  constructor(user, host = '', session = '', apiKey = API_KEY, clinicaDada = null) {
     const clinica = (attr) => {
+      if (clinicaDada) return clinicaDada;
       if (!user) throw erroPython("'NoneType' object has no attribute 'fk_clinica'");
       if (!user.fk_clinica) throw erroPython(`'NoneType' object has no attribute '${attr}'`);
       return user.fk_clinica;
@@ -50,10 +52,41 @@ class WhatsAppService {
     this.session = session || clinica('whatsappClient').whatsappClient;
     this.api_base = this.host ? `${this.host}/api` : '';
     this.headers = { 'x-api-key': apiKey, accept: 'application/json' };
+    this._user = user;
+    this._clinica = clinicaDada || (user && !session ? user.fk_clinica : null);
+    this.evo = null;
+  }
+
+  /**
+   * WAHA (padrão) ou Evolution API, conforme a clínica (util/evolution.js).
+   * Na Evolution os mesmos métodos falam com a instância = ID da sessão.
+   */
+  async _evo() {
+    if (this._evoPronto) return this.evo;
+    this._evoPronto = true;
+    try {
+      const cl = this._clinica || await evolution.clinicaDaSessao(this.session, this._user);
+      if (cl && evolution.disponivel() && await evolution.provedorDaClinica(cl.id) === evolution.EVOLUTION) {
+        this.evo = new evolution.Evolution(this.session);
+        this.host = this.evo.url;
+        this.api_base = this.evo.url;
+      }
+    } catch (e) {
+      console.log(`[WhatsApp] Não foi possível ler o servidor da clínica: ${e.message}`);
+      this.evo = null;
+    }
+    return this.evo;
   }
 
   async check_status() {
+    const evo = await this._evo();
     if (!this.api_base) return { success: false, status: 'OFFLINE', message: 'Host nao configurado' };
+    if (evo) {
+      const st = await evo.statusWaha();
+      if (st === null) return { success: false, status: 'OFFLINE', message: 'Servidor da Evolution API inacessível' };
+      if (st === 'ERROR') return { success: false, status: 'ERROR', message: 'A Evolution API recusou a chave (EVOLUTION_API_KEY)' };
+      return { success: true, status: st, host: this.host, session: this.session, provedor: 'evolution' };
+    }
     try {
       const r = await requests.get(`${this.api_base}/sessions/${pyStrValor(this.session)}`, { headers: this.headers, timeout: 5 });
       if (r.ok) {
@@ -68,7 +101,9 @@ class WhatsAppService {
 
   /** O WhatsApp identifica parte dos contatos por um "LID": traduz para o telefone (só dígitos) ou '' */
   async pn_do_lid(lid) {
+    const evo = await this._evo();
     if (!(this.api_base && this.session && lid)) return '';
+    if (evo) return '';   // a Evolution já manda o telefone no evento (remoteJidAlt)
     const numero = String(lid).split('@')[0];
     for (const chave of [`${numero}@lid`, numero]) {
       try {
@@ -100,7 +135,9 @@ class WhatsAppService {
 
   /** (true, chatId) existe / (false, null) não existe / (null, null) não deu para checar */
   async _check_exists(phoneDigits) {
+    const evo = await this._evo();
     if (!this.api_base) return [null, null];
+    if (evo) return evo.numeroExiste(phoneDigits);
     try {
       const r = await requests.get(`${this.api_base}/contacts/check-exists`, {
         params: { phone: phoneDigits, session: this.session }, headers: this.headers, timeout: 10,
@@ -129,7 +166,19 @@ class WhatsAppService {
   }
 
   async _post(endpoint, body) {
+    const evo = await this._evo();
     if (!this.api_base) return new RespostaFalsa({ error: 'Host do WhatsApp nao configurado' }, 500);
+    if (evo) {
+      try {
+        const r = await evo.enviaComoWaha(endpoint, body);
+        console.log(`[v0] Evolution ${endpoint} -> HTTP ${r.status_code} | ${r.text.slice(0, 300)}`);
+        return r;
+      } catch (e) {
+        if (e instanceof requests.Timeout) return new RespostaFalsa({ error: 'Timeout ao contatar a Evolution API.' }, 504);
+        if (e instanceof requests.ConnectionError) return new RespostaFalsa({ error: `Falha de conexao com a Evolution API: ${e.message}` }, 502);
+        return new RespostaFalsa({ error: e.message }, 500);
+      }
+    }
     try {
       return await requests.post(`${this.api_base}/${endpoint.replace(/^\/+/, '')}`, { json: body, headers: this.headers, timeout: 30 });
     } catch (e) {
@@ -140,7 +189,15 @@ class WhatsAppService {
   }
 
   async get_photo(phone) {
+    const evo = await this._evo();
     const host = `${this.host} ( ${pyStrValor(this.session)} )`;
+    if (evo) {
+      for (const cid of WhatsAppService.format_id(phone)) {
+        const url = await evo.foto(cid);
+        if (url) return { success: true, url, chatId: cid, host };
+      }
+      return { success: false, error: 'Foto nao encontrada', host };
+    }
     for (const cid of WhatsAppService.format_id(phone)) {
       for (const refresh of ['false', 'true']) {
         try {

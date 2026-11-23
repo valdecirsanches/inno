@@ -92,6 +92,21 @@
                 <label for="id_whatsappClient">ID da sessão</label>
                 <input id="id_whatsappClient" name="whatsappClient" type="text" class="form-control" maxlength="100">
             </div>
+
+            {# Servidor do WhatsApp: fora do formulário da clínica (sem "name"); grava na hora #}
+            <div id="whatsapp_provedor_div" class="form-group c-4">
+                <label for="whatsapp_provedor">Servidor do WhatsApp</label>
+                {% if user.is_superuser or user.administrador == 'True' %}
+                <select id="whatsapp_provedor" class="form-control" onchange="TrocaProvedorWhatsapp(this.value)">
+                    <option value="waha">WAHA</option>
+                    <option value="evolution">Evolution API</option>
+                </select>
+                {% else %}
+                <input id="whatsapp_provedor_txt" type="text" class="form-control" readonly value="WAHA"
+                       title="Só o superusuário ou o administrador troca o servidor do WhatsApp.">
+                {% endif %}
+                <small id="whatsapp_provedor_ajuda" class="text-muted"></small>
+            </div>
         </div>
 
         <div class="clinica-conexao">

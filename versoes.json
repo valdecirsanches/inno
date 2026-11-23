@@ -2,6 +2,21 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.13",
+      "data": "23/11/2026",
+      "titulo": "WhatsApp pela Evolution API",
+      "itens": [
+        {
+          "tipo": "novo",
+          "texto": "O superusuário ou o administrador escolhe, no cadastro da clínica, se o WhatsApp usa o WAHA ou a Evolution API. A Evolution mantém a conexão com o celular mais estável; o endereço do WAHA fica guardado para voltar a ele quando quiser."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "Na Evolution API, os lembretes, as respostas 1/2 dos pacientes, o QR Code, o reinício da conexão e a foto do contato funcionam como no WAHA."
+        }
+      ]
+    },
+    {
       "versao": "2.4.12",
       "data": "18/11/2026",
       "titulo": "Médico nas prescrições, relatórios e exames",

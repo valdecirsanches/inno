@@ -19,6 +19,7 @@ const requests = require('../util/requests');
 const { json } = require('../util/http');
 const { erroPython } = require('../util/orm');
 const { WhatsAppService } = require('../util/whatsapp');
+const evolution = require('../util/evolution');
 const { pyStrValor, pyGet, pyBool, ehDict, pyJsonLoads } = require('../util/python');
 const { formata } = require('../util/formato-data');
 
@@ -132,11 +133,65 @@ function variantesTelefone(numero) {
   return formas;
 }
 
+// ------------------------------------------- servidor do WhatsApp da clínica
+/** GET/POST /api/whatsapp/provedor/: WAHA ou Evolution API (só super/admin troca) */
+async function provedor(req, res) {
+  const post = req.method === 'POST';
+  const prm = post ? prmDe(req, false) : { get: (k) => req.GET.get(k) };
+  let idClinica = parseInt(prm.get('id_clinica') || (req.user && req.user.fk_clinica_id) || 0, 10);
+  if (!Number.isFinite(idClinica)) idClinica = 0;
+  const pode = evolution.podeTrocar(req.user);
+  if (post) {
+    if (!pode) return responde(res, { success: false, error: 'Só o superusuário ou o administrador troca o servidor do WhatsApp.' }, 403);
+    if (!idClinica || !(await db.busca('TbClinica', { id: idClinica }))) {
+      return responde(res, { success: false, error: 'Salve a clínica antes de escolher o servidor do WhatsApp.' }, 400);
+    }
+    const escolha = String(prm.get('provedor') || '').toLowerCase();
+    if (escolha === evolution.EVOLUTION && !evolution.disponivel()) {
+      return responde(res, { success: false, error: 'A Evolution API não está configurada no servidor (EVOLUTION_URL).' }, 400);
+    }
+    const novo = await evolution.gravaProvedor(idClinica, escolha, req.user && req.user.login);
+    console.log(`[WhatsApp] Clínica ${idClinica}: servidor -> ${novo} (por ${req.user && req.user.login})`);
+    return responde(res, { success: true, provedor: novo });
+  }
+  return responde(res, { provedor: await evolution.provedorDaClinica(idClinica), podeTrocar: pode, evolutionDisponivel: evolution.disponivel() });
+}
+
+/** a instância da Evolution, se a clínica desta sessão usa a Evolution */
+async function evolutionDaSessao(req, sessionId) {
+  try {
+    const cl = await evolution.clinicaDaSessao(sessionId, req.user);
+    if (cl && evolution.disponivel() && await evolution.provedorDaClinica(cl.id) === evolution.EVOLUTION) {
+      return new evolution.Evolution(sessionId || cl.whatsappClient);
+    }
+  } catch (e) { console.log(`[WhatsApp] Erro ao ler o servidor da clínica: ${e.message}`); }
+  return null;
+}
+
+async function qrEvolution(req, res, evo) {
+  try {
+    const st = await evo.statusWaha();
+    if (st === 'WORKING') return responde(res, { status: 'WORKING', connected: true, qr: null, message: 'WhatsApp conectado.' });
+    if (st === null) return responde(res, { status: 'OFFLINE', connected: false, qr: null, message: 'Servidor da Evolution API inacessível, tentando de novo...' });
+    if (st === 'ERROR') return responde(res, { status: 'ERROR', connected: false, qr: null, message: 'A Evolution API recusou a chave (EVOLUTION_API_KEY).' });
+    const qr = await evo.qr(evolution.enderecoWebhook(req));
+    if (qr) return responde(res, { status: 'SCAN_QR_CODE', connected: false, qr });
+    return responde(res, { status: 'STARTING', connected: false, qr: null, message: 'QR ainda nao disponivel, aguarde...' });
+  } catch (e) {
+    if (e instanceof requests.Timeout) return responde(res, { status: 'TIMEOUT', connected: false, qr: null, message: 'Servidor demorou a responder, tentando de novo...' });
+    return responde(res, { error: e.message, connected: false });
+  }
+}
+
 // ------------------------------------------------------------------ ações
 async function read_qrcode(req, res) {
   const prm = prmDe(req, true);
   let host = prm.get('host');
   let sessionId = prm.get('sessionId');
+  if (pyBool(sessionId) && typeof sessionId === 'string') {
+    const evo = await evolutionDaSessao(req, sessionId.trim());
+    if (evo) return qrEvolution(req, res, evo);
+  }
   if (!pyBool(host) || !pyBool(sessionId)) return responde(res, { error: 'Parametros ausentes' }, 400);
   if (typeof host !== 'string') throw erroPython(`'${typeof host === 'number' ? 'int' : typeof host}' object has no attribute 'strip'`);
   if (typeof sessionId !== 'string') throw erroPython(`'${typeof sessionId === 'number' ? 'int' : typeof sessionId}' object has no attribute 'strip'`);
@@ -209,6 +264,20 @@ async function restart_session(req, res) {
   const prm = prmDe(req, false);
   let host = prm.get('host');
   let sessionId = prm.get('sessionId');
+  const evo = pyBool(sessionId) ? await evolutionDaSessao(req, pyStrValor(sessionId).trim()) : null;
+  if (evo) {
+    const antes = await evo.statusWaha();
+    let st, dados;
+    try { [st, dados] = await evo.reinicia(evolution.enderecoWebhook(req)); } catch (e) {
+      if (e instanceof requests.Timeout) return responde(res, { success: false, error: 'A Evolution API demorou demais para responder ao reinicio.', sessionId: evo.sessao, status_before: antes }, 504);
+      return responde(res, { success: false, error: `Falha de comunicacao com a Evolution API: ${e.message}`, sessionId: evo.sessao, status_before: antes }, 502);
+    }
+    if (st >= 400) {
+      return responde(res, { success: false, error: 'A Evolution API recusou o pedido de reinicio.', sessionId: evo.sessao, status_before: antes, status_code: st, api_response: dados }, 502);
+    }
+    return responde(res, { success: true, message: 'Solicitacao de reinicio enviada ao servidor WhatsApp.', host: evo.url, sessionId: evo.sessao,
+      status_before: antes, status_error: null, status_code: st, api_response: dados, provedor: 'evolution' });
+  }
   if (!pyBool(host) || !pyBool(sessionId)) {
     return responde(res, { success: false, error: 'Informe os parametros host e sessionId.' }, 400);
   }
@@ -259,6 +328,13 @@ async function iniciar_sessao(req, res) {
   const prm = prmDe(req, true);
   let host = prm.get('host');
   let sessionId = prm.get('sessionId');
+  const evo = pyBool(sessionId) ? await evolutionDaSessao(req, pyStrValor(sessionId).trim()) : null;
+  if (evo) {
+    try {
+      const [ok, dados] = await evo.inicia(evolution.enderecoWebhook(req));
+      return responde(res, { success: ok, status_code: ok ? 200 : 502, api_response: dados, provedor: 'evolution' });
+    } catch (e) { return responde(res, { success: false, error: e.message }); }
+  }
   if (!pyBool(host) || !pyBool(sessionId)) return responde(res, { success: false, error: 'Parametros ausentes' }, 400);
   host = pyStrValor(host).trim().replace(/\/+$/, '');
   sessionId = pyStrValor(sessionId).trim();
@@ -369,6 +445,7 @@ module.exports = function (app) {
         await enviaWhatsApp(req);
         throw erroPython('Object of type JsonResponse is not JSON serializable');
       } },
+      { nome: 'provedor', detalhe: false, metodos: ['post', 'get'], fn: provedor },
       { nome: 'read_qrcode', detalhe: false, metodos: ['post', 'get'], fn: read_qrcode },
       { nome: 'restart_session', detalhe: false, metodos: ['post'], fn: restart_session },
       { nome: 'iniciar_sessao', detalhe: false, metodos: ['post', 'get'], fn: iniciar_sessao },
