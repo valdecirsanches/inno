@@ -215,7 +215,7 @@ function _htmlWebhook(r) {
     }
     var ultimo = r.ultimo_recebido
         ? _escWebhook(r.ultimo_recebido.dh) + ' · ' + _escWebhook(r.ultimo_recebido.evento) + ' (' + _escWebhook(r.ultimo_recebido.servidor) + ', sessão ' + _escWebhook(r.ultimo_recebido.sessao) + ')'
-        : 'nenhuma ainda';
+        : 'nenhum ainda';
     var situacao = r.confere
         ? '<div style="padding:8px;border-radius:6px;background:#e8f8f0;color:#1e7e4a;">Configurado corretamente.</div>'
         : '<div style="padding:8px;border-radius:6px;background:#fdecea;color:#a93226;">O webhook gravado no servidor não é o esperado: as respostas dos pacientes não vão chegar.' +
@@ -229,7 +229,7 @@ function _htmlWebhook(r) {
         linha('Sessão / instância', _escWebhook(r.sessao || '(sem ID da sessão)') + (r.estado ? ' · ' + _escWebhook(r.estado) : '')) +
         linha('Webhook esperado', _escWebhook(r.webhook_esperado)) +
         linha('Gravado no servidor', gravado) +
-        linha('Última resposta recebida', ultimo) +
+        linha('Último evento recebido', ultimo) +
         '</table>' + _htmlRecebidas(r.recebidas || []) + botoes;
 }
 

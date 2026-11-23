@@ -2,6 +2,18 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.16",
+      "data": "23/11/2026",
+      "titulo": "Botão Webhook: só mensagens na lista",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "A lista de mensagens recebidas do botão Webhook mostrava também os avisos de conexão do servidor do WhatsApp."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.15",
       "data": "23/11/2026",
       "titulo": "WhatsApp: diagnóstico das respostas dos pacientes",

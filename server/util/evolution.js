@@ -283,6 +283,8 @@ async function respostasRecebidas(limite = 8) {
       continue;
     }
     if (!d.event || d.event === 'teste.webhook' || !('instance' in d || 'session' in d)) continue;
+    // só mensagens (os avisos de conexão do servidor não entram na lista)
+    if (!['messages.upsert', 'message', 'message.any', 'message.received'].includes(String(d.event).toLowerCase().replace(/_/g, '.'))) continue;
     let p, sessao, servidor;
     if ('instance' in d) { [, p, sessao] = eventoComoWaha(d); servidor = 'Evolution API'; } else { p = ehObj(d.payload) ? d.payload : {}; sessao = d.session || ''; servidor = 'WAHA'; }
     const dh = l.dh ? `${l.dh.slice(8, 10)}/${l.dh.slice(5, 7)}/${l.dh.slice(0, 4)} ${l.dh.slice(11, 19)}` : '';
