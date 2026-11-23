@@ -77,11 +77,9 @@
         <p class="clinica-secao-ajuda">Conexão usada para enviar os lembretes de consulta e receber as respostas dos pacientes.</p>
 
         <div class="clinica-campos">
-            <div id="id_whatsapp_url_div" class="form-group c-8">
-                <label for="id_whatsapp_url">Endereço do servidor do WhatsApp</label>
-                <input id="id_whatsapp_url" name="whatsapp_url" class="form-control" type="text"
-                       placeholder="http://192.168.0.10:3000">
-            </div>
+            {# o endereço do servidor do WhatsApp fica no .env (WAHA_URL / EVOLUTION_URL):
+               o campo continua no formulário, escondido, para não apagar o valor gravado #}
+            <input id="id_whatsapp_url" name="whatsapp_url" type="hidden">
 
             {# <div id="id_whatsappSecret_div" class="form-group col-md-4">
                 <label for="id_whatsappSecret">Token</label>
@@ -118,6 +116,11 @@
             <button type="button" id="btnReiniciarWhatsapp" class="btn btn-sm"
                     onclick="ReiniciarWhatsapp()">
                 <i class="glyphicon glyphicon-refresh" aria-hidden="true"></i> Reiniciar conexão
+            </button>
+
+            <button type="button" id="btnWebhookWhatsapp" class="btn btn-sm"
+                    onclick="ConfereWebhookWhatsapp()" title="Confere para onde o servidor do WhatsApp manda as respostas dos pacientes">
+                <i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Webhook
             </button>
         </div>
 

@@ -3,6 +3,8 @@ const http = require('http');
 const porta = Number(process.argv[2] || 8790);
 const CHAVE = 'chave-evo';
 const estado = {}; // instancia -> 'close' | 'connecting' | 'open'
+const ganchos = {}; // instancia -> webhook gravado
+const waha = [];
 const log = [];
 http.createServer((req, res) => {
   let corpo = '';
@@ -10,10 +12,18 @@ http.createServer((req, res) => {
   req.on('end', () => {
     const u = new URL(req.url, 'http://x');
     let j = null; try { j = corpo ? JSON.parse(corpo) : null; } catch (e) { j = corpo; }
-    if (!u.pathname.startsWith('/__')) log.push({ m: req.method, p: u.pathname, apikey: req.headers.apikey, corpo: j });
+    if (!u.pathname.startsWith('/__') && !u.pathname.startsWith('/api/')) log.push({ m: req.method, p: u.pathname, apikey: req.headers.apikey, corpo: j });
     const resp = (st, o) => { res.writeHead(st, { 'content-type': 'application/json' }); res.end(JSON.stringify(o)); };
     if (u.pathname === '/__log') return resp(200, log);
-    if (u.pathname === '/__zera') { log.length = 0; for (const k of Object.keys(estado)) delete estado[k]; return resp(200, {}); }
+    if (u.pathname === '/__zera') { log.length = 0; waha.length = 0; for (const k of Object.keys(ganchos)) delete ganchos[k]; for (const k of Object.keys(estado)) delete estado[k]; return resp(200, {}); }
+    if (u.pathname === '/__webhook') { ganchos[u.searchParams.get('i')] = { enabled: true, url: u.searchParams.get('url'), events: ['MESSAGES_UPSERT'] }; return resp(200, {}); }
+    if (u.pathname === '/__waha') return resp(200, waha);
+    // WAHA falso (WAHA_URL aponta para cá)
+    if (u.pathname.startsWith('/api/')) {
+      waha.push({ m: req.method, p: u.pathname, chave: req.headers['x-api-key'] });
+      if (u.pathname.match(/^\/api\/sessions\/[^/]+$/)) return resp(200, { name: 'clin1', status: 'WORKING', config: { webhooks: [{ url: 'https://teste.local/webhook/resposta/', events: ['message'] }] } });
+      return resp(200, {});
+    }
     if (u.pathname === '/__abre') { estado[u.searchParams.get('i')] = 'open'; return resp(200, {}); }
     if (req.headers.apikey !== CHAVE) return resp(401, { status: 401, error: 'Unauthorized', response: { message: 'Unauthorized' } });
     const m = u.pathname.match(/^\/([a-zA-Z]+)\/([a-zA-Z]+)\/?(.*)$/);
@@ -26,7 +36,8 @@ http.createServer((req, res) => {
     }
     if (grupo === 'instance' && acao === 'connect') { estado[i] = 'connecting'; return resp(200, { pairingCode: null, code: '2@abc', base64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==', count: 1 }); }
     if (grupo === 'instance' && acao === 'restart') return resp(200, { instance: { instanceName: i, state: 'connecting' } });
-    if (grupo === 'webhook' && acao === 'set') return resp(201, { webhook: { instanceName: i, webhook: j.webhook } });
+    if (grupo === 'webhook' && acao === 'set') { ganchos[i] = { enabled: !!j.webhook.enabled, url: j.webhook.url, events: j.webhook.events }; return resp(201, { webhook: { instanceName: i, webhook: j.webhook } }); }
+    if (grupo === 'webhook' && acao === 'find') { if (!(i in estado)) return resp(404, { status: 404 }); return resp(200, ganchos[i] ? Object.assign({ instanceName: i }, ganchos[i]) : null); }
     if (grupo === 'chat' && acao === 'whatsappNumbers') return resp(200, j.numbers.map((n) => ({ exists: !n.endsWith('0000'), jid: `${n}@s.whatsapp.net`, number: n })));
     if (grupo === 'chat' && acao === 'fetchProfilePictureUrl') return resp(200, { wuid: `${j.number}@s.whatsapp.net`, profilePictureUrl: 'https://pps.whatsapp.net/foto.jpg' });
     if (grupo === 'message') return resp(201, { key: { remoteJid: `${j.number}@s.whatsapp.net`, fromMe: true, id: `EVO${log.length}` }, status: 'PENDING', message: {} });

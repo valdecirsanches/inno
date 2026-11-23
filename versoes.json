@@ -2,6 +2,25 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.14",
+      "data": "23/11/2026",
+      "titulo": "WhatsApp: servidor no .env e conferência do webhook",
+      "itens": [
+        {
+          "tipo": "melhoria",
+          "texto": "O endereço do servidor do WhatsApp (WAHA ou Evolution API) fica nas configurações do sistema e não aparece mais no cadastro da clínica."
+        },
+        {
+          "tipo": "novo",
+          "texto": "Botão Webhook no cadastro da clínica: mostra para onde o WhatsApp manda as respostas dos pacientes, o que está gravado no servidor, a situação da conexão e a última resposta recebida; o administrador aplica a configuração certa e testa o endereço por ali."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Na Evolution API, uma instância que já estava conectada ficava sem o endereço das respostas dos pacientes; agora ele é gravado ao conferir a conexão. Respostas em mensagens temporárias também são lidas."
+        }
+      ]
+    },
+    {
       "versao": "2.4.13",
       "data": "23/11/2026",
       "titulo": "WhatsApp pela Evolution API",

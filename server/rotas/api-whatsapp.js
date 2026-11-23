@@ -157,6 +157,63 @@ async function provedor(req, res) {
   return responde(res, { provedor: await evolution.provedorDaClinica(idClinica), podeTrocar: pode, evolutionDisponivel: evolution.disponivel() });
 }
 
+/**
+ * Botão "Webhook" da clínica.
+ * GET  /api/whatsapp/webhook/?id_clinica=N   o que está configurado
+ * POST /api/whatsapp/webhook/ {id_clinica, acao: aplicar|testar}
+ */
+async function webhook(req, res) {
+  const post = req.method === 'POST';
+  const prm = post ? prmDe(req, false) : { get: (k) => req.GET.get(k) };
+  const id = parseInt(prm.get('id_clinica') || (req.user && req.user.fk_clinica_id) || 0, 10);
+  const clinica = Number.isFinite(id) && id ? await db.busca('TbClinica', { id }) : null;
+  if (!clinica) return responde(res, { success: false, error: 'Salve a clínica antes de conferir o webhook.' }, 400);
+  const provedor = await evolution.provedorDaClinica(clinica.id);
+  const sessao = String(clinica.whatsappClient || '').trim();
+  const esperado = evolution.enderecoWebhook(req);
+  const acao = post ? String(prm.get('acao') || '') : '';
+
+  if (acao === 'testar') {
+    // o próprio servidor chama o endereço do webhook (confere se ele responde)
+    try {
+      const r = await requests.post(esperado, { json: { event: 'teste.webhook', instance: sessao, data: {} }, timeout: 10 });
+      let corpo;
+      try { corpo = JSON.parse(r.text); } catch (e) { corpo = r.text.slice(0, 300); }
+      const ok = r.status_code === 200 && corpo && typeof corpo === 'object' && corpo.success === true;
+      return responde(res, { success: ok, url: esperado, http: r.status_code, resposta: corpo });
+    } catch (e) {
+      return responde(res, { success: false, url: esperado, error: `O endereço não respondeu: ${e.message}` });
+    }
+  }
+  if (acao === 'aplicar') {
+    if (!evolution.podeTrocar(req.user)) return responde(res, { success: false, error: 'Só o superusuário ou o administrador aplica o webhook.' }, 403);
+    if (provedor !== evolution.EVOLUTION) return responde(res, { success: false, error: 'No WAHA o webhook é configurado no próprio servidor do WAHA (WHATSAPP_HOOK_URL).' }, 400);
+    if (!evolution.disponivel() || !sessao) return responde(res, { success: false, error: 'Falta EVOLUTION_URL no .env ou o ID da sessão da clínica.' }, 400);
+    if (!(await new evolution.Evolution(sessao).configuraWebhook(esperado))) {
+      return responde(res, { success: false, error: 'A Evolution API não aceitou o webhook (a instância existe? conecte pelo QR Code).' }, 502);
+    }
+  }
+  const ret = { provedor, sessao, webhook_esperado: esperado,
+    podeAplicar: evolution.podeTrocar(req.user) && provedor === evolution.EVOLUTION, ultimo_recebido: await evolution.ultimoRecebido() };
+  if (provedor === evolution.EVOLUTION) {
+    const evo = new evolution.Evolution(sessao);
+    ret.servidor = evo.url || '(EVOLUTION_URL não está no .env)';
+    ret.estado = evo.url ? await evo.statusWaha() : null;
+    const atual = evo.url ? await evo.webhookAtual() : { erro: 'EVOLUTION_URL não está no .env.' };
+    ret.no_servidor = atual;
+    ret.confere = Boolean(atual.url && atual.url === esperado && atual.enabled && (atual.events || []).some((e) => String(e).toUpperCase() === 'MESSAGES_UPSERT'));
+  } else {
+    const url = evolution.wahaUrl(clinica.whatsapp_url || '');
+    ret.servidor = url || '(WAHA_URL não está no .env)';
+    const atual = await evolution.webhookWaha(url, sessao);
+    ret.estado = atual.status === undefined ? null : atual.status;
+    ret.no_servidor = atual;
+    ret.confere = (atual.webhooks || []).some((g) => g.url === esperado);
+  }
+  if (acao === 'aplicar') ret.success = true;
+  return responde(res, ret);
+}
+
 /** a instância da Evolution, se a clínica desta sessão usa a Evolution */
 async function evolutionDaSessao(req, sessionId) {
   try {
@@ -171,7 +228,10 @@ async function evolutionDaSessao(req, sessionId) {
 async function qrEvolution(req, res, evo) {
   try {
     const st = await evo.statusWaha();
-    if (st === 'WORKING') return responde(res, { status: 'WORKING', connected: true, qr: null, message: 'WhatsApp conectado.' });
+    if (st === 'WORKING') {
+      await evo.configuraWebhook(evolution.enderecoWebhook(req));
+      return responde(res, { status: 'WORKING', connected: true, qr: null, message: 'WhatsApp conectado.' });
+    }
     if (st === null) return responde(res, { status: 'OFFLINE', connected: false, qr: null, message: 'Servidor da Evolution API inacessível, tentando de novo...' });
     if (st === 'ERROR') return responde(res, { status: 'ERROR', connected: false, qr: null, message: 'A Evolution API recusou a chave (EVOLUTION_API_KEY).' });
     const qr = await evo.qr(evolution.enderecoWebhook(req));
@@ -192,12 +252,13 @@ async function read_qrcode(req, res) {
     const evo = await evolutionDaSessao(req, sessionId.trim());
     if (evo) return qrEvolution(req, res, evo);
   }
+  host = evolution.wahaUrl(pyBool(host) ? host : '') || host;
   if (!pyBool(host) || !pyBool(sessionId)) return responde(res, { error: 'Parametros ausentes' }, 400);
   if (typeof host !== 'string') throw erroPython(`'${typeof host === 'number' ? 'int' : typeof host}' object has no attribute 'strip'`);
   if (typeof sessionId !== 'string') throw erroPython(`'${typeof sessionId === 'number' ? 'int' : typeof sessionId}' object has no attribute 'strip'`);
   host = host.trim().replace(/\/+$/, '');
   sessionId = sessionId.trim();
-  const headers = { 'X-Api-Key': API_KEY, Accept: 'application/json' };
+  const headers = { 'X-Api-Key': evolution.wahaChave(), Accept: 'application/json' };
   const urlStatus = `${host}/api/sessions/${sessionId}`;
   const urlQr = `${host}/api/${sessionId}/auth/qr`;
   const urlStart = `${host}/api/sessions/${sessionId}/start`;
@@ -281,10 +342,10 @@ async function restart_session(req, res) {
   if (!pyBool(host) || !pyBool(sessionId)) {
     return responde(res, { success: false, error: 'Informe os parametros host e sessionId.' }, 400);
   }
-  host = pyStrValor(host).trim().replace(/\/+$/, '');
+  host = evolution.wahaUrl(pyStrValor(host));
   sessionId = pyStrValor(sessionId).trim();
   if (!host || !sessionId) return responde(res, { success: false, error: 'Host ou sessionId invalido.' }, 400);
-  const headers = { 'X-Api-Key': API_KEY, Accept: 'application/json' };
+  const headers = { 'X-Api-Key': evolution.wahaChave(), Accept: 'application/json' };
   let statusAntes = null;
   let statusErro = null;
   try {
@@ -336,10 +397,10 @@ async function iniciar_sessao(req, res) {
     } catch (e) { return responde(res, { success: false, error: e.message }); }
   }
   if (!pyBool(host) || !pyBool(sessionId)) return responde(res, { success: false, error: 'Parametros ausentes' }, 400);
-  host = pyStrValor(host).trim().replace(/\/+$/, '');
+  host = evolution.wahaUrl(pyStrValor(host));
   sessionId = pyStrValor(sessionId).trim();
   try {
-    const r = await requests.post(`${host}/api/sessions/${sessionId}/start`, { headers: { 'X-Api-Key': API_KEY, Accept: 'application/json' }, timeout: 8 });
+    const r = await requests.post(`${host}/api/sessions/${sessionId}/start`, { headers: { 'X-Api-Key': evolution.wahaChave(), Accept: 'application/json' }, timeout: 8 });
     let api;
     try { api = r.json(); } catch (e) { api = { message: fatia(r.text, 1000) }; }
     return responde(res, { success: r.ok, status_code: r.status_code, api_response: api });
@@ -369,8 +430,8 @@ async function agenda_texto(req, res) {
     const cl = await rel('TbClinica', ag.fk_clinica_id, 'whatsapp_url');
     json(res, {
       success, name: pac.paciente, celular: pac.celular, logo,
-      host: cl.whatsapp_url, session: cl.whatsappClient, whatsapp_status: statusWa,
-      host_ident: `${pyStrValor(cl.whatsapp_url)} ( ${pyStrValor(cl.whatsappClient)} )`,
+      host: evolution.wahaUrl() || cl.whatsapp_url, session: cl.whatsappClient, whatsapp_status: statusWa,
+      host_ident: `${evolution.wahaUrl() || pyStrValor(cl.whatsapp_url)} ( ${pyStrValor(cl.whatsappClient)} )`,
     });
   } catch (e) {
     json(res, { success: false, error: e.message }, 400);
@@ -446,6 +507,7 @@ module.exports = function (app) {
         throw erroPython('Object of type JsonResponse is not JSON serializable');
       } },
       { nome: 'provedor', detalhe: false, metodos: ['post', 'get'], fn: provedor },
+      { nome: 'webhook', detalhe: false, metodos: ['post', 'get'], fn: webhook },
       { nome: 'read_qrcode', detalhe: false, metodos: ['post', 'get'], fn: read_qrcode },
       { nome: 'restart_session', detalhe: false, metodos: ['post'], fn: restart_session },
       { nome: 'iniciar_sessao', detalhe: false, metodos: ['post', 'get'], fn: iniciar_sessao },

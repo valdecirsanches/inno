@@ -260,7 +260,15 @@ nome do "ID da sessão" da clínica. Ao conectar pelo QR Code, a instância é c
 das respostas (`/webhook/resposta/`, evento `MESSAGES_UPSERT`) é configurado nela.
 O `WhatsAppService` (`server/util/whatsapp.js`) e o robô traduzem os pedidos e eventos do WAHA
 para a Evolution (`server/util/evolution.js`, fonte única com `WhatsApp/evolution.py`).
-Teste: `tools/testes/evolution/` (Evolution falsa; o mesmo roteiro passa no AppClinic e no Inno).
+O endereço e a chave do WAHA também vêm do `.env` (`WAHA_URL`, `WAHA_API_KEY`); a tela da clínica
+não mostra mais o endereço (o campo fica escondido, para não apagar o valor gravado, que só vale
+sem `WAHA_URL`). O botão "Webhook" da clínica (`/api/whatsapp/webhook/`) mostra o webhook esperado,
+o gravado no servidor (Evolution: `/webhook/find`; WAHA: `config.webhooks` da sessão), o estado da
+conexão e a última resposta que chegou (`tbWhatsappLog`); na Evolution o super/administrador
+aplica o webhook por ali, e "Testar o endereço" faz o próprio servidor chamar o webhook.
+Ao conferir a conexão de uma instância já conectada, o webhook é gravado de novo.
+Teste: `node tools/testes/evolution/roda.js ../appclinic ~/venv-dj/bin/python` (Evolution e WAHA
+falsos; o mesmo roteiro passa no AppClinic e no Inno).
 
 ## WhatsApp: logo no topo da mensagem
 

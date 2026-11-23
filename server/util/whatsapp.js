@@ -48,10 +48,11 @@ class WhatsAppService {
       return user.fk_clinica;
     };
     const h = host || clinica('whatsapp_url').whatsapp_url || '';
-    this.host = String(h).trim().replace(/\/+$/, '');
+    // o endereço do WAHA vem do .env (WAHA_URL); sem ele, o da clínica
+    this.host = evolution.wahaUrl(h);
     this.session = session || clinica('whatsappClient').whatsappClient;
     this.api_base = this.host ? `${this.host}/api` : '';
-    this.headers = { 'x-api-key': apiKey, accept: 'application/json' };
+    this.headers = { 'x-api-key': apiKey === API_KEY ? evolution.wahaChave() : apiKey, accept: 'application/json' };
     this._user = user;
     this._clinica = clinicaDada || (user && !session ? user.fk_clinica : null);
     this.evo = null;

@@ -27,6 +27,10 @@ function servidor() {
 }
 const disponivel = () => Boolean(servidor()[0]);
 
+/** endereço do WAHA: o do .env (WAHA_URL); sem ele, o gravado na clínica */
+const wahaUrl = (daClinica = '') => (limpa(process.env.WAHA_URL) || limpa(daClinica)).replace(/\/+$/, '');
+const wahaChave = () => limpa(process.env.WAHA_API_KEY) || 'eds.2013';
+
 async function garanteTabela() {
   if (await db.knex.schema.hasTable(TABELA)) return;
   await db.knex.schema.createTable(TABELA, (t) => {
@@ -66,7 +70,7 @@ async function clinicaDaSessao(sessao, usuario = null) {
 }
 
 function enderecoWebhook(req = null) {
-  const url = limpa(process.env.EVOLUTION_WEBHOOK_URL);
+  const url = limpa(process.env.EVOLUTION_WEBHOOK_URL || process.env.WHATSAPP_WEBHOOK_URL);
   if (url) return url;
   if (!req) return '';
   const proto = String(req.get('x-forwarded-proto') || (req.socket && req.socket.encrypted ? 'https' : 'http')).split(',')[0].trim();
@@ -132,6 +136,18 @@ class Evolution {
       [st] = await this.chama('POST', `/webhook/set/${this.inst}`, { url, enabled: true, webhook_by_events: false, events: ['MESSAGES_UPSERT'] });
       return st < 400;
     } catch (e) { return false; }
+  }
+
+  /** o webhook gravado na instância: {url, enabled, events} | {erro} */
+  async webhookAtual() {
+    let st, d;
+    try { [st, d] = await this.chama('GET', `/webhook/find/${this.inst}`, null, 8); } catch (e) { return { erro: `Servidor da Evolution API inacessível: ${e.message}` }; }
+    if (st === 404) return { erro: 'A instância ainda não existe na Evolution API (conecte pelo QR Code).' };
+    if (st === 401 || st === 403) return { erro: 'A Evolution API recusou a chave (EVOLUTION_API_KEY).' };
+    if (st >= 400) return { erro: `A Evolution API respondeu HTTP ${st}.` };
+    if (!ehObj(d)) return { url: '', enabled: false, events: [] };
+    const w = ehObj(d.webhook) ? d.webhook : d;
+    return { url: w.url || '', enabled: Boolean(w.enabled), events: w.events || [], byEvents: Boolean(w.webhookByEvents || w.byEvents) };
   }
 
   async cria(webhook = '') {
@@ -217,9 +233,46 @@ class Evolution {
   }
 }
 
+// ------------------------------- conferência do webhook (botão "Webhook" da clínica)
+async function webhookWaha(urlWaha, sessao) {
+  if (!urlWaha) return { erro: 'WAHA_URL não está no .env.' };
+  let r;
+  try {
+    r = await requests.get(`${urlWaha}/api/sessions/${encodeURIComponent(sessao || '')}`, { headers: { 'X-Api-Key': wahaChave(), Accept: 'application/json' }, timeout: 8 });
+  } catch (e) { return { erro: `Servidor do WAHA inacessível: ${e.message}` }; }
+  if (r.status_code === 404) return { erro: 'A sessão não existe no WAHA (conecte pelo QR Code).' };
+  if (r.status_code >= 400) return { erro: `O WAHA respondeu HTTP ${r.status_code}.` };
+  let d;
+  try { d = JSON.parse(r.text) || {}; } catch (e) { return { erro: 'Resposta inválida do WAHA.' }; }
+  const ganchos = (ehObj(d.config) && Array.isArray(d.config.webhooks)) ? d.config.webhooks : [];
+  return { status: d.status === undefined ? null : d.status, webhooks: ganchos.filter(ehObj).map((g) => ({ url: g.url || '', events: g.events || [] })) };
+}
+
+/** o último evento que chegou de um servidor de WhatsApp em /webhook/resposta/ */
+async function ultimoRecebido() {
+  try {
+    const L = 'TbWhatsAppLog';
+    const linhas = await db.tabela(L).orderBy(db.coluna(L, 'id'), 'desc').limit(200);
+    for (const l0 of linhas) {
+      const l = db.linha(L, l0);
+      let d = l.data_json;
+      if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { continue; } }
+      if (ehObj(d) && d.event && d.event !== 'teste.webhook' && ('instance' in d || 'session' in d)) {
+        const dh = l.dh ? `${l.dh.slice(8, 10)}/${l.dh.slice(5, 7)}/${l.dh.slice(0, 4)} ${l.dh.slice(11, 19)}` : '';
+        return { dh, evento: String(d.event), sessao: String(d.instance || d.session || ''), servidor: 'instance' in d ? 'Evolution API' : 'WAHA' };
+      }
+    }
+  } catch (e) { /* sem log */ }
+  return null;
+}
+
 // ------------------------------------------------- webhook: Evolution -> WAHA
 function texto(m) {
   m = ehObj(m) ? m : {};
+  // mensagens temporárias / visualização única vêm embrulhadas
+  for (const capa of ['ephemeralMessage', 'viewOnceMessage', 'viewOnceMessageV2', 'documentWithCaptionMessage', 'editedMessage']) {
+    if (ehObj(m[capa]) && ehObj(m[capa].message)) m = m[capa].message;
+  }
   const g = (o, ...ks) => ks.reduce((x, k) => (ehObj(x) ? x[k] : undefined), o);
   return String(m.conversation || g(m, 'extendedTextMessage', 'text') || g(m, 'buttonsResponseMessage', 'selectedDisplayText')
     || g(m, 'buttonsResponseMessage', 'selectedButtonId') || g(m, 'templateButtonReplyMessage', 'selectedDisplayText')
@@ -246,6 +299,6 @@ function eventoComoWaha(corpo) {
 const ehEventoEvolution = (corpo) => ehObj(corpo) && 'instance' in corpo && 'data' in corpo && !('payload' in corpo);
 
 module.exports = {
-  EVOLUTION, WAHA, servidor, disponivel, provedorDaClinica, gravaProvedor, podeTrocar, clinicaDaSessao,
+  EVOLUTION, WAHA, servidor, disponivel, wahaUrl, wahaChave, webhookWaha, ultimoRecebido, provedorDaClinica, gravaProvedor, podeTrocar, clinicaDaSessao,
   enderecoWebhook, Evolution, Resposta, eventoComoWaha, ehEventoEvolution,
 };

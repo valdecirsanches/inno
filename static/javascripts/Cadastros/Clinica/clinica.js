@@ -78,10 +78,9 @@ function MostraProvedorWhatsapp(provedor, disponivel) {
     $('#whatsapp_provedor_txt').val(nome);
     $('#whatsapp_provedor option[value=evolution]').prop('disabled', !disponivel && whatsappProvedor !== 'evolution');
     var ajuda = whatsappProvedor === 'evolution'
-        ? 'Usa o servidor da Evolution API configurado no sistema; o endereço acima fica guardado para voltar ao WAHA.'
+        ? 'Usa o servidor da Evolution API configurado no sistema (.env).'
         : (disponivel ? '' : 'Evolution API não configurada no servidor.');
     $('#whatsapp_provedor_ajuda').text(ajuda);
-    $('#id_whatsapp_url').prop('placeholder', whatsappProvedor === 'evolution' ? 'Não usado com a Evolution API' : 'http://192.168.0.10:3000');
 }
 
 function CarregaProvedorWhatsapp(idClinica) {
@@ -184,3 +183,102 @@ function DelClinica(id) {
 }
 
 
+
+// ---------------------------------------------------------------------------
+// Botão "Webhook": mostra para onde o servidor do WhatsApp manda as respostas
+// dos pacientes, o que está gravado nele e a última resposta que chegou.
+// ---------------------------------------------------------------------------
+function _escWebhook(t) {
+    return String(t === null || t === undefined ? '' : t)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function _htmlWebhook(r) {
+    var linha = function (rotulo, valor) {
+        return '<tr><th style="padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top;">' + rotulo +
+            '</th><td style="padding:4px 0;word-break:break-all;">' + valor + '</td></tr>';
+    };
+    var ns = r.no_servidor || {};
+    var gravado;
+    if (ns.erro) {
+        gravado = '<span style="color:#c0392b;">' + _escWebhook(ns.erro) + '</span>';
+    } else if (r.provedor === 'evolution') {
+        gravado = ns.url
+            ? _escWebhook(ns.url) + '<br><small>' + (ns.enabled ? 'ativo' : '<b style="color:#c0392b;">desativado</b>') +
+              ' · eventos: ' + _escWebhook((ns.events || []).join(', ') || 'nenhum') + '</small>'
+            : '<span style="color:#c0392b;">nenhum webhook gravado na instância</span>';
+    } else {
+        var g = ns.webhooks || [];
+        gravado = g.length
+            ? g.map(function (x) { return _escWebhook(x.url) + ' <small>(' + _escWebhook((x.events || []).join(', ')) + ')</small>'; }).join('<br>')
+            : '<span style="color:#c0392b;">nenhum webhook na sessão do WAHA</span>';
+    }
+    var ultimo = r.ultimo_recebido
+        ? _escWebhook(r.ultimo_recebido.dh) + ' · ' + _escWebhook(r.ultimo_recebido.evento) + ' (' + _escWebhook(r.ultimo_recebido.servidor) + ', sessão ' + _escWebhook(r.ultimo_recebido.sessao) + ')'
+        : 'nenhuma ainda';
+    var situacao = r.confere
+        ? '<div style="padding:8px;border-radius:6px;background:#e8f8f0;color:#1e7e4a;">Configurado corretamente.</div>'
+        : '<div style="padding:8px;border-radius:6px;background:#fdecea;color:#a93226;">O webhook gravado no servidor não é o esperado: as respostas dos pacientes não vão chegar.' +
+          (r.podeAplicar ? ' Use "Aplicar no servidor".' : '') + '</div>';
+    var botoes = '<div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">' +
+        (r.podeAplicar ? '<button type="button" class="btn btn-sm btn-primary" onclick="AplicaWebhookWhatsapp()">Aplicar no servidor</button>' : '') +
+        '<button type="button" class="btn btn-sm btn-default" onclick="TestaWebhookWhatsapp()">Testar o endereço</button>' +
+        '</div><div id="webhook_teste_resultado" style="margin-top:8px;font-size:13px;"></div>';
+    return situacao + '<table style="margin-top:10px;text-align:left;font-size:13px;width:100%;">' +
+        linha('Servidor', (r.provedor === 'evolution' ? 'Evolution API' : 'WAHA') + ' · ' + _escWebhook(r.servidor)) +
+        linha('Sessão / instância', _escWebhook(r.sessao || '(sem ID da sessão)') + (r.estado ? ' · ' + _escWebhook(r.estado) : '')) +
+        linha('Webhook esperado', _escWebhook(r.webhook_esperado)) +
+        linha('Gravado no servidor', gravado) +
+        linha('Última resposta recebida', ultimo) +
+        '</table>' + botoes;
+}
+
+function _idClinicaWebhook() {
+    var id = $('.classClinica #id_id').val() || 0;
+    if (!(parseInt(id, 10) > 0)) {
+        toastr.warning('Salve a clínica antes de conferir o webhook.');
+        return 0;
+    }
+    return id;
+}
+
+function ConfereWebhookWhatsapp() {
+    var id = _idClinicaWebhook();
+    if (!id) return;
+    $.get('/api/whatsapp/webhook/', { id_clinica: id }).done(function (r) {
+        swal({ title: 'Webhook do WhatsApp', html: '<div id="webhook_conteudo">' + _htmlWebhook(r) + '</div>', width: 640, confirmButtonText: 'Fechar' });
+    }).fail(function (x) {
+        swal('Webhook do WhatsApp', (x.responseJSON && x.responseJSON.error) || 'Não foi possível conferir o webhook.', 'error');
+    });
+}
+
+function _postWebhook(acao) {
+    return $.ajax({
+        url: '/api/whatsapp/webhook/', type: 'POST',
+        data: { id_clinica: _idClinicaWebhook(), acao: acao },
+        headers: { 'X-CSRFToken': (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '' },
+    });
+}
+
+function AplicaWebhookWhatsapp() {
+    $('#webhook_teste_resultado').text('Aplicando...');
+    _postWebhook('aplicar').done(function (r) {
+        $('#webhook_conteudo').html(_htmlWebhook(r));
+        $('#webhook_teste_resultado').html(r.confere ? '<span style="color:#1e7e4a;">Webhook aplicado no servidor.</span>'
+            : '<span style="color:#a93226;">O servidor aceitou, mas a conferência ainda não bate.</span>');
+    }).fail(function (x) {
+        $('#webhook_teste_resultado').html('<span style="color:#a93226;">' + _escWebhook((x.responseJSON && x.responseJSON.error) || 'Falhou.') + '</span>');
+    });
+}
+
+function TestaWebhookWhatsapp() {
+    $('#webhook_teste_resultado').text('Testando...');
+    _postWebhook('testar').done(function (r) {
+        $('#webhook_teste_resultado').html(r.success
+            ? '<span style="color:#1e7e4a;">O endereço respondeu (HTTP ' + r.http + '). Se o servidor do WhatsApp alcança este mesmo endereço, as respostas chegam.</span>'
+            : '<span style="color:#a93226;">O endereço ' + _escWebhook(r.url) + ' não respondeu como esperado: ' +
+              _escWebhook(r.error || ('HTTP ' + r.http + ' ' + JSON.stringify(r.resposta || ''))) + '</span>');
+    }).fail(function () {
+        $('#webhook_teste_resultado').html('<span style="color:#a93226;">Falhou.</span>');
+    });
+}
