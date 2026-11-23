@@ -198,6 +198,25 @@ class Evolution {
     return [false, null];
   }
 
+  /** telefone (só dígitos) de um contato @lid, pelos contatos da instância; '' se não achar */
+  async telefoneDoLid(lid) {
+    let st, d;
+    try { [st, d] = await this.chama('POST', `/chat/findContacts/${this.inst}`, { where: { remoteJid: lid } }, 8); } catch (e) { return ''; }
+    if (st >= 400) return '';
+    const achados = [];
+    const procura = (o) => {
+      if (Array.isArray(o)) o.forEach(procura);
+      else if (ehObj(o)) {
+        for (const [k, v] of Object.entries(o)) {
+          if (typeof v === 'string' && /(pn|alt|phone|number)/i.test(k) && /^\d{10,15}(@s\.whatsapp\.net|@c\.us)?$/.test(v)) achados.push(digitos(v));
+          else procura(v);
+        }
+      }
+    };
+    procura(d);
+    return achados[0] || '';
+  }
+
   async foto(numero) {
     let st, d;
     try { [st, d] = await this.chama('POST', `/chat/fetchProfilePictureUrl/${this.inst}`, { number: digitos(numero) }, 10); } catch (e) { return null; }
@@ -248,6 +267,30 @@ async function webhookWaha(urlWaha, sessao) {
   return { status: d.status === undefined ? null : d.status, webhooks: ganchos.filter(ehObj).map((g) => ({ url: g.url || '', events: g.events || [] })) };
 }
 
+/** as últimas mensagens que chegaram no webhook e o que o sistema fez com cada uma */
+async function respostasRecebidas(limite = 8) {
+  const L = 'TbWhatsAppLog';
+  let linhas;
+  try { linhas = (await db.tabela(L).orderBy(db.coluna(L, 'id'), 'desc').limit(400)).reverse(); } catch (e) { return []; }
+  const eventos = [];
+  for (const l0 of linhas) {
+    const l = db.linha(L, l0);
+    let d = l.data_json;
+    if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { continue; } }
+    if (!ehObj(d)) continue;
+    if (d.tipo === 'resultado_webhook') {
+      for (let i = eventos.length - 1; i >= 0; i--) if (eventos[i].resultado === null) { eventos[i].resultado = d.resposta; eventos[i].http = d.http; break; }
+      continue;
+    }
+    if (!d.event || d.event === 'teste.webhook' || !('instance' in d || 'session' in d)) continue;
+    let p, sessao, servidor;
+    if ('instance' in d) { [, p, sessao] = eventoComoWaha(d); servidor = 'Evolution API'; } else { p = ehObj(d.payload) ? d.payload : {}; sessao = d.session || ''; servidor = 'WAHA'; }
+    const dh = l.dh ? `${l.dh.slice(8, 10)}/${l.dh.slice(5, 7)}/${l.dh.slice(0, 4)} ${l.dh.slice(11, 19)}` : '';
+    eventos.push({ dh, evento: String(d.event), servidor, sessao: String(sessao || ''), de: String(p.from || ''), texto: String(p.body || '').slice(0, 80), resultado: null, http: null });
+  }
+  return eventos.slice(-limite).reverse();
+}
+
 /** o último evento que chegou de um servidor de WhatsApp em /webhook/resposta/ */
 async function ultimoRecebido() {
   try {
@@ -293,12 +336,14 @@ function eventoComoWaha(corpo) {
     id: k.id === undefined ? null : k.id, from: k.remoteJid || '', fromMe: Boolean(k.fromMe), body: texto(d.message),
     remoteJidAlt: k.remoteJidAlt || k.senderPn || '', senderPn: k.senderPn || d.senderPn || '', participant: k.participant || '',
     pushName: d.pushName || '', evolution: true,
+    // o evento inteiro: o telefone real pode vir em outras chaves (senderPn, participantPn...)
+    dados: d,
   }, sessao];
 }
 
 const ehEventoEvolution = (corpo) => ehObj(corpo) && 'instance' in corpo && 'data' in corpo && !('payload' in corpo);
 
 module.exports = {
-  EVOLUTION, WAHA, servidor, disponivel, wahaUrl, wahaChave, webhookWaha, ultimoRecebido, provedorDaClinica, gravaProvedor, podeTrocar, clinicaDaSessao,
+  EVOLUTION, WAHA, servidor, disponivel, wahaUrl, wahaChave, webhookWaha, ultimoRecebido, respostasRecebidas, provedorDaClinica, gravaProvedor, podeTrocar, clinicaDaSessao,
   enderecoWebhook, Evolution, Resposta, eventoComoWaha, ehEventoEvolution,
 };

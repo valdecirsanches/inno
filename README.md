@@ -267,6 +267,10 @@ o gravado no servidor (Evolution: `/webhook/find`; WAHA: `config.webhooks` da se
 conexão e a última resposta que chegou (`tbWhatsappLog`); na Evolution o super/administrador
 aplica o webhook por ali, e "Testar o endereço" faz o próprio servidor chamar o webhook.
 Ao conferir a conexão de uma instância já conectada, o webhook é gravado de novo.
+O botão mostra também as últimas mensagens recebidas e o que o robô fez com cada uma (o resultado
+de cada evento fica gravado em `tbWhatsappLog` logo depois dele, com `tipo: resultado_webhook`).
+Resposta de um contato `@lid` sem o telefone no evento: na Evolution, o telefone é procurado nos
+contatos da instância (`/chat/findContacts`) e em qualquer chave do evento (senderPn, participantPn...).
 Teste: `node tools/testes/evolution/roda.js ../appclinic ~/venv-dj/bin/python` (Evolution e WAHA
 falsos; o mesmo roteiro passa no AppClinic e no Inno).
 

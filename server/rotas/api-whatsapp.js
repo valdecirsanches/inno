@@ -194,7 +194,8 @@ async function webhook(req, res) {
     }
   }
   const ret = { provedor, sessao, webhook_esperado: esperado,
-    podeAplicar: evolution.podeTrocar(req.user) && provedor === evolution.EVOLUTION, ultimo_recebido: await evolution.ultimoRecebido() };
+    podeAplicar: evolution.podeTrocar(req.user) && provedor === evolution.EVOLUTION, ultimo_recebido: await evolution.ultimoRecebido(),
+    recebidas: await evolution.respostasRecebidas() };
   if (provedor === evolution.EVOLUTION) {
     const evo = new evolution.Evolution(sessao);
     ret.servidor = evo.url || '(EVOLUTION_URL não está no .env)';

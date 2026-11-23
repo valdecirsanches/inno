@@ -230,7 +230,27 @@ function _htmlWebhook(r) {
         linha('Webhook esperado', _escWebhook(r.webhook_esperado)) +
         linha('Gravado no servidor', gravado) +
         linha('Última resposta recebida', ultimo) +
-        '</table>' + botoes;
+        '</table>' + _htmlRecebidas(r.recebidas || []) + botoes;
+}
+
+// as últimas mensagens que chegaram no webhook e o que o sistema fez com cada uma
+function _htmlRecebidas(lista) {
+    if (!lista.length) return '';
+    var explica = function (r) {
+        if (!r) return '<span style="color:#888;">sem resultado gravado</span>';
+        if (r.acao) return '<span style="color:#1e7e4a;">' + _escWebhook(r.acao) + ' da consulta ' + _escWebhook(r.consulta) +
+            (r.retorno_enviado ? ' (retorno enviado ao paciente)' : ' (<b>retorno ao paciente não saiu</b>)') + '</span>';
+        if (r.error === 'Contexto não encontrado') return '<span style="color:#a93226;">Nenhum lembrete pendente para este número' +
+            (r.telefones && r.telefones.length ? ' (' + _escWebhook(r.telefones.join(', ')) + ')' : ' (o WhatsApp não informou o telefone)') + '</span>';
+        return '<span style="color:' + (r.success === false ? '#a93226' : '#666') + ';">' + _escWebhook(r.error || r.info || r.message || JSON.stringify(r)) + '</span>';
+    };
+    return '<div style="margin-top:12px;text-align:left;font-size:12px;"><b>Últimas mensagens recebidas</b>' +
+        '<table style="width:100%;margin-top:4px;border-collapse:collapse;">' +
+        lista.map(function (e) {
+            return '<tr style="border-top:1px solid #eee;"><td style="padding:3px 6px 3px 0;white-space:nowrap;vertical-align:top;">' + _escWebhook(e.dh) +
+                '</td><td style="padding:3px 6px;vertical-align:top;word-break:break-all;">' + _escWebhook(e.de) + '<br><i>"' + _escWebhook(e.texto) + '"</i></td>' +
+                '<td style="padding:3px 0;vertical-align:top;">' + explica(e.resultado) + '</td></tr>';
+        }).join('') + '</table></div>';
 }
 
 function _idClinicaWebhook() {

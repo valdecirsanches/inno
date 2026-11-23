@@ -99,7 +99,7 @@ waha.listen(0, async () => {
       assert.equal(sq.prepare('SELECT status FROM tb_whatsapp WHERE id = 1').get().status, 'fechado');
       const ult = pedidos.filter((p) => p.caminho === '/api/sendImage').at(-1);
       assert.equal(ult.corpo.caption, 'Olá Ana Paula de Souza,\nSua consulta em 02 de janeiro às 09:10 \nConfirmado.');
-      assert.equal(sq.prepare('SELECT COUNT(*) n FROM tbWhatsappLog').get().n, n0 + 2);   // evento recebido + detalhes do retorno
+      assert.equal(sq.prepare('SELECT COUNT(*) n FROM tbWhatsappLog').get().n, n0 + 3);   // evento recebido + detalhes do retorno + resultado do webhook
       assert.equal(sq.prepare('SELECT COUNT(*) n FROM WhatsApp_mensagemprocessada').get().n, 1);
     });
     // envio pendente de outra consulta, respondido por um contato @lid

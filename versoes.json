@@ -2,6 +2,21 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.15",
+      "data": "23/11/2026",
+      "titulo": "WhatsApp: diagnóstico das respostas dos pacientes",
+      "itens": [
+        {
+          "tipo": "novo",
+          "texto": "O botão Webhook mostra as últimas mensagens que chegaram dos pacientes e o que o sistema fez com cada uma (confirmou, cancelou, não achou o lembrete, resposta não reconhecida)."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Na Evolution API, respostas de pacientes identificados pelo WhatsApp só por um código interno (@lid) agora encontram o telefone pelos contatos da instância."
+        }
+      ]
+    },
+    {
       "versao": "2.4.14",
       "data": "23/11/2026",
       "titulo": "WhatsApp: servidor no .env e conferência do webhook",

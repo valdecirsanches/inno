@@ -39,6 +39,7 @@ http.createServer((req, res) => {
     if (grupo === 'webhook' && acao === 'set') { ganchos[i] = { enabled: !!j.webhook.enabled, url: j.webhook.url, events: j.webhook.events }; return resp(201, { webhook: { instanceName: i, webhook: j.webhook } }); }
     if (grupo === 'webhook' && acao === 'find') { if (!(i in estado)) return resp(404, { status: 404 }); return resp(200, ganchos[i] ? Object.assign({ instanceName: i }, ganchos[i]) : null); }
     if (grupo === 'chat' && acao === 'whatsappNumbers') return resp(200, j.numbers.map((n) => ({ exists: !n.endsWith('0000'), jid: `${n}@s.whatsapp.net`, number: n })));
+    if (grupo === 'chat' && acao === 'findContacts') return resp(200, [{ id: 'c1', remoteJid: j.where.remoteJid, pushName: 'Paciente', remoteJidAlt: '5511988887777@s.whatsapp.net' }]);
     if (grupo === 'chat' && acao === 'fetchProfilePictureUrl') return resp(200, { wuid: `${j.number}@s.whatsapp.net`, profilePictureUrl: 'https://pps.whatsapp.net/foto.jpg' });
     if (grupo === 'message') return resp(201, { key: { remoteJid: `${j.number}@s.whatsapp.net`, fromMe: true, id: `EVO${log.length}` }, status: 'PENDING', message: {} });
     resp(404, { error: 'rota desconhecida' });

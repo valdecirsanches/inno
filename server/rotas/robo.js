@@ -67,6 +67,13 @@ async function telefonesDoRemetente(remetente, payload, sessao) {
   const b = pyStrValor(remetente || '');
   if (b.endsWith('@c.us') || b.endsWith('@s.whatsapp.net')) tels.add(b.split('@')[0].replace(/\D/g, ''));
   telefonesNoPayload(payload, tels);
+  if (b.endsWith('@lid') && !tels.size && ehDict(payload) && payload.evolution) {
+    const cl = await clinicaDaSessao(sessao);
+    if (cl && evolution.disponivel() && await evolution.provedorDaClinica(cl.id) === evolution.EVOLUTION) {
+      const pn = await new evolution.Evolution(sessao || cl.whatsappClient).telefoneDoLid(b);
+      if (pn) tels.add(pn);
+    }
+  }
   if (b.endsWith('@lid') && !tels.size) {
     const cl = await clinicaDaSessao(sessao);
     if (cl) {
@@ -218,11 +225,25 @@ async function resposta(req, res) {
   }
 }
 
+/** o que foi feito com o evento fica gravado logo depois dele (botão "Webhook" da clínica) */
+async function respostaComResultado(req, res) {
+  const envia = res.send.bind(res);
+  let enviado = null;
+  res.send = (b) => { enviado = b; return envia(b); };
+  await resposta(req, res);
+  try {
+    const corpo = JSON.parse(Buffer.isBuffer(enviado) ? enviado.toString('utf8') : String(enviado));
+    if (!(ehDict(corpo) && String(corpo.info || '').startsWith('Evento '))) {
+      await registraRecebido(req, comoJson({ tipo: 'resultado_webhook', http: res.statusCode, resposta: corpo }));
+    }
+  } catch (e) { /* sem resultado */ }
+}
+
 module.exports = function (app) {
   // @require_http_methods(["POST"]): outro método recebe 405 vazio
   app.all('/webhook/resposta/', (req, res, next) => {
     if (req.method !== 'POST') return res.status(405).set('Allow', 'POST').type('html').send('');
-    Promise.resolve(resposta(req, res)).catch(next);
+    Promise.resolve(respostaComResultado(req, res)).catch(next);
   });
 };
 

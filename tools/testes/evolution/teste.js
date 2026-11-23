@@ -109,10 +109,20 @@ async function roteiro(base, arq, { admin = ['diego', 'teste123'], comum = ['med
   r = J(await anon.pede('POST', '/webhook/resposta/', { json: { event: 'connection.update', instance: 'clin1', data: { state: 'open' } } }));
   ok(r.success === true && /ignorado/.test(r.info || ''), 'outros eventos ignorados', r);
 
+  // @lid sem o telefone no evento: a Evolution informa pelos contatos da instância
+  await n.pede('POST', '/api/whatsapp/EnviaWhatsApp/', { corpo: { id_consulta: String(consultas[0]), celular: '11988887777' }, ajax: true });
+  r = J(await anon.pede('POST', '/webhook/resposta/', { json: evento('1', 'RESP4', '999888777666555@lid') }));
+  ok(r.success === true && r.acao === 'CONFIRMAÇÃO' && r.consulta === consultas[0], '@lid sem telefone no evento: achado pelos contatos da Evolution', r);
+  r = J(await anon.pede('POST', '/webhook/resposta/', { json: evento('quero remarcar', 'RESP5', '5511977776666@s.whatsapp.net') }));
+
   // botão "Webhook": conferência, aplicar e testar
   r = J(await n.pede('GET', '/api/whatsapp/webhook/?id_clinica=1', { ajax: true }));
   ok(r.provedor === 'evolution' && r.webhook_esperado === 'https://teste.local/webhook/resposta/' && r.confere === true && r.estado === 'WORKING'
     && r.ultimo_recebido && r.ultimo_recebido.servidor === 'Evolution API', 'webhook conferido (gravado = esperado; última resposta)', r);
+  const rec = r.recebidas || [];
+  ok(rec.length >= 4 && rec[0].texto === 'quero remarcar' && rec[0].resultado && /Opção inválida/.test(rec[0].resultado.message)
+    && rec[1].de === '999888777666555@lid' && rec[1].resultado && rec[1].resultado.acao === 'CONFIRMAÇÃO',
+  'últimas mensagens recebidas com o que foi feito', rec.slice(0, 3));
   await fetch(EVO + '/__webhook?i=clin1&url=http://outro/');
   r = J(await n.pede('GET', '/api/whatsapp/webhook/?id_clinica=1', { ajax: true }));
   ok(r.confere === false && r.no_servidor.url === 'http://outro/', 'webhook errado no servidor é apontado', r);
