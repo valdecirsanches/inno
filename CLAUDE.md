@@ -62,7 +62,8 @@ O dono do projeto fala português: responda em português.
   `node tools/testes/whatsapp-logo.js` (WhatsApp com a logo no topo) e
   `node tools/testes/prontuario.js` (correções da revisão do prontuário) e
   `node tools/testes/evolution/roda.js ../appclinic ~/venv-dj/bin/python` (Evolution API e WAHA
-  pelo `.env`, no AppClinic e no Inno),
+  pelo `.env`, no AppClinic e no Inno) e `node tools/testes/evolution-reconecta.js`
+  (reconexão da Evolution no "Connection Closed"),
   cada um com o serviço externo falso, local.
   Para testes novos, use `tools/testes/base.js` (banco, login e cliente prontos).
 - Cobertura: `python3 tools/testes/rotas_django.py ../appclinic > /tmp/django.txt` e

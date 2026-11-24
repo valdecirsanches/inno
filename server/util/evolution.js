@@ -121,6 +121,20 @@ class Evolution {
     return String(inst.state || (ehObj(d) && d.state) || inst.status || '').toLowerCase() || 'close';
   }
 
+  /** reinicia a instância (PUT na v2; POST em versões antigas) e espera voltar a "open" (até ~20 s) */
+  async reinicia() {
+    try {
+      let [st] = await this.chama('PUT', `/instance/restart/${this.inst}`, null, 20);
+      if (st === 404 || st === 405) [st] = await this.chama('POST', `/instance/restart/${this.inst}`, null, 20);
+      if (st >= 400) return false;
+    } catch (e) { return false; }
+    for (let i = 0; i < 10; i++) {
+      await new Promise((ok) => setTimeout(ok, 2000));
+      if (await this.estado() === 'open') { await new Promise((ok) => setTimeout(ok, 1500)); return true; }
+    }
+    return false;
+  }
+
   /** o estado no vocabulário do WAHA */
   async statusWaha() {
     const e = await this.estado();
@@ -241,6 +255,12 @@ class Evolution {
       caminho = `/message/sendWhatsAppAudio/${this.inst}`; corpo = { number: numero, audio: arq.url || arq.data || '' };
     } else return new Resposta({ error: `Envio "${ep}" não existe na Evolution API.` }, 400);
     let [st, d] = await this.chama('POST', caminho, corpo, 60);
+    // "Connection Closed": a Evolution diz que a instância está conectada (open), mas a conexão com
+    // o WhatsApp caiu por dentro. Reinicia a instância, espera reconectar e tenta mais uma vez.
+    if (st >= 400 && /connection closed/i.test(JSON.stringify(d || ''))) {
+      console.log(`[Evolution] ${this.sessao}: "Connection Closed" ao enviar; reiniciando a instância`);
+      if (await this.reinicia()) [st, d] = await this.chama('POST', caminho, corpo, 60);
+    }
     if (!ehObj(d)) d = { resposta: d };
     const chave = ehObj(d.key) ? d.key : null;
     if (st < 400 && chave) d.id = { id: chave.id || '', remote: chave.remoteJid || `${numero}@s.whatsapp.net` };

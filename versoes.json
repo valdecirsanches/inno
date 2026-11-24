@@ -2,6 +2,18 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.20",
+      "data": "24/11/2026",
+      "titulo": "WhatsApp: reconexão automática da Evolution",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Envio pela Evolution API que falhava com Connection Closed (a instância aparece conectada, mas a ligação com o WhatsApp caiu): o Inno reinicia a instância, espera reconectar e tenta de novo."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.19",
       "data": "24/11/2026",
       "titulo": "WhatsApp: servidor mostrado na janela",

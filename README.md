@@ -249,6 +249,9 @@ Teste: `node tools/testes/prontuario.js`.
   vem de `response.message` (antes só "Internal Server Error"). (2.4.19) A linha "Conectado à ..."
   (`host_ident`) mostra "Evolution API <url> ( <sessão de quem envia> )" quando o envio sai pela
   Evolution; com o WAHA, continua como era.
+- (2.4.20, só no Inno) Evolution: "Connection Closed" no envio com a instância "open" (a ligação do
+  Baileys caiu por dentro): reinicia a instância (`PUT /instance/restart`), espera voltar a "open"
+  (até ~20 s) e tenta o envio mais uma vez. Teste: `node tools/testes/evolution-reconecta.js`.
 - (2.4.12) Médico do documento: aplicar padrão de prescrição/relatório (`UtilizaConf...`) gravava
   o médico do usuário, vazio para usuário sem médico vinculado (o botão Novo já usava o da consulta);
   agora usa o da consulta. Imprimir exame/relatório/prescrição sem médico gravado (usuário sem
