@@ -194,7 +194,8 @@ function executarAcaoFinal(acao, row) {
                 if(typeof AtualizaTabela === 'function') AtualizaTabela();
             } else {
                 // Aviso de Erro que veio do Python
-                swal('Erro no Envio', res.error || 'Ocorreu um erro inesperado.', 'error');
+                if (acao === 'whatsapp') ConfereConexaoAposErro(row, res.error);
+                else swal('Erro no Envio', res.error || 'Ocorreu um erro inesperado.', 'error');
             }
         },
         error: function(xhr) {
@@ -205,6 +206,27 @@ function executarAcaoFinal(acao, row) {
             swal('Falha Crítica', erroMsg, 'error');
         }
     });
+}
+
+// Falhou o envio: a conexão pode ter caído depois que a janela abriu
+// (a instância volta para "connecting"/QR). Confere de novo e, se pedir
+// leitura do QR Code, reabre a janela do WhatsApp já com o QR na tela.
+async function ConfereConexaoAposErro(row, erro) {
+    let wa = null;
+    try {
+        const r = await api.get('/whatsapp/agenda_texto/', { params: { id_consulta: row.id, _ts: Date.now() } });
+        wa = r.data && r.data.whatsapp_status;
+    } catch (e) { wa = null; }
+    if (wa && wa.status === 'SCAN_QR_CODE') {
+        swal({
+            title: 'WhatsApp desconectado',
+            html: 'A conexão com o WhatsApp caiu e precisa ser refeita.<br>Leia o QR Code na próxima tela e envie de novo.',
+            type: 'warning',
+            confirmButtonText: 'Mostrar QR Code'
+        }).then(function () { EnviaWhatsApp(row); }, function () {});
+        return;
+    }
+    swal('Erro no Envio', erro || 'Ocorreu um erro inesperado.', 'error');
 }
 
 function Mostrar_texto_whatsapp(){
