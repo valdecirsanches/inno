@@ -2,6 +2,18 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.19",
+      "data": "24/11/2026",
+      "titulo": "WhatsApp: servidor mostrado na janela",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Agenda: a janela do WhatsApp mostrava sempre o endereço do WAHA e a sessão da clínica da consulta; agora mostra o servidor (Evolution API ou WAHA) e a sessão por onde o envio sai."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.18",
       "data": "24/11/2026",
       "titulo": "WhatsApp: QR Code indevido e motivo do erro",

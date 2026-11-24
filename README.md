@@ -246,7 +246,9 @@ Teste: `node tools/testes/prontuario.js`.
   clínica de quem marcou a consulta (`ag.fk_usuario`), mas o envio sai pela clínica de quem está
   usando (`request.user`); com sessões/provedores diferentes, a tela pedia QR Code com o WhatsApp
   conectado. Agora usa a do usuário (sem clínica: a de quem marcou). Erro da Evolution: a mensagem
-  vem de `response.message` (antes só "Internal Server Error").
+  vem de `response.message` (antes só "Internal Server Error"). (2.4.19) A linha "Conectado à ..."
+  (`host_ident`) mostra "Evolution API <url> ( <sessão de quem envia> )" quando o envio sai pela
+  Evolution; com o WAHA, continua como era.
 - (2.4.12) Médico do documento: aplicar padrão de prescrição/relatório (`UtilizaConf...`) gravava
   o médico do usuário, vazio para usuário sem médico vinculado (o botão Novo já usava o da consulta);
   agora usa o da consulta. Imprimir exame/relatório/prescrição sem médico gravado (usuário sem

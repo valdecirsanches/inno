@@ -436,7 +436,9 @@ async function agenda_texto(req, res) {
     json(res, {
       success, name: pac.paciente, celular: pac.celular, logo,
       host: evolution.wahaUrl() || cl.whatsapp_url, session: cl.whatsappClient, whatsapp_status: statusWa,
-      host_ident: `${evolution.wahaUrl() || pyStrValor(cl.whatsapp_url)} ( ${pyStrValor(cl.whatsappClient)} )`,
+      // o servidor e a sessão por onde o envio sai de verdade (antes mostrava sempre o do WAHA e a
+      // sessão da clínica da consulta, mesmo com a Evolution API)
+      host_ident: ws.evo ? `Evolution API ${ws.host} ( ${pyStrValor(ws.session)} )` : `${evolution.wahaUrl() || pyStrValor(cl.whatsapp_url)} ( ${pyStrValor(cl.whatsappClient)} )`,
     });
   } catch (e) {
     json(res, { success: false, error: e.message }, 400);
