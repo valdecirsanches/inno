@@ -2,6 +2,22 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.18",
+      "data": "24/11/2026",
+      "titulo": "WhatsApp: QR Code indevido e motivo do erro",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Agenda: a janela do WhatsApp pedia o QR Code mesmo com o WhatsApp conectado; conferia a sessão de quem marcou a consulta, não a da clínica de quem está enviando."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "Erro no envio pela Evolution API mostra o motivo de verdade, em vez de só Internal Server Error."
+        }
+      ],
+      "silenciosa": true
+    },
+    {
       "versao": "2.4.17",
       "data": "23/11/2026",
       "titulo": "Respostas dos pacientes pela Evolution API",

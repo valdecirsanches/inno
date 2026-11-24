@@ -242,6 +242,11 @@ Teste: `node tools/testes/prontuario.js`.
   Consultas já marcadas antes disso: `node tools/manutencao/convenio-consultas.js` (lista) e
   `--corrige`. (2.4.11) Além disso, ao abrir o atendimento (`IniciaAtendimento`) de uma consulta
   em aberto, o convênio dela é acertado para o do cadastro antes de montar o cabeçalho.
+- (2.4.18) Janela do WhatsApp na agenda (`agenda_texto`): a situação da conexão era a da sessão da
+  clínica de quem marcou a consulta (`ag.fk_usuario`), mas o envio sai pela clínica de quem está
+  usando (`request.user`); com sessões/provedores diferentes, a tela pedia QR Code com o WhatsApp
+  conectado. Agora usa a do usuário (sem clínica: a de quem marcou). Erro da Evolution: a mensagem
+  vem de `response.message` (antes só "Internal Server Error").
 - (2.4.12) Médico do documento: aplicar padrão de prescrição/relatório (`UtilizaConf...`) gravava
   o médico do usuário, vazio para usuário sem médico vinculado (o botão Novo já usava o da consulta);
   agora usa o da consulta. Imprimir exame/relatório/prescrição sem médico gravado (usuário sem

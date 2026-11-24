@@ -244,9 +244,13 @@ class Evolution {
     if (!ehObj(d)) d = { resposta: d };
     const chave = ehObj(d.key) ? d.key : null;
     if (st < 400 && chave) d.id = { id: chave.id || '', remote: chave.remoteJid || `${numero}@s.whatsapp.net` };
-    else if (st >= 400 && !('error' in d)) {
+    else if (st >= 400) {
+      // a Evolution manda {"error": "Internal Server Error", "response": {"message": [...]}}:
+      // o motivo de verdade está em response.message (antes a tela só mostrava o genérico)
       const msg = ehObj(d.response) ? d.response.message : null;
-      d.error = Array.isArray(msg) ? msg.map(String).join('; ') : (msg || d.message || `HTTP ${st}`);
+      const detalhe = Array.isArray(msg) ? msg.map(String).join('; ') : (msg ? String(msg) : '');
+      if (detalhe) d.error = detalhe;
+      else if (!('error' in d)) d.error = d.message || `HTTP ${st}`;
     }
     return new Resposta(d, st);
   }

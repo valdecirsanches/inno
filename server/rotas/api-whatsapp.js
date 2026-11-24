@@ -424,7 +424,11 @@ async function agenda_texto(req, res) {
   try {
     const ag = await consulta(req.GET.get('id_consulta'));
     const logo = `${esquema(req)}://${hostDe(req)}/static/img/neuro100.png`;
-    const ws = new WhatsAppService(await usuarioComClinica(ag.fk_usuario_id));
+    // a situação da conexão é a da sessão por onde o envio sai: a da clínica de quem está usando
+    // (EnviaWhatsApp usa req.user); antes era a de quem marcou a consulta, e a tela pedia o QR
+    // Code de outra sessão
+    const quem = req.user && req.user.is_authenticated && req.user.fk_clinica_id ? await usuarioComClinica(req.user.id) : await usuarioComClinica(ag.fk_usuario_id);
+    const ws = new WhatsAppService(quem);
     const statusWa = await ws.check_status();
     const success = await msgWhatsapp(ag);
     const pac = await rel('TbPacientes', ag.fk_paciente_id, 'paciente');
