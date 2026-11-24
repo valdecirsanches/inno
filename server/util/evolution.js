@@ -118,7 +118,30 @@ class Evolution {
     if (st === 401 || st === 403) return 'recusada';
     if (st >= 400) return 'offline';
     const inst = ehObj(d) && ehObj(d.instance) ? d.instance : {};
-    return String(inst.state || (ehObj(d) && d.state) || inst.status || '').toLowerCase() || 'close';
+    const e = String(inst.state || (ehObj(d) && d.state) || inst.status || '').toLowerCase() || 'close';
+    if (e !== 'open') return e;
+    // O connectionState às vezes fica em "open" com a sessão já caída (o envio dá
+    // "Connection Closed"), enquanto o painel da Evolution mostra "Connecting":
+    // confere também o estado que o painel usa e fica com o pior dos dois.
+    const painel = await this.estadoPainel();
+    return painel && painel !== 'open' ? painel : e;
+  }
+
+  /** estado da instância como o painel da Evolution mostra (fetchInstances); '' se não souber */
+  async estadoPainel() {
+    let st, d;
+    try { [st, d] = await this.chama('GET', `/instance/fetchInstances?instanceName=${this.inst}`, null, 8); } catch (e) { return ''; }
+    if (st >= 400) return '';
+    const lista = Array.isArray(d) ? d : (ehObj(d) ? [d] : []);
+    for (const x of lista) {
+      if (!ehObj(x)) continue;
+      const i = ehObj(x.instance) ? x.instance : x;
+      const nome = i.name || i.instanceName || '';
+      if (nome && nome !== this.sessao) continue;
+      const v = i.connectionStatus || i.status || i.state || '';
+      if (['open', 'connecting', 'close'].includes(String(v).toLowerCase())) return String(v).toLowerCase();
+    }
+    return '';
   }
 
   /** reinicia a instância (PUT na v2; POST em versões antigas) e espera voltar a "open" (até ~20 s) */

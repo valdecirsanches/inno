@@ -3,6 +3,7 @@ const http = require('http');
 const assert = require('assert');
 const path = require('path');
 let falhas = 1;
+let painel = 'open';
 const pedidos = [];
 const srv = http.createServer((req, res) => {
   let c = ''; req.on('data', (d) => { c += d; });
@@ -10,6 +11,7 @@ const srv = http.createServer((req, res) => {
     pedidos.push(`${req.method} ${req.url.split('?')[0]}`);
     const envia = (s, b) => { res.writeHead(s, { 'content-type': 'application/json' }); res.end(JSON.stringify(b)); };
     if (/\/instance\/connectionState\//.test(req.url)) return envia(200, { instance: { state: 'open' } });
+    if (/\/instance\/fetchInstances/.test(req.url)) return envia(200, [{ name: 'appclinic', connectionStatus: painel }]);
     if (/\/instance\/restart\//.test(req.url)) return envia(200, { instance: { state: 'connecting' } });
     if (/\/message\/send/.test(req.url)) {
       if (falhas-- > 0) return envia(500, { status: 500, error: 'Internal Server Error', response: { message: ['Error: Connection Closed'] } });
@@ -32,7 +34,13 @@ srv.listen(0, '127.0.0.1', async () => {
     assert.equal(r.status_code, 500); assert.equal(JSON.parse(r.text).error, 'Error: Connection Closed');
     assert.equal(pedidos.filter((p) => /send/.test(p)).length, 2);
     console.log('ok - continua fechada: tenta só mais uma vez e mostra o motivo');
-    console.log('\n2 conferências ok');
+    painel = 'connecting';
+    assert.equal(await e.estado(), 'connecting'); assert.equal(await e.statusWaha(), 'SCAN_QR_CODE');
+    console.log('ok - connectionState "open" mas o painel "Connecting": vale o painel (pede QR Code)');
+    painel = 'open';
+    assert.equal(await e.statusWaha(), 'WORKING');
+    console.log('ok - os dois "open": conectado');
+    console.log('\n4 conferências ok');
   } catch (x) { console.error('FALHOU:', x.message); process.exitCode = 1; }
   srv.close();
 });

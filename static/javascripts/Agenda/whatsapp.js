@@ -103,19 +103,22 @@ async function EnviaWhatsApp(row) {
                 }
 
                 // 3. MONITORAMENTO DO QR CODE
-                const ajustarLayout = () => {
+                const ajustarLayout = (html) => {
                     if (colQr.style.display !== 'none') {
                         colQr.style.display = 'none';
                         modal.style.width = '450px';
                         fallback.appendChild(statusHeader);
-                        labelHost.innerHTML = `<i class="fa fa-check-circle" style="color:#1ab394;"></i> Conectado à ${data.host_ident}`;
                     }
+                    labelHost.innerHTML = html || `<i class="fa fa-check-circle" style="color:#1ab394;"></i> Conectado à ${data.host_ident}`;
                 };
 
                 const wa = data.whatsapp_status;
-                if (wa && wa.status === 'SCAN_QR_CODE') {
+                const sit = SituacaoWhatsApp(wa);
+                if (sit === 'qr') {
                     containerQr.innerHTML = '';
                     ReadQRCode2(containerQr, wa.host, wa.session);
+                } else if (sit === 'erro') {
+                    ajustarLayout(TextoErroWhatsApp(wa, data.host_ident));
                 } else { ajustarLayout(); }
 
                 timerWA = setInterval(async () => {
@@ -208,6 +211,22 @@ function executarAcaoFinal(acao, row) {
     });
 }
 
+// Situação da conexão para a tela: 'conectado' só com a sessão autenticada
+// (WORKING); sem autenticação (aguardando QR, parada) → 'qr'; servidor fora
+// do ar ou chave recusada → 'erro' (antes qualquer coisa aparecia "Conectado").
+function SituacaoWhatsApp(wa) {
+    const st = wa && wa.status;
+    if (st === 'WORKING' || st === 'CONNECTED') return 'conectado';
+    if (st === 'SCAN_QR_CODE' || st === 'STOPPED' || st === 'STARTING' || st === 'FAILED') return wa.host || wa.session ? 'qr' : 'erro';
+    return 'erro';
+}
+
+function TextoErroWhatsApp(wa, hostIdent) {
+    const msg = (wa && (wa.message || wa.status)) || 'sem resposta';
+    return `<i class="fa fa-exclamation-triangle" style="color:#ed5565;"></i> WhatsApp não conectado (${$('<div>').text(msg).html()})` +
+        (hostIdent ? `<br><small>${hostIdent}</small>` : '');
+}
+
 // Falhou o envio: a conexão pode ter caído depois que a janela abriu
 // (a instância volta para "connecting"/QR). Confere de novo e, se pedir
 // leitura do QR Code, reabre a janela do WhatsApp já com o QR na tela.
@@ -217,7 +236,7 @@ async function ConfereConexaoAposErro(row, erro) {
         const r = await api.get('/whatsapp/agenda_texto/', { params: { id_consulta: row.id, _ts: Date.now() } });
         wa = r.data && r.data.whatsapp_status;
     } catch (e) { wa = null; }
-    if (wa && wa.status === 'SCAN_QR_CODE') {
+    if (SituacaoWhatsApp(wa) === 'qr') {
         swal({
             title: 'WhatsApp desconectado',
             html: 'A conexão com o WhatsApp caiu e precisa ser refeita.<br>Leia o QR Code na próxima tela e envie de novo.',
@@ -403,11 +422,13 @@ async function Restaura(row) {
             };
 
             // INICIALIZAÇÃO
-            if (data.whatsapp_status && data.whatsapp_status.status === 'SCAN_QR_CODE') {
+            const sitR = SituacaoWhatsApp(data.whatsapp_status);
+            if (sitR === 'qr') {
                 containerQr.innerHTML = '';
                 ReadQRCode2(containerQr, data.whatsapp_status.host, data.whatsapp_status.session);
             } else {
                 ajustarLayoutConectado();
+                if (sitR === 'erro') labelHost.innerHTML = TextoErroWhatsApp(data.whatsapp_status, data.host_ident);
             }
 
             // MONITORAMENTO EM TEMPO REAL

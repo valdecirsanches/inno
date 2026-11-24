@@ -2,6 +2,21 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.22",
+      "data": "24/11/2026",
+      "titulo": "WhatsApp: estado real da conexão",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "A janela do WhatsApp mostrava 'Conectado' mesmo com a instância da Evolution em 'Connecting' (desconectada); agora confere o mesmo estado do painel da Evolution e mostra o QR Code para reconectar."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Quando o servidor do WhatsApp está fora do ar ou recusa a chave, a janela avisa em vermelho em vez de dizer 'Conectado'."
+        }
+      ]
+    },
+    {
       "versao": "2.4.21",
       "data": "24/11/2026",
       "titulo": "WhatsApp: QR Code quando a conexão cai no envio",
