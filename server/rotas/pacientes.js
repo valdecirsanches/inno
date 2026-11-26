@@ -11,7 +11,7 @@ const QueryDict = require('../util/querydict');
 const { render } = require('../templates');
 const { json } = require('../util/http');
 const modelo = require('../util/modelo');
-const { pyStr, djJson, exige, escapaLike, idade, dmy, anoDe } = require('../util/python');
+const { pyStr, pyStrValor, djJson, exige, escapaLike, idade, dmy, anoDe } = require('../util/python');
 const { extenso, strFloat } = require('../util/extenso');
 const { erroPython } = require('../util/orm');
 
@@ -20,6 +20,14 @@ const BASE = '/cadastros/paciente';
 
 const EXCLUI_PACIENTE = ['ultima_alt', 'titular', 'responsavel', 'hora_cadastro', 'data_cadastro', 'usuario', 'telefone_salvo'];
 const EXCLUI_RECIBO = ['fk_paciente', 'fk_usuario', 'codigo', 'valor_extenso', 'valor', 'usuario'];
+
+/** o código do prontuário da tela é o do paciente? ("00123" e 123 contam como iguais) */
+function mesmoCodigo(daTela, doBanco) {
+  const t = String(daTela).trim();
+  const b = String(doBanco === null || doBanco === undefined ? '' : doBanco).trim();
+  if (t === b) return true;
+  return /^\d+$/.test(t) && /^\d+$/.test(b) && Number(t) === Number(b);
+}
 
 function naoExiste(nome) { const e = new Error(`${nome} matching query does not exist.`); e.python = true; return e; }
 
@@ -221,8 +229,18 @@ module.exports = function (app) {
     if (!/^\s*[-+]?\d+\s*$/.test(pid)) throw new Error(`invalid literal for int() with base 10: '${pid}'`);
     const pacienteId = parseInt(pid, 10);
     const instancia = pacienteId > 0 ? await obtem('TbPacientes', { id: pacienteId }) : null;
-    const form = await modelo.validaForm('TbPacientes', new QueryDict(formSerializado), { instancia, exclui: EXCLUI_PACIENTE });
+    const dadosForm = new QueryDict(formSerializado);
+    const form = await modelo.validaForm('TbPacientes', dadosForm, { instancia, exclui: EXCLUI_PACIENTE });
     if (!form.valido) return json(res, { erro: Object.keys(form.erros) });
+    // Trava contra gravar uma ficha por cima de outro paciente: o código do prontuário
+    // (só leitura na tela) tem de ser o do paciente do ID. Se não for, a tela ficou com
+    // o ID de um paciente aberto antes (ex.: resposta atrasada depois do "Novo
+    // prontuário") e os dados digitados iriam para ele: não grava nada e explica.
+    const codForm = String(dadosForm.get('codigo') || '').trim();
+    if (instancia && codForm && !mesmoCodigo(codForm, instancia.codigo)) {
+      console.log(`[SalvaPaciente] recusado: ID ${pacienteId} (código ${instancia.codigo}) com a ficha do código ${codForm}`);
+      return json(res, { erro: ['codigo'], mensagem: `A ficha na tela (prontuário ${codForm}) ia ser gravada por cima do prontuário ${pyStrValor(instancia.codigo)} - ${instancia.paciente || ''}. Nada foi gravado. Se é um paciente novo, clique em "Novo prontuário" e digite de novo; se é uma alteração, abra o paciente de novo pela pesquisa.` });
+    }
     const p = Object.assign(instancia ? Object.assign({}, instancia) : {}, form.valores);
     p.fk_clinica_id = usuario.fk_clinica_id;
     await modelo.salva(req, 'TbPacientes', p);

@@ -199,7 +199,15 @@ function CadastroProntuario(value){
     $('#modal_cadastrar').modal('toggle');
 }
 
+// Cada abertura de ficha (carregar um paciente ou começar um novo) ganha um número.
+// Uma resposta que chega depois de outra abertura é descartada: sem isso, um
+// paciente que ainda estava carregando (ex.: o último aberto, ao entrar na tela)
+// voltava para a tela por cima da ficha nova, e o "Salvar" gravava nele.
+var aberturaPaciente = 0;
+
 function NovoProntuario(){
+    aberturaPaciente++;
+    if ($selecionaPesquisa && $selecionaPesquisa[0]) $selecionaPesquisa[0].selectize.clear(true);
     ChangeIdPaciente(0);
     $.ajax({
         url: '/cadastros/paciente/NovoProntuario',
@@ -213,11 +221,13 @@ function NovoProntuario(){
 
 
 function CarregaPaciente(value){
+    var minhaAbertura = ++aberturaPaciente;
     $.ajax({
         url: 'CarregaPaciente',
         data: {paciente: value},
         method: 'GET',
     }).success(function Ret(data){
+        if (minhaAbertura !== aberturaPaciente) { return; }  // outra ficha foi aberta depois
         if(data.erro){
             swal('Erro', "Impossivel Carregar Prontuário", 'error');
         } else {
@@ -243,6 +253,22 @@ function CarregaPaciente(value){
 }
 
 
+// Duplo clique num homônimo: abre o prontuário que já existe. Os dados digitados
+// na ficha nova seriam trocados pelos dele (e o "Salvar" gravaria nele): confirma antes.
+function AbreHomonimo(id){
+    swal({
+        title: 'Abrir o prontuário existente?',
+        text: 'Os dados digitados na ficha nova serão descartados e a tela passará a mostrar o prontuário já cadastrado.',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Abrir o existente',
+        cancelButtonText: 'Continuar a ficha nova'
+    }).then(function () {
+        if (typeof box !== 'undefined' && box) { box.modal('hide'); }
+        CarregaPaciente(id);
+    }, function () {});
+}
+
 function Homonimos(paciente){
 
     if ($('.classPaciente #id_id').val()==='0' || $('.classPaciente #id_id').val()===''){
@@ -256,7 +282,7 @@ function Homonimos(paciente){
                     message: function(){
                         var msg = '<table class="table table-condensed table-hover"><thead><tr><th>Código</th><th>Nome</th><th>Idade</th><th>Nascimento</th></tr></thead><tbody>';
                         for (var i=0; i < data.success.length; i++){
-                            msg += "<tr ondblclick='CarregaPaciente("+ data.success[i].id +")'>" +
+                            msg += "<tr ondblclick='AbreHomonimo("+ data.success[i].id +")'>" +
                                 "<td>" + data.success[i].codigo   + "</td>" +
                                 "<td>" + data.success[i].paciente + "</td>" +
                                 "<td>" + data.success[i].idade    + "</td>" +
@@ -333,7 +359,11 @@ function SalvaProntuario() {
     })
     .done(function (data) {
 
-        if (data.erro === true) {
+        if (data.erro && data.mensagem) {
+
+            swal('Dados não salvos', data.mensagem, 'error');
+
+        } else if (Array.isArray(data.erro)) {
             $('.form-group').removeClass('has-error');
 
             for (var i = 0; i < data.erro.length; i++) {
@@ -354,6 +384,8 @@ function SalvaProntuario() {
                 .addClass('has-success');
 
             $('.classPaciente #id_id').val(pac.id);
+            // paciente novo recebe o código no servidor: a ficha passa a mostrar o código gravado
+            if (pac.codigo !== undefined && pac.codigo !== null) $('.classPaciente #id_codigo').val(pac.codigo);
             $('.classPaciente #id').val(pac.id);
             $('.classPaciente #id_disable').val(pac.id);
 

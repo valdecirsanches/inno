@@ -731,8 +731,14 @@ function ExcluirReceita(){
 
 
 
+// Cada abertura da ficha (editar um paciente ou adicionar um novo) ganha um número;
+// a resposta de uma abertura anterior que chegue atrasada é descartada (senão o
+// paciente anterior voltava para a ficha nova e o "Salvar" gravava por cima dele).
+var aberturaCadastro = 0;
+
 function CadastroProntuario(idProntuario){
     var id = idProntuario || 0;
+    var minhaAbertura = ++aberturaCadastro;
     if(idProntuario > 0){
         $.ajax({
             url: '/cadastros/paciente/CarregaPaciente',
@@ -744,6 +750,7 @@ function CadastroProntuario(idProntuario){
         });
 
         function RetCarrega(data){
+            if (minhaAbertura !== aberturaCadastro) { return; }
             if(data.erro){
                 swal(data.erro, 'Erro!', 'error');
             }
@@ -773,6 +780,7 @@ function CadastroProntuario(idProntuario){
             success: RetNovo,
         });
         function RetNovo(data){
+            if (minhaAbertura !== aberturaCadastro) { return; }
             if(data.erro){
                 toastr.error(data.erro, 'Erro!');
             } else {
@@ -799,7 +807,9 @@ function SalvaProntuario(){
         success: Ret,
     });
     function Ret(data){
-        if (data.erro){
+        if (data.erro && data.mensagem){
+            swal('Dados não salvos', data.mensagem, 'error');
+        } else if (data.erro){
             $('.form-group').removeClass('has-error');
             for (var i=0; i<data.erro.length; i++){
                 $('#id_'+data.erro[i]+'_div').addClass('has-error');
@@ -809,6 +819,7 @@ function SalvaProntuario(){
             data=data.success;
             $('.form-group').removeClass('has-error').addClass('has-success');
             $('#id_id').val(data.id);
+            if (data.codigo !== undefined && data.codigo !== null) $('#formCadastrar #id_codigo').val(data.codigo);
             selecionaPaciente.addOption(data);
             selecionaPaciente.setValue(data.id);
             $('#modalCadastrar').modal('hide');

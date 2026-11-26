@@ -2,6 +2,25 @@
   "LEIA": "Histórico de versões do AppClinic e do Inno (o mesmo arquivo nos dois). A primeira é a atual. Para uma versão nova use: node tools/versao/nova.js",
   "versoes": [
     {
+      "versao": "2.4.23",
+      "data": "26/11/2026",
+      "titulo": "Cadastro de paciente: ficha nova não grava mais por cima de outro",
+      "itens": [
+        {
+          "tipo": "correcao",
+          "texto": "Ao clicar em 'Novo prontuário' logo depois de abrir a tela (ou com um paciente ainda carregando), o paciente anterior podia voltar para a ficha e o 'Salvar' gravava os dados novos por cima dele. Agora a ficha nova fica limpa e o sistema recusa gravar uma ficha no prontuário de outro paciente."
+        },
+        {
+          "tipo": "melhoria",
+          "texto": "Duplo clique num homônimo pede confirmação antes de trocar a ficha pelo prontuário existente."
+        },
+        {
+          "tipo": "correcao",
+          "texto": "Recibo novo sempre ligado ao paciente da ficha; campos com erro voltam a ficar em vermelho ao salvar o paciente."
+        }
+      ]
+    },
+    {
       "versao": "2.4.22",
       "data": "24/11/2026",
       "titulo": "WhatsApp: estado real da conexão",

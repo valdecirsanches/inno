@@ -51,8 +51,8 @@ function NovoRecibo(){
         $('.classRecibo #id_fk_usuario').val(data.success.fk_usuario);
         // "Emitido por": mostra quem está incluindo o recibo
         $('.classRecibo #id_usuario').val(data.success.usuario || '');
-        $('.classRecibo #id_fk_paciente').val($('#id_id').val());
-        $('.classRecibo #id_paciente_nome').val($('#id_paciente').val());
+        $('.classRecibo #id_fk_paciente').val($('.classPaciente #id_id').val());
+        $('.classRecibo #id_paciente_nome').val($('.classPaciente #id_paciente').val());
         $('.classRecibo #id_valor').focus();
     });
 }

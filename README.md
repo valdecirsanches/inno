@@ -320,6 +320,16 @@ se for a do próprio administrador, ele continua conectado.
 O Inno reproduz até os erros do AppClinic, porque as telas contam com eles. As exceções, todas a favor do usuário:
 
 - Entrar pela página `/login/` direto não leva mais a uma página "não encontrada" (`/login/None`).
+- Cadastro de paciente (2.4.23): uma ficha nunca é gravada por cima de outro paciente. Na tela
+  de pacientes e na ficha da agenda, a resposta atrasada de um paciente aberto antes do
+  "Novo prontuário" é descartada (antes ela trazia o paciente de volta, com o ID dele, e o
+  "Salvar" gravava os dados novos nele). E o `SalvaPaciente` confere o código do prontuário
+  da tela com o do ID: se forem de pacientes diferentes, não grava nada e explica
+  (`{"erro": ["codigo"], "mensagem": "..."}`), depois da validação do formulário. Depois de
+  salvar, a ficha mostra o código gravado; o duplo clique num homônimo pede confirmação;
+  o recibo novo usa o paciente da ficha (antes lia o campo ID do próprio recibo); erro de
+  validação na tela de pacientes volta a marcar os campos (a tela esperava `erro === true`).
+  Teste: `node tools/testes/paciente-sobrepoe.js`.
 - Endereços chamados sem a barra final respondem direto, sem o redirecionamento extra.
 - A primeira vez que um usuário sem preferências salvas abre um paciente (ou a agenda), o Django dava erro. O Inno cria as preferências com os valores padrão.
 - Impressos: o nome do arquivo com acento (resumo de atendimentos) vai no formato MIME (`=?utf-8?b?...?=`), porque o Node não envia latin-1 cru no cabeçalho.

@@ -180,7 +180,9 @@ function SalvaProntuario(){
         },
         method: 'POST',
     }).success(function Ret(data){
-        if (data.erro){
+        if (data.erro && data.mensagem){
+            swal('Dados não salvos', data.mensagem, 'error');
+        } else if (data.erro){
             $('.form-group').removeClass('has-error');
             for (var i=0; i<data.erro.length; i++){
                 $('#id_'+data.erro[i]+'_div').addClass('has-error');
@@ -189,6 +191,7 @@ function SalvaProntuario(){
         } else if(data.success){
             $('.form-group').removeClass('has-error').addClass('has-success');
             $('#id_id').val(data.success.id);
+            if (data.success.codigo !== undefined && data.success.codigo !== null) $('#formCadastrar #id_codigo').val(data.success.codigo);
             // selecionaPaciente.addOption(data.success); #duvida
             // selecionaPaciente.setValue(data.success.id); #duvida
             $('#modalCadastrar').modal('hide');
